@@ -17,7 +17,7 @@ u64 Utils::shift_right(u64 board) { // Moving the board right a file
     return board >> 1;
 }
 
-bool Utils::piece_is_at_square(uint64_t board, int square) {
+bool Utils::piece_is_at_square(uint64_t board, int square) { // Checking whether a piece is at a given square on the provided board (can be added as any type of board, the entire or just one piece etc.)
     return (board & (1ULL << square)) != 0;
 }
 

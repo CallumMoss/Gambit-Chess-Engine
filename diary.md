@@ -1,0 +1,16 @@
+ 30/09/2024
+ Pushed work done over the summer (Board representation and move gen for knights, kings and some pawn moves, as well as progress made on sliders)
+
+ 30/09/2024 - 04/10/2024
+ Planning and further research conducted
+
+ 04/10/2024
+ Meeting with Eduard to discuss the project, talking about where we want to go with the project and whether it is feasible
+
+ 05/10/2024 - 11/10/2024
+ Planning thoroughly for self and project plan
+ Writing up project plan
+ Adding notes to daybook for later reference that didnt fit in the project plan
+
+ 11/10/2024
+ Added piece values and some comments

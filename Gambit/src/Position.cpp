@@ -145,6 +145,7 @@ void Position::print_position() {
     print_board(board);
 }
 
+// Converts the board state to a character array, which can be used by the print board function.
 std::array<char, 64> Position::board_to_char_array(u64 board) {
     std::array<char, 64> char_array;
     for (int i = 0; i < 64; i++) {
@@ -168,9 +169,8 @@ void Position::print_board(std::array<char, 64> board) {
     std::cout << "   A   B   C   D   E   F   G   H  " << std::endl << std::endl;
 }
 
+// Sets the turn to white or black
 void Position::set_turn(Turn turn) {this->turn = turn;}
-
-
 
 u64 Position::generate_pawn_attacks(int square) {
     // Generate pawn attacks
@@ -263,6 +263,7 @@ Final_Magic Position::find_magic(int square) {
     }
 }
 
+// Attemptps to make the table used for the precomputations of magic attacks
 bb_vector Position::create_magic_table(MagicEntry magic, int square) {
     bb_vector table(1 << magic.index_bits, 0ULL);
     u64 moves;
@@ -280,6 +281,7 @@ bb_vector Position::create_magic_table(MagicEntry magic, int square) {
     return table;
 }
 
+// Gets the piece type of a piece on a given square
 Piece Position::get_piece_type(int square) {
     u64 piece_pos = 1ULL << square;
     if(get_pawns() & piece_pos) {return Piece::PAWN;}
@@ -291,10 +293,12 @@ Piece Position::get_piece_type(int square) {
     else {return Piece::INVALID;} // If no piece on square
 }
 
+// Gets squares where pieces are that block the sliding piece from moving past it
 u64 Position::get_blockers(int square) {
     return Utils::ROOK_ATTACKS_NO_EDGES[square] & get_board();
 }
 
+// Gets squares where if a piece were on it, it would block the sliding piece from moving past it
 u64 Position::get_relevant_blocker_squares(int square) {
     return Utils::ROOK_ATTACKS_NO_EDGES[square];
 }
