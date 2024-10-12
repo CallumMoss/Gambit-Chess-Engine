@@ -28,12 +28,12 @@ enum Piece_Values
     // used 3 instead of 3.25 as knights
     // against weak opponents can sometimes be stronger than bishops,
     // but bishops are simply better at a higher level.
-    PAWN = 1,
-    KNIGHT = 3, 
-    BISHOP = 3,
-    ROOK = 5,
-    QUEEN = 9,
-    KING = INT_MAX
+    PAWN_VALUE = 1,
+    KNIGHT_VALUE = 3, 
+    BISHOP_VALUE = 3,
+    ROOK_VALUE = 5,
+    QUEEN_VALUE = 9,
+    KING_VALUE = INT_MAX
 };
 
 enum Colour

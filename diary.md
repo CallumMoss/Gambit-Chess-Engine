@@ -14,3 +14,6 @@
 
  11/10/2024
  Added piece values and some comments
+
+ 12/10/2024
+ Continued work on magics, should be done tomorrow, made some notes in daybook about what to do.

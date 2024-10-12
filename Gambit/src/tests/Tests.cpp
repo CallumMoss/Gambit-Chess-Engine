@@ -327,6 +327,7 @@ TEST(GEN_MOVES_VALIDATION, finding_magic) {
 	u64 blocker_squares = pos.get_relevant_blocker_squares(square);
 	Utils::PrintBB(blocker_squares, square, true);
 	Final_Magic magic = pos.find_magic(square);
+	std::cout << "Done";
 	std::cout << "\nMagic Number: " << magic.magic.magic_number << "\n";
 	for(size_t i = 0; i < magic.table.size(); i++) {
 		std::cout << magic.table[i] << "\n ########################################### \n";

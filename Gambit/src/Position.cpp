@@ -220,6 +220,16 @@ u64 Position::generate_pawn_attacks(int square) {
         58, 59, 59, 59, 59, 59, 59, 58
     };
 
+   extern U64 bishopAttacksEmptyBoard[64];
+    extern U64 rookAttacksEmptyBoard[64];
+    extern U64 bishopAttacksTable[64][1ULL << 9ULL]; // At any given time, a bishop can be blocked by up to 9 squares (think about a rook on a1 for example)
+    extern U64 rookAttacksTable[64][1ULL << 12ULL]; // At any given time, a rook can be blocked by up to 12 squares (think about a rook on a1 for example)
+
+    
+
+    u64 key = (blockers * magic.magic_number?) >> ROOK_SHIFTS[sq];
+    rookAttacksTable[sq][key] = rookAttacksSlow(sq, blockersArrangement);
+
     // Number of times to right shift bits in the magic process, such that the bits are moved to the right most bits, making multiplication by a magic number for effective at producing unique values
     // For example, a rook on a1 has 12 different squares that block its movement. Therefore, 64 - 12 = 52. So the 12th bit will move to 64, with the rest behind it.
     const int ROOK_SHIFTS[64] = {
@@ -263,15 +273,35 @@ Final_Magic Position::find_magic(int square) {
     }
 }
 
-// Attemptps to make the table used for the precomputations of magic attacks
+ size_t get_magic_index(MagicEntry magic, u64 blockers) {
+    blockers &= magic.mask; // ands this blocker combination with the block attack mask
+    // Perform the magic multiplication (wrapping multiply equivalent)
+    uint64_t hash = blockers * magic.magic_number;
+
+    // Calculate the index by shifting the hash
+    size_t index = static_cast<size_t>(hash >> (64 - magic.index_bits));
+
+    return index;
+ }
+
+// Attempts to make the table used for the precomputations of magic attacks
 bb_vector Position::create_magic_table(MagicEntry magic, int square) {
     bb_vector table(1 << magic.index_bits, 0ULL);
+    std::cout << table.size() << "\n";
     u64 moves;
-    int index;
+    for(u64 a : table) {
+        //Utils::Print_BB
+        std::cout << a << "\n";
+    }
     for(u64 blockers : get_blocker_combinations(magic.mask)) {
+        std::cout << "1\n";
         moves = pseudo_legalise_rook_attacks_slow(square, blockers);
-        index = ROOK_SHIFTS[square];
+        std::cout << "2\n";
+        // Calculate the table index based on the magic number
+        size_t index = get_magic_index(magic, blockers);
+        std::cout << "3\n";
         if(table[index] == 0ULL) { // if empty
+        std::cout << "4\n";
             table[index] = moves;
         }
         else if (table[index] != moves) { // if collision
