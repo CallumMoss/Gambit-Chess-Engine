@@ -17,3 +17,6 @@
 
  12/10/2024
  Continued work on magics, should be done tomorrow, made some notes in daybook about what to do.
+
+ 13/10/2024
+ Organised some code, ammended some errors on magics
