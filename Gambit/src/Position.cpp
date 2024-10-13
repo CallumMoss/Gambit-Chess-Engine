@@ -4,7 +4,6 @@
 #include <iostream>
 #include <array>
 #include <cstdint>
-#include <random>
 
 Position::Position(const std::string& fen):
     pieces(),
@@ -208,184 +207,6 @@ u64 Position::generate_pawn_attacks(int square) {
     return attacks;
 }
 
-    // Common Knowledge, however was found at this link: https://github.com/TiltedDFA/TDFA/blob/TestingVsMagicBBs/src/MagicBitboards.hpp
-    const int BISHOP_SHIFTS[64] = {
-        58, 59, 59, 59, 59, 59, 59, 58, 
-        59, 59, 59, 59, 59, 59, 59, 59, 
-        59, 59, 57, 57, 57, 57, 59, 59, 
-        59, 59, 57, 55, 55, 57, 59, 59, 
-        59, 59, 57, 55, 55, 57, 59, 59, 
-        59, 59, 57, 57, 57, 57, 59, 59, 
-        59, 59, 59, 59, 59, 59, 59, 59, 
-        58, 59, 59, 59, 59, 59, 59, 58
-    };
-
-   extern U64 bishopAttacksEmptyBoard[64];
-    extern U64 rookAttacksEmptyBoard[64];
-    extern U64 bishopAttacksTable[64][1ULL << 9ULL]; // At any given time, a bishop can be blocked by up to 9 squares (think about a rook on a1 for example)
-    extern U64 rookAttacksTable[64][1ULL << 12ULL]; // At any given time, a rook can be blocked by up to 12 squares (think about a rook on a1 for example)
-
-    
-
-    u64 key = (blockers * magic.magic_number?) >> ROOK_SHIFTS[sq];
-    rookAttacksTable[sq][key] = rookAttacksSlow(sq, blockersArrangement);
-
-    // Number of times to right shift bits in the magic process, such that the bits are moved to the right most bits, making multiplication by a magic number for effective at producing unique values
-    // For example, a rook on a1 has 12 different squares that block its movement. Therefore, 64 - 12 = 52. So the 12th bit will move to 64, with the rest behind it.
-    const int ROOK_SHIFTS[64] = {
-        52, 53, 53, 53, 53, 53, 53, 52, 
-        53, 54, 54, 54, 54, 54, 54, 53, 
-        53, 54, 54, 54, 54, 54, 54, 53, 
-        53, 54, 54, 54, 54, 54, 54, 53, 
-        53, 54, 54, 54, 54, 54, 54, 53, 
-        53, 54, 54, 54, 54, 54, 54, 53, 
-        53, 54, 54, 54, 54, 54, 54, 53, 
-        52, 53, 53, 53, 53, 53, 53, 52
-    };
-
-// Inspiration drawn from: https://analog-hors.github.io/site/magic-bitboards/
-Final_Magic Position::find_magic(int square) {
-    MagicEntry magic;
-    Final_Magic successful_magic;
-    const int index_bits = ROOK_SHIFTS[square];
-    bb_vector magic_table;
-
-    // Create a random device
-    std::random_device rd;
-
-    // Initialize a Mersenne Twister pseudo-random number generator
-    std::mt19937_64 gen(rd());
-
-    // Define the range of random numbers (inclusive)
-    std::uniform_int_distribution<uint64_t> dis(0, UINT64_MAX);
-    magic.mask = get_relevant_blocker_squares(square); // Bitboard of spaces where blockers would be an issue
-    magic.index_bits = ROOK_SHIFTS[square];
-    while(true) {
-        // Magics require a low number of active bits, so we AND
-        // by two more random values to cut down on the bits set.
-        magic.magic_number = dis(gen) & dis(gen) & dis(gen);
-        magic_table = create_magic_table(magic, square);
-        successful_magic.magic = magic;
-        if (magic_table.size() == ((std::size_t)(1 << index_bits))) { // if full table (meaning no collisions or missed computations)
-            successful_magic.table = magic_table;
-            return successful_magic;
-        }
-    }
-}
-
- size_t get_magic_index(MagicEntry magic, u64 blockers) {
-    blockers &= magic.mask; // ands this blocker combination with the block attack mask
-    // Perform the magic multiplication (wrapping multiply equivalent)
-    uint64_t hash = blockers * magic.magic_number;
-
-    // Calculate the index by shifting the hash
-    size_t index = static_cast<size_t>(hash >> (64 - magic.index_bits));
-
-    return index;
- }
-
-// Attempts to make the table used for the precomputations of magic attacks
-bb_vector Position::create_magic_table(MagicEntry magic, int square) {
-    bb_vector table(1 << magic.index_bits, 0ULL);
-    std::cout << table.size() << "\n";
-    u64 moves;
-    for(u64 a : table) {
-        //Utils::Print_BB
-        std::cout << a << "\n";
-    }
-    for(u64 blockers : get_blocker_combinations(magic.mask)) {
-        std::cout << "1\n";
-        moves = pseudo_legalise_rook_attacks_slow(square, blockers);
-        std::cout << "2\n";
-        // Calculate the table index based on the magic number
-        size_t index = get_magic_index(magic, blockers);
-        std::cout << "3\n";
-        if(table[index] == 0ULL) { // if empty
-        std::cout << "4\n";
-            table[index] = moves;
-        }
-        else if (table[index] != moves) { // if collision
-            return bb_vector(0);
-        }
-    }
-    return table;
-}
-
-// Gets the piece type of a piece on a given square
-Piece Position::get_piece_type(int square) {
-    u64 piece_pos = 1ULL << square;
-    if(get_pawns() & piece_pos) {return Piece::PAWN;}
-    else if (get_knights() & piece_pos) {return Piece::KNIGHT;}
-    else if (get_bishops() & piece_pos) {return Piece::BISHOP;}
-    else if (get_rooks() & piece_pos) {return Piece::ROOK;}
-    else if (get_queens() & piece_pos) {return Piece::QUEEN;}
-    else if (get_kings() & piece_pos) {return Piece::KING;}
-    else {return Piece::INVALID;} // If no piece on square
-}
-
-// Gets squares where pieces are that block the sliding piece from moving past it
-u64 Position::get_blockers(int square) {
-    return Utils::ROOK_ATTACKS_NO_EDGES[square] & get_board();
-}
-
-// Gets squares where if a piece were on it, it would block the sliding piece from moving past it
-u64 Position::get_relevant_blocker_squares(int square) {
-    return Utils::ROOK_ATTACKS_NO_EDGES[square];
-}
-
-bb_vector Position::get_blocker_combinations(u64 blockers) {
-    bb_vector blocker_combinations;
-    // Start from the full mask and generate all subsets
-    u64 subset = blockers;
-    do {
-        blocker_combinations.push_back(subset);
-        subset = (subset - 1) & blockers;  // Move to the next subset
-    } while (subset != blockers);  // Stop when we cycle back to the full mask
-
-    return blocker_combinations;
-}
-
-u64 Position::pseudo_legalise_rook_attacks_slow(int square, u64 blockers) {
-    // Shift in all directions until meet certain criteria
-    u64 attacks_after_blockers = 0;
-    int temp_square = 0; 
-    u64 temp_bb;
-
-    for(temp_square = square + 1; (temp_square) % 8 != 0; temp_square++) { // Checking Right
-        temp_bb = 1ULL << temp_square;
-        attacks_after_blockers |= temp_bb;
-        if((blockers & temp_bb) && (temp_square != square)) {
-            break;
-        }
-    }
-
-    for(temp_square = square - 1; (temp_square + 1) % 8 != 0 && temp_square >= 0; temp_square--) { // Checking Left
-        temp_bb = 1ULL << temp_square;
-        attacks_after_blockers |= temp_bb;
-        if((blockers & temp_bb) && (temp_square != square)) {
-            break;
-        }
-    }   
-
-    for(temp_square = square; temp_square < 64; temp_square += 8) { // Checking Up
-        temp_bb = 1ULL << temp_square;
-        attacks_after_blockers |= temp_bb;
-        if((blockers & temp_bb) && (temp_square != square)) {
-            break;
-        }
-    }
-
-    for(temp_square = square; temp_square > 0; temp_square -= 8) { // Checking Down
-        temp_bb = 1ULL << temp_square;
-        attacks_after_blockers |= temp_bb;
-        if((blockers & temp_bb) && (temp_square != square)) {
-            break;
-        }
-    }
-    attacks_after_blockers ^= 1ULL << square; // Remove current square
-    return attacks_after_blockers; // Actual location of blocking pieces
-}
-
 //////////////////////////////////
 
 // bb_vector Position::pseudo_legalise_rook_attacks(int square, u64 attacks) {
@@ -405,6 +226,20 @@ u64 Position::pseudo_legalise_rook_attacks_slow(int square, u64 blockers) {
 //     find_magic(new_attacks, square); //////////////////////////////////////////////////////////////////////////////////////
 //     return bb_vector(0);
 // }
+
+// Gets the piece type of a piece on a given square
+Piece Position::get_piece_type(int square) {
+    u64 piece_pos = 1ULL << square;
+    if(get_pawns() & piece_pos) {return Piece::PAWN;}
+    else if (get_knights() & piece_pos) {return Piece::KNIGHT;}
+    else if (get_bishops() & piece_pos) {return Piece::BISHOP;}
+    else if (get_rooks() & piece_pos) {return Piece::ROOK;}
+    else if (get_queens() & piece_pos) {return Piece::QUEEN;}
+    else if (get_kings() & piece_pos) {return Piece::KING;}
+    else {return Piece::INVALID;} // If no piece on square
+}
+
+
 
 bb_vector Position::extract_piece_moves(u64 attacks) {
     bb_vector attacks_vector;  // Use a vector for dynamic storage

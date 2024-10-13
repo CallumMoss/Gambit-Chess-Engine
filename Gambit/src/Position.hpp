@@ -11,17 +11,6 @@ enum class Turn: u8 {
     WHITE,
     BLACK
 };
-struct MagicEntry {
-    u64 mask;
-    u64 magic_number;
-    int index_bits; // Could probably use a u8 for smaller data type but this keeps it simple
-};
-
-struct Final_Magic {
-    bb_vector table;
-    MagicEntry magic;
-};
-
 class Position { // Game state class
     public:
         Position(const std::string& fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -31,17 +20,9 @@ class Position { // Game state class
         void print_board(std::array<char, 64> board);
 
         u64 generate_pawn_attacks(int square);
-        u64 get_relevant_rook_blockers(int square, u64 attacks);
-        u64 get_blockers(int square);
-        bb_vector get_blocker_combinations(u64 blockers);
-        bb_vector get_attacks_after_blockers(int square, u64 attacks, bb_vector blocking_squares);
-        u64 pseudo_legalise_rook_attacks_slow(int square, u64 attacks);
         bb_vector pseudo_legalise_rook_attacks(int square, u64 attacks);
         std::vector<u64> generate_piece_moves(int square, Piece type);
         std::vector<u64> extract_piece_moves(u64 attacks);
-        Final_Magic find_magic(int square);
-        bb_vector create_magic_table(MagicEntry magic, int square);
-        u64 get_relevant_blocker_squares(int square);
 
         Piece get_piece_type(int square);
         std::array<u64, 6> get_pieces();

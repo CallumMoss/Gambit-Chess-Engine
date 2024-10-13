@@ -57,7 +57,8 @@ namespace Utils {
     bool piece_is_at_square(uint64_t board, int square);
     u64 get_ls1b(u64 board); // gets the least significant bit that is 1 (furthest right in bitstring)
     void PrintBB(u64 board, int board_center, bool mirrored);
-
+    int count_number_of_1bs(u64 board);
+    int find_piece_index(u64 bitboard);
     // Credit for precomputations of KNIGHT_ATTACKS and KING_ATTACKS to https://github.com/simpleguy747/MollyChessBot/blob/initial-commit-fen-parser/src/attacks.c
     // A knight's attacks for any given square is all the pseudo-legal squares it could move to (meaning it doesnt take into account whether your own pieces are on those squares etc)
     constexpr u64 KNIGHT_ATTACKS[64] = {

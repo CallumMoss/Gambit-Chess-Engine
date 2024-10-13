@@ -21,11 +21,14 @@ bool Utils::piece_is_at_square(uint64_t board, int square) { // Checking whether
     return (board & (1ULL << square)) != 0;
 }
 
-// Find position on board from the ls1b
-// Use this to determine whether there is a piece of same colour on corresponding square (can check if & 1 << square_of_ls1b)
+int Utils::count_number_of_1bs(u64 board) {
+    return __builtin_popcountll(board);
+}
 
+// Use this to determine whether there is a piece of same colour on corresponding square (can check if & 1 << square_of_ls1b)
+// Finds the position of the ls1b
 // Credit to https://www.chessprogramming.org/BitScan#DeBruijnMultiplation and Reference: Hacker's Delight by Henry S. Warren, Jr. and ChatGPT
-int find_piece_index(u64 bitboard) {
+int Utils::find_piece_index(u64 bitboard) {
     static const int index64[64] = {
          0,  1, 48,  2, 57, 49, 28,  3,
         61, 58, 50, 42, 38, 29, 17,  4,
