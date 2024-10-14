@@ -310,29 +310,49 @@ TEST(GEN_MOVES_VALIDATION, pawns_forward_double) {
 // 	}
 // }
 
-// Manually reviewing rook moves (passes regardless)
-TEST(GEN_MOVES_VALIDATION, rook_no_edges_precalculations) {
+// Manually reviewing bishop moves (passes regardless)
+TEST(GEN_MOVES_VALIDATION, bishop_no_edges_precalculations) {
 	Position pos = Position();
 	pos.set_turn(Turn::WHITE);
 	for(int i = 0; i < 64; i++) {
-		Utils::PrintBB(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
+		Utils::PrintBB(Utils::BISHOP_ATTACKS_NO_EDGES[i], i, true);
 	}
 }
 
-// Manually reviewing rook moves (passes regardless)
-TEST(GEN_MOVES_VALIDATION, finding_magic) {
+// Manually reviewing bishop moves (passes regardless)
+TEST(GEN_MOVES_VALIDATION, queen_no_edges_precalculations) {
 	Position pos = Position();
 	pos.set_turn(Turn::WHITE);
-	int square = 0;
-	u64 blocker_squares = pos.get_relevant_blocker_squares(square);
-	Utils::PrintBB(blocker_squares, square, true);
-	Final_Magic magic = pos.find_magic(square);
-	std::cout << "Done";
-	std::cout << "\nMagic Number: " << magic.magic.magic_number << "\n";
-	for(size_t i = 0; i < magic.table.size(); i++) {
-		std::cout << magic.table[i] << "\n ########################################### \n";
+	for(int i = 0; i < 64; i++) {
+		u64 queen_attacks = Utils::BISHOP_ATTACKS_NO_EDGES[i] | Utils::ROOK_ATTACKS_NO_EDGES[i];
+		std::cout << queen_attacks << std::endl;
+		Utils::PrintBB(queen_attacks, i, true);
 	}
 }
+
+// // Manually reviewing rook moves (passes regardless)
+// TEST(GEN_MOVES_VALIDATION, rook_no_edges_precalculations) {
+// 	Position pos = Position();
+// 	pos.set_turn(Turn::WHITE);
+// 	for(int i = 0; i < 64; i++) {
+// 		Utils::PrintBB(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
+// 	}
+// }
+
+// // Manually reviewing rook moves (passes regardless)
+// TEST(GEN_MOVES_VALIDATION, finding_magic) {
+// 	Position pos = Position();
+// 	pos.set_turn(Turn::WHITE);
+// 	int square = 0;
+// 	u64 blocker_squares = pos.get_relevant_blocker_squares(square);
+// 	Utils::PrintBB(blocker_squares, square, true);
+// 	Final_Magic magic = pos.find_magic(square);
+// 	std::cout << "Done";
+// 	std::cout << "\nMagic Number: " << magic.magic.magic_number << "\n";
+// 	for(size_t i = 0; i < magic.table.size(); i++) {
+// 		std::cout << magic.table[i] << "\n ########################################### \n";
+// 	}
+// }
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

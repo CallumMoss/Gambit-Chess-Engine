@@ -21,14 +21,14 @@ struct Final_Magic {
 };
 namespace Magics {
     u64 get_relevant_rook_blockers(int square, u64 attacks);
-    u64 get_blockers(int square);
+    u64 get_blockers(int square, u64 board);
     bb_vector get_blocker_combinations(u64 blockers);
     bb_vector get_attacks_after_blockers(int square, u64 attacks, bb_vector blocking_squares);
     u64 pseudo_legalise_rook_attacks_slow(int square, u64 attacks);
 
-    std::vector<u64> create_blocker_bitboards(u64 moves);
-    Final_Magic find_magic(int square);
-    bb_vector create_magic_table(MagicEntry magic, int square);
-    u64 get_relevant_blocker_squares(int square);
+    Final_Magic find_magic(Piece piece_type, int square);
+    bb_vector create_magic_table(Piece piece_type, MagicEntry magic, int square);
+    u64 get_relevant_blocker_squares(Piece piece_type, int square);
+    size_t get_magic_index(MagicEntry magic, u64 blockers);
 }
 #endif // #ifndef MAGICS_HPP
