@@ -320,15 +320,26 @@ TEST(GEN_MOVES_VALIDATION, bishop_no_edges_precalculations) {
 }
 
 // Manually reviewing bishop moves (passes regardless)
-TEST(GEN_MOVES_VALIDATION, queen_no_edges_precalculations) {
+TEST(GEN_MOVES_VALIDATION, queen_precalculations) {
 	Position pos = Position();
 	pos.set_turn(Turn::WHITE);
 	for(int i = 0; i < 64; i++) {
-		u64 queen_attacks = Utils::BISHOP_ATTACKS_NO_EDGES[i] | Utils::ROOK_ATTACKS_NO_EDGES[i];
+		u64 queen_attacks = Utils::BISHOP_ATTACKS[i] | Utils::ROOK_ATTACKS[i];
 		std::cout << queen_attacks << std::endl;
-		Utils::PrintBB(queen_attacks, i, true);
+		//Utils::PrintBB(queen_attacks, i, true);
 	}
 }
+
+// // Manually reviewing bishop moves (passes regardless)
+// TEST(GEN_MOVES_VALIDATION, queen_no_edges_precalculations) {
+// 	Position pos = Position();
+// 	pos.set_turn(Turn::WHITE);
+// 	for(int i = 0; i < 64; i++) {
+// 		u64 queen_attacks = Utils::BISHOP_ATTACKS_NO_EDGES[i] | Utils::ROOK_ATTACKS_NO_EDGES[i];
+// 		std::cout << queen_attacks << std::endl;
+// 		//Utils::PrintBB(queen_attacks, i, true);
+// 	}
+// }
 
 // // Manually reviewing rook moves (passes regardless)
 // TEST(GEN_MOVES_VALIDATION, rook_no_edges_precalculations) {
