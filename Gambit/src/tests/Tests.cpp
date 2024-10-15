@@ -133,60 +133,60 @@ TEST(FEN_And_Pos_Rep, complex_position) {
 // 	}
 // }
 // Manually reviewing precomputations (passes regardless)
-TEST(PRECOMPUTATION_VALIDATION, knight_move_extraction) {
-	Position pos = Position();
-	int i = 30;
-	std::vector<u64> moves = pos.generate_piece_moves(i, Piece::KNIGHT);
-	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-		Utils::PrintBB(moves[q], i, true);
-	}
-}
+// TEST(PRECOMPUTATION_VALIDATION, knight_move_extraction) {
+// 	Position pos = Position();
+// 	int i = 30;
+// 	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::KNIGHT, i);
+// 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
+// 		Utils::PrintBB(moves[q], i, true);
+// 	}
+// }
 
-// Manually reviewing precomputations (passes regardless)
-TEST(PRECOMPUTATION_VALIDATION, bishop_move_extraction) {
-	Position pos = Position();
-	int i = 30;
-	std::vector<u64> moves = pos.generate_piece_moves(i, Piece::BISHOP);
-	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-		Utils::PrintBB(moves[q], i, true);
-	}
-}
+// // Manually reviewing precomputations (passes regardless)
+// TEST(PRECOMPUTATION_VALIDATION, bishop_move_extraction) {
+// 	Position pos = Position();
+// 	int i = 30;
+// 	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::BISHOP, i);
+// 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
+// 		Utils::PrintBB(moves[q], i, true);
+// 	}
+// }
 
-// Manually reviewing precomputations (passes regardless)
-TEST(PRECOMPUTATION_VALIDATION, rook_move_extraction) {
-	Position pos = Position();
-	int i = 30;
-	std::vector<u64> moves = pos.generate_piece_moves(i, Piece::ROOK);
-	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-		Utils::PrintBB(moves[q], i, true);
-	}
-}
+// // Manually reviewing precomputations (passes regardless)
+// TEST(PRECOMPUTATION_VALIDATION, rook_move_extraction) {
+// 	Position pos = Position("8/8/8/8/6R1/8/8/8 w - - 0 1");
+// 	int i = 30;
+// 	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::ROOK, i);
+// 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
+// 		Utils::PrintBB(moves[q], i, true);
+// 	}
+// }
 
-// Manually reviewing precomputations (passes regardless)
-TEST(PRECOMPUTATION_VALIDATION, queen_move_extraction) {
-	Position pos = Position();
-	int i = 30;
-	std::vector<u64> moves = pos.generate_piece_moves(i, Piece::QUEEN);
-	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-		Utils::PrintBB(moves[q], i, true);
-	}
-}
+// // Manually reviewing precomputations (passes regardless)
+// TEST(PRECOMPUTATION_VALIDATION, queen_move_extraction) {
+// 	Position pos = Position();
+// 	int i = 30;
+// 	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::QUEEN, i);
+// 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
+// 		Utils::PrintBB(moves[q], i, true);
+// 	}
+// }
 
-// Manually reviewing precomputations (passes regardless)
-TEST(PRECOMPUTATION_VALIDATION, king_move_extraction) {
-	Position pos = Position();
-	int i = 30;
-	std::vector<u64> moves = pos.generate_piece_moves(i, Piece::KING);
-	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-		Utils::PrintBB(moves[q], i, true);
-	}
-}
+// // Manually reviewing precomputations (passes regardless)
+// TEST(PRECOMPUTATION_VALIDATION, king_move_extraction) {
+// 	Position pos = Position();
+// 	int i = 30;
+// 	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::KING, i);
+// 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
+// 		Utils::PrintBB(moves[q], i, true);
+// 	}
+// }
 
 // Manually reviewing pawn moves (passes regardless)
 TEST(GEN_MOVES_VALIDATION, pawns) {
 	Position pos = Position();
 	int i = 12;
-	std::vector<u64> moves = pos.generate_piece_moves(i, Piece::PAWN);
+	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::PAWN, i);
 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 		Utils::PrintBB(moves[q], i, true);
 	}
@@ -196,7 +196,7 @@ TEST(GEN_MOVES_VALIDATION, pawns) {
 TEST(GEN_MOVES_VALIDATION, pawns_diagonal) {
 	Position pos = Position();
 	int i = 12 + (4*8);
-	std::vector<u64> moves = pos.generate_piece_moves(i, Piece::PAWN);
+	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::PAWN, i);
 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 		Utils::PrintBB(moves[q], i, true);
 	}
@@ -207,7 +207,7 @@ TEST(GEN_MOVES_VALIDATION, pawns_black) {
 	Position pos = Position();
 	pos.set_turn(Turn::BLACK);
 	int i = 12 + (5*8);
-	std::vector<u64> moves = pos.generate_piece_moves(i, Piece::PAWN);
+	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::PAWN, i);
 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 		Utils::PrintBB(moves[q], i, true);
 	}
@@ -218,7 +218,7 @@ TEST(GEN_MOVES_VALIDATION, pawns_black_diagonal) {
 	Position pos = Position();
 	pos.set_turn(Turn::BLACK);
 	int i = 20;
-	std::vector<u64> moves = pos.generate_piece_moves(i, Piece::PAWN);
+	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::PAWN, i);
 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 		Utils::PrintBB(moves[q], i, true);
 	}
@@ -229,7 +229,7 @@ TEST(GEN_MOVES_VALIDATION, pawns_forward_double) {
 	Position pos = Position();
 	pos.set_turn(Turn::WHITE);
 	int i = 20;
-	std::vector<u64> moves = pos.generate_piece_moves(i, Piece::PAWN);
+	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::PAWN, i);
 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 		Utils::PrintBB(moves[q], i, true);
 	}
@@ -327,7 +327,7 @@ TEST(GEN_MOVES_VALIDATION, queen_precalculations) {
 	for(int i = 0; i < 64; i++) {
 		u64 queen_attacks = Utils::BISHOP_ATTACKS[i] | Utils::ROOK_ATTACKS[i];
 		std::cout << queen_attacks << std::endl;
-		//Utils::PrintBB(queen_attacks, i, true);
+		Utils::PrintBB(queen_attacks, i, true);
 	}
 }
 
@@ -367,21 +367,48 @@ TEST(GEN_MOVES_VALIDATION, queen_precalculations) {
 // }
 
 // Tests finding of magics
-TEST(GEN_MOVES_VALIDATION, find_magic) {
-	// 8/3N4/1p3P2/8/3B4/5p2/5P2/8 w - - 0 1 Bishop testing position
-	Position pos = Position("8/3P4/5p2/8/2pR4/5P2/8/3p4 w - - 0 1");
-	pos.set_turn(Turn::WHITE);
-	int i = 27;
-	Final_Magic fm = Magics::find_magic(Piece::ROOK, i);
-	u64 attacks = fm.table[Magics::get_magic_index(fm.magic, Magics::get_blockers(i, pos.get_board()))];
-	Utils::PrintBB(pos.get_board(), i, true);
-	Utils::PrintBB(Utils::ROOK_ATTACKS[i], i, true);
-	Utils::PrintBB(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
-	Utils::PrintBB(Magics::get_blockers(i, pos.get_board()), i, true);
-	Utils::PrintBB(attacks, i, true);
+// TEST(GEN_MOVES_VALIDATION, find_magic) {
+// 	// 8/3N4/1p3P2/8/3B4/5p2/5P2/8 w - - 0 1 Bishop testing position
+// 	Position pos = Position("8/3P4/5p2/8/2pR4/5P2/8/3p4 w - - 0 1");
+// 	pos.set_turn(Turn::WHITE);
+// 	int i = 27;
+// 	Final_Magic fm = Magics::find_magic(Piece::ROOK, i);
+// 	u64 attacks = fm.table[Magics::get_magic_index(fm.magic, Magics::get_blockers(i, pos.get_board()))];
+// 	Utils::PrintBB(pos.get_board(), i, true);
+// 	Utils::PrintBB(Utils::ROOK_ATTACKS[i], i, true);
+// 	Utils::PrintBB(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
+// 	Utils::PrintBB(Magics::get_blockers(i, pos.get_board()), i, true);
+// 	Utils::PrintBB(attacks, i, true);
+// }
 
-	// Need to check if a given piece is on a square before calling it
+// // Tests finding of magics
+// TEST(GEN_MOVES_VALIDATION, getting_magics) {
+// 	// I used this function to get the magics:
+// 	Position pos = Position();
+// 	Magics::init(pos);
+// 	for(Final_Magic magic : rook_magics_table) {
+// 		std::cout << magic.magic.magic_number << std::endl;
+// 	}
+// }
+
+TEST(GEN_MOVES_VALIDATION, using_generated_magics) {
+	Position pos = Position();
+	Magics::init(pos);
+	for(Final_Magic magic : rook_magics_table) {
+		std::cout << magic.magic.magic_number << std::endl;
+	}
 }
+
+// // Tests finding of magics
+// TEST(GEN_MOVES_VALIDATION, testing_move_gen) {
+// 	Position pos = Position("8/3P4/5p2/8/2pR1P2/5P2/8/3p4 w - - 0 1");
+// 	Magics::init(pos);
+// 	int square = 27;
+// 	bb_vector moves = pos.generate_piece_moves(pos, Piece::ROOK, square);
+// 	for(u64 move : moves) {
+// 		Utils::PrintBB(move, square, true);
+// 	}
+// }
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

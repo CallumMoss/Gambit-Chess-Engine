@@ -1,4 +1,5 @@
 #include "Position.hpp"
+#include "Magics.hpp"
 #include <vector>
 #include <sstream>
 #include <iostream>
@@ -240,7 +241,7 @@ Piece Position::get_piece_type(int square) {
 }
 
 
-
+// Should probably be private
 bb_vector Position::extract_piece_moves(u64 attacks) {
     bb_vector attacks_vector;  // Use a vector for dynamic storage
     while (attacks) {
@@ -256,8 +257,42 @@ bb_vector Position::extract_piece_moves(u64 attacks) {
     return attacks_vector;
 }
 
-bb_vector Position::generate_piece_moves(int square, Piece type) { // will be used when searching for both sides, so will use Turn.
+std::vector<bb_vector> Position::generate_all_moves(Position pos) // uses the board state to generate all moves for a given colour 
+    {
+        std::vector<bb_vector> moves;
+        u64 pieces;
+        if(pos.get_turn() == Turn::WHITE) {
+            pieces = pos.get_white_pieces();
+        }
+        else {
+            pieces = pos.get_black_pieces();
+        }
+        bb_vector square_moves;
+        bb_vector empty_vector; // no moves for this square as the player whos turn it is does not have a piece on it
+        for(int square = 0; square < 64; square++) {
+            if(1ULL << square & pieces) { // if the person whos turn it is has a piece on this square, gen its moves
+                Piece piece_type = pos.get_piece_type(square);
+                square_moves = pos.generate_piece_moves(pos, piece_type, square);
+                moves.push_back(square_moves);
+                continue;
+            }
+            moves.push_back(empty_vector);
+        }
+        return moves;
+    }
+
+u64 Position::get_rook_moves(int square, u64 blockers) {
+    // Returns the long table of moves for a rook on that square. To choose which ones apply, you should return 
+    Final_Magic fm = rook_magics_table[square];
+    return fm.table[Magics::get_magic_index(fm.magic, blockers)];
+}
+
+	// Final_Magic fm = Magics::find_magic(Piece::ROOK, i);
+	// u64 attacks = fm.table[Magics::get_magic_index(fm.magic, Magics::get_blockers(i, pos.get_board()))];
+
+bb_vector Position::generate_piece_moves(Position pos, Piece type, int square) { // will be used when searching for both sides, so will use Turn.
     u64 attacks = 0ULL;
+    u64 blockers = 0ULL;
     switch(type) {
         case Piece::PAWN:
             attacks = generate_pawn_attacks(square);
@@ -269,8 +304,8 @@ bb_vector Position::generate_piece_moves(int square, Piece type) { // will be us
             attacks = Utils::BISHOP_ATTACKS[square];
             break;
         case Piece::ROOK:
-            attacks = Utils::ROOK_ATTACKS[square];
-            //attacks = pseudo_legalise_rook_attacks(square, attacks);
+            blockers = Magics::get_blockers(square, pos.get_board());
+            attacks = get_rook_moves(square, blockers);
             break;
         case Piece::QUEEN:
             attacks = Utils::QUEEN_ATTACKS[square];
@@ -279,7 +314,7 @@ bb_vector Position::generate_piece_moves(int square, Piece type) { // will be us
             attacks = Utils::KING_ATTACKS[square];
             break;
         case Piece::INVALID:
-            throw std::invalid_argument("Recieved invalid piece type");
+            attacks = 0;
             break;
     }
     if(turn == Turn::WHITE) {
