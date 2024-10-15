@@ -20,7 +20,6 @@ struct Final_Magic {
     MagicEntry magic;
 };
 namespace Magics {
-    u64 get_relevant_rook_blockers(int square, u64 attacks);
     u64 get_blockers(int square, u64 board);
     bb_vector get_blocker_combinations(u64 blockers);
     bb_vector get_attacks_after_blockers(int square, u64 attacks, bb_vector blocking_squares);

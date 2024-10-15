@@ -48,9 +48,11 @@
         52, 53, 53, 53, 53, 53, 53, 52
     };
 
+
+
+
 // Inspiration drawn from: https://analog-hors.github.io/site/magic-bitboards/
 Final_Magic Magics::find_magic(Piece piece_type, int square) {
-    
     MagicEntry magic;
     magic.mask = get_relevant_blocker_squares(piece_type, square); // Bitboard of spaces where blockers would be an issue if occupied (get_blockers gets the occupied)
     magic.index_bits = Utils::count_number_of_1bs(magic.mask);

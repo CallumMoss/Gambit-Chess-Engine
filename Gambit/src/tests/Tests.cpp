@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "../Position.hpp"
 #include "../utils.hpp"
+#include "../Magics.hpp"
 #include <iostream>
 
 // Testing getters and FEN parser.
@@ -364,6 +365,23 @@ TEST(GEN_MOVES_VALIDATION, queen_precalculations) {
 // 		std::cout << magic.table[i] << "\n ########################################### \n";
 // 	}
 // }
+
+// Tests finding of magics
+TEST(GEN_MOVES_VALIDATION, find_magic) {
+	// 8/3N4/1p3P2/8/3B4/5p2/5P2/8 w - - 0 1 Bishop testing position
+	Position pos = Position("8/3P4/5p2/8/2pR4/5P2/8/3p4 w - - 0 1");
+	pos.set_turn(Turn::WHITE);
+	int i = 27;
+	Final_Magic fm = Magics::find_magic(Piece::ROOK, i);
+	u64 attacks = fm.table[Magics::get_magic_index(fm.magic, Magics::get_blockers(i, pos.get_board()))];
+	Utils::PrintBB(pos.get_board(), i, true);
+	Utils::PrintBB(Utils::ROOK_ATTACKS[i], i, true);
+	Utils::PrintBB(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
+	Utils::PrintBB(Magics::get_blockers(i, pos.get_board()), i, true);
+	Utils::PrintBB(attacks, i, true);
+
+	// Need to check if a given piece is on a square before calling it
+}
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
