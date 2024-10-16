@@ -208,26 +208,6 @@ u64 Position::generate_pawn_attacks(int square) {
     return attacks;
 }
 
-//////////////////////////////////
-
-// bb_vector Position::pseudo_legalise_rook_attacks(int square, u64 attacks) {
-// // Uninterrupted attack mask (standard lookup from the ROOK_ATTACKS etc)
-// // Relevant blocking squares mask (if another piece would on this, itd block the rook from getting past)
-// // Actual squares of blocking pieces (occupancy bitboard) by & with board mask
-// // Multiply by magic number to access lookup table
-// // Use this index to get the attack mask for the rook on a1, considering the occupancy bitboard.
-
-// // 1. attacks
-// // 2. 
-//     // Shift in all directions until meet certain criteria
-//     u64 blocking_squares = get_blockers(square);
-//     bb_vector new_attacks = get_attacks_after_blockers(square, attacks, get_blocker_combinations(blocking_squares));
-//     // pass in vector
-
-//     find_magic(new_attacks, square); //////////////////////////////////////////////////////////////////////////////////////
-//     return bb_vector(0);
-// }
-
 // Gets the piece type of a piece on a given square
 Piece Position::get_piece_type(int square) {
     u64 piece_pos = 1ULL << square;
@@ -281,10 +261,19 @@ std::vector<bb_vector> Position::generate_all_moves(Position pos) // uses the bo
         return moves;
     }
 
-u64 Position::get_rook_moves(int square, u64 blockers) {
+u64 Position::get_rook_moves(Position pos, int square) {
     // Returns the long table of moves for a rook on that square. To choose which ones apply, you should return 
-    Final_Magic fm = rook_magics_table[square];
-    return fm.table[Magics::get_magic_index(fm.magic, blockers)];
+    bb_vector attacks_on_square = rook_magics_table[square];
+    MagicEntry magic;
+    magic.magic_number = rook_magics[square];
+    magic.mask = Magics::get_relevant_blocker_squares(Piece::ROOK, square);
+    magic.index_bits = Utils::count_number_of_1bs(magic.mask);
+    u64 blockers = Magics::get_blockers(Piece::ROOK, square, pos.get_board());
+    u64 attacks = attacks_on_square[Magics::get_magic_index(magic, blockers)];
+    if(get_turn() == Turn::WHITE) {
+        return attacks & ~get_white_pieces();
+    }
+    return attacks & ~get_black_pieces();
 }
 
 	// Final_Magic fm = Magics::find_magic(Piece::ROOK, i);
@@ -304,8 +293,7 @@ bb_vector Position::generate_piece_moves(Position pos, Piece type, int square) {
             attacks = Utils::BISHOP_ATTACKS[square];
             break;
         case Piece::ROOK:
-            blockers = Magics::get_blockers(square, pos.get_board());
-            attacks = get_rook_moves(square, blockers);
+            attacks = get_rook_moves(pos, square);
             break;
         case Piece::QUEEN:
             attacks = Utils::QUEEN_ATTACKS[square];

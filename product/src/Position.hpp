@@ -20,7 +20,7 @@ class Position { // Game state class
         void print_board(std::array<char, 64> board);
 
         u64 generate_pawn_attacks(int square);
-        u64 get_rook_moves(int square, u64 blockers);
+        u64 get_rook_moves(Position pos, int square);
         std::vector<bb_vector> generate_all_moves(Position pos);
         bb_vector generate_piece_moves(Position pos, Piece type, int square);
         std::vector<u64> extract_piece_moves(u64 attacks);

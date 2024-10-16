@@ -381,6 +381,7 @@ TEST(GEN_MOVES_VALIDATION, queen_precalculations) {
 // 	Utils::PrintBB(attacks, i, true);
 // }
 
+// ARCHIVED:
 // // Tests finding of magics
 // TEST(GEN_MOVES_VALIDATION, getting_magics) {
 // 	// I used this function to get the magics:
@@ -391,11 +392,47 @@ TEST(GEN_MOVES_VALIDATION, queen_precalculations) {
 // 	}
 // }
 
-TEST(GEN_MOVES_VALIDATION, using_generated_magics) {
-	Position pos = Position();
-	Magics::init(pos);
-	for(Final_Magic magic : rook_magics_table) {
-		std::cout << magic.magic.magic_number << std::endl;
+// TEST(GEN_MOVES_VALIDATION, using_generated_magics) {
+// 	Position pos = Position();
+// 	Magics::init();
+// 	int square = 0;
+// 	bb_vector attack_table_for_square = rook_magics_table[square];
+// 	// for(int i = 0; i < (int)attack_table_for_square.size(); i++) {
+// 	// 	Utils::PrintBB(attack_table_for_square[i], square, true);
+// 	// }
+// }
+
+// TEST(GEN_MOVES_VALIDATION, using_generated_magics) {
+// 	// For an empty board
+// 	Position pos = Position();
+// 	Magics::init(pos);
+// 	int square = 0;
+// 	bb_vector attack_table_for_square = rook_magics_table[square];
+// 	for(int i = 0; i < (int)attack_table_for_square.size(); i++) {
+// 		std::cout << i << std::endl;
+// 		Utils::PrintBB(attack_table_for_square[i], square, true);
+// 	}
+// }
+
+TEST(GEN_MOVES_VALIDATION, using_generated_magics2)
+{
+	Position pos = Position("8/3P4/5p2/8/2pR1P2/5P2/8/3p4 w - - 0 1");
+	Magics::init();
+	int square = 27;
+	std::cout << "Hey\n";
+	u64 rook_moves = pos.get_rook_moves(pos, square);
+	Utils::PrintBB(rook_moves, square, true);
+}
+
+TEST(GEN_MOVES_VALIDATION, using_generated_magics3)
+{
+	Position pos = Position("8/3P4/5p2/8/2pR1P2/5P2/8/3p4 w - - 0 1");
+	Magics::init();
+	int square = 27;
+	std::cout << "Hey\n";
+	bb_vector rook_moves = pos.generate_piece_moves(pos, Piece::ROOK, square);
+	for(u64 rook_move : rook_moves) {
+		Utils::PrintBB(rook_move, square, true);
 	}
 }
 
