@@ -23,6 +23,18 @@ u64 rook_magics[64] = {
     144115785080525314ULL, 18156261281402946ULL, 844460107767809ULL, 9433845737718017ULL, 2306407144847057026ULL, 10414866196203529ULL, 281517926417409ULL, 108091889697235978ULL
 };
 
+u64 bishop_magics[64] = {
+    153131183432040961ULL, 2199562813440ULL, 216190374366942208ULL, 80814256751620ULL, 19142669305381122ULL, 9663709184ULL, 576531172587225092ULL, 4629982469595286530ULL,
+    72339075465740288ULL, 4538786146943021ULL, 1152996273545174114ULL, 1099512152576ULL, 4503737636818948ULL, 297964604922011648ULL, 17935973220352ULL, 1164180521056468992ULL,
+    4616189644092997776ULL, 1247497096785821824ULL, 4616260270267334656ULL, 40541330196664356ULL, 144260598539618578ULL, 577067682857222144ULL, 201474564ULL, 9148658901590336ULL,
+    2328466560471044096ULL, 378344218860781568ULL, 1343230976ULL, 4521213330202770ULL, 4503703176348416ULL, 9367496021309931524ULL, 36732485014405121ULL, 9223380867307544720ULL,
+    1158271799058769920ULL, 2919599230291018241ULL, 9851624520418440ULL, 2251834208043072ULL, 1153202980154115089ULL, 4612073081031361536ULL, 1441152155738734632ULL, 4720640ULL,
+    40533496174758420ULL, 18102376721809664ULL, 2251799815818240ULL, 11673368858785219584ULL, 9232555742454612120ULL, 140741783322624ULL, 148619066882392160ULL, 9516141269215353088ULL,
+    144396665200590852ULL, 351845927100416ULL, 9046817140637776ULL, 36029072433759241ULL, 600104788876591370ULL, 301742275094937632ULL, 72774614131935520ULL, 4400261365761ULL,
+    1161102130153600ULL, 9225623837746413569ULL, 1180224663316403202ULL, 72057639136149504ULL, 1297036693219573760ULL, 1155173579333173256ULL, 667696577984351304ULL, 25334414498076032ULL
+};
+
+
 u64 ROOK_SHIFTS[64] = {
     52, 53, 53, 53, 53, 53, 53, 52, 
     53, 54, 54, 54, 54, 54, 54, 53, 
@@ -37,60 +49,60 @@ u64 ROOK_SHIFTS[64] = {
 
 // ARCHIVED:
 // Initialises magic tables
-// void Magics::init(Position pos)
-// {
-//     Final_Magic fm;
-//     int key;
-//     u64 attacks;
-// 	for(int square = 0; square < 64; square++)
-//     {
-//     	//bishop_magics_table[square] = Magics::find_magic(Piece::BISHOP, square);
-// 	    rook_magics_table[square] = Magics::find_magic(Piece::ROOK, square);
-//         //rook_magics_table[square] = Magics::create_magic_table(Piece::ROOK, square);
-//         //queen_magics_table
-//     }
-// }
-// // Inspiration drawn from: https://analog-hors.github.io/site/magic-bitboards/
-// Final_Magic Magics::find_magic(Piece piece_type, int square)
-// {
-//     MagicEntry magic;
-//     magic.mask = get_relevant_blocker_squares(piece_type, square); // Bitboard of spaces where blockers would be an issue if occupied (get_blockers gets the occupied)
-//     magic.index_bits = Utils::count_number_of_1bs(magic.mask);
-
-//     Final_Magic successful_magic;
-//     bb_vector magic_table;
-
-//     // Create a random device
-//     std::random_device rd;
-//     // Initialize a Mersenne Twister pseudo-random number generator
-//     std::mt19937_64 gen(rd());
-//     // Define the range of random numbers (inclusive)
-//     std::uniform_int_distribution<uint64_t> dis(0, UINT64_MAX);
-
-//     while(true) {
-//         // Magics require a low number of active bits, so we AND
-//         // by two more random values to cut down on the bits set.
-//         magic.magic_number = dis(gen) & dis(gen) & dis(gen); // creates a random u64 magic number
-//         magic_table = create_magic_table(piece_type, magic, square);
-//         if (magic_table.size() == ((std::size_t)(1 << magic.index_bits))) { // if full table (meaning no collisions or missed computations)
-//             successful_magic.magic = magic;
-//             successful_magic.table = magic_table;
-//             return successful_magic;
-//         }
-//     }
-// }
-
-// Initialises magic tables
 void Magics::init()
 {
+    Final_Magic fm;
+    int key;
+    u64 attacks;
 	for(int square = 0; square < 64; square++)
     {
     	//bishop_magics_table[square] = Magics::find_magic(Piece::BISHOP, square);
-	    rook_magics_table[square] = Magics::create_magic_table(Piece::ROOK, rook_magics[square], square);
+	    bishop_magics_table[square] = Magics::find_magic(Piece::BISHOP, square);
         //rook_magics_table[square] = Magics::create_magic_table(Piece::ROOK, square);
         //queen_magics_table
     }
 }
+// Inspiration drawn from: https://analog-hors.github.io/site/magic-bitboards/
+Final_Magic Magics::find_magic(Piece piece_type, int square)
+{
+    MagicEntry magic;
+    magic.mask = get_relevant_blocker_squares(piece_type, square); // Bitboard of spaces where blockers would be an issue if occupied (get_blockers gets the occupied)
+    magic.index_bits = Utils::count_number_of_1bs(magic.mask);
+
+    Final_Magic successful_magic;
+    bb_vector magic_table;
+
+    // Create a random device
+    std::random_device rd;
+    // Initialize a Mersenne Twister pseudo-random number generator
+    std::mt19937_64 gen(rd());
+    // Define the range of random numbers (inclusive)
+    std::uniform_int_distribution<uint64_t> dis(0, UINT64_MAX);
+
+    while(true) {
+        // Magics require a low number of active bits, so we AND
+        // by two more random values to cut down on the bits set.
+        magic.magic_number = dis(gen) & dis(gen) & dis(gen); // creates a random u64 magic number
+        magic_table = create_magic_table(piece_type, magic.magic_number, square);
+        if (magic_table.size() == ((std::size_t)(1 << magic.index_bits))) { // if full table (meaning no collisions or missed computations)
+            successful_magic.magic = magic;
+            successful_magic.table = magic_table;
+            return successful_magic;
+        }
+    }
+}
+
+// // Initialises magic tables
+// void Magics::init()
+// {
+// 	for(int square = 0; square < 64; square++)
+//     {
+//     	//bishop_magics_table[square] = Magics::find_magic(Piece::BISHOP, square);
+// 	    rook_magics_table[square] = Magics::create_magic_table(Piece::ROOK, rook_magics[square], square);
+//         //rook_magics_table[square] = Magics::create_magic_table(Piece::ROOK, square);
+//         //queen_magics_table
+//     }
+// }
 
 // Attempts to make the table used for the precomputations of magic attacks
 bb_vector Magics::create_magic_table(Piece piece_type, u64 magic_number, int square)
@@ -132,17 +144,37 @@ bb_vector Magics::create_magic_table(Piece piece_type, u64 magic_number, int squ
 // Gets squares where pieces are that block the sliding piece from moving past it
 u64 Magics::get_blockers(Piece piece_type, int square, u64 board)
 {
-    return Utils::ROOK_ATTACKS_NO_EDGES[square] & board; // @s with get_board()
+    if(piece_type == Piece::BISHOP)
+    {
+        return Utils::BISHOP_ATTACKS_NO_EDGES[square] & board;
+    }
+    else if(piece_type == Piece::ROOK)
+    {
+        return Utils::ROOK_ATTACKS_NO_EDGES[square] & board;
+    }
+    else
+    {
+        return Utils::QUEEN_ATTACKS[square] & board;
+    }
+    return 0ULL;
 }
 
 // Gets squares where if a piece were on it, it would block the sliding piece from moving past it
 u64 Magics::get_relevant_blocker_squares(Piece piece_type, int square)
 {
-    if(piece_type == (Piece::BISHOP))
+    if(piece_type == Piece::BISHOP)
     {
         return Utils::BISHOP_ATTACKS_NO_EDGES[square];
     }
-    return Utils::ROOK_ATTACKS_NO_EDGES[square];
+    else if(piece_type == Piece::ROOK)
+    {
+        return Utils::ROOK_ATTACKS_NO_EDGES[square];
+    }
+    else
+    {
+        return Utils::QUEEN_ATTACKS_NO_EDGES[square];
+    }
+    return 0ULL;
 }
 
 bb_vector Magics::get_blocker_combinations(u64 blockers) {
@@ -157,7 +189,7 @@ bb_vector Magics::get_blocker_combinations(u64 blockers) {
     return blocker_combinations;
 }
 
-// Gets rook attacks dependent on blockers (used to precompute attacks which correspond to the magic indexes, not used at runtime)
+// Gets rook attacks dependent on blockers (used to precompute attacks which correspond to the magic indexes)
 u64 Magics::pseudo_legalise_rook_attacks_slow(int square, u64 blockers)
 {
     // Shift in all directions until meet certain criteria
@@ -199,5 +231,50 @@ u64 Magics::pseudo_legalise_rook_attacks_slow(int square, u64 blockers)
         }
     }
     attacks_after_blockers ^= 1ULL << square; // Remove current square
-    return attacks_after_blockers; // Actual location of blocking pieces
+    return attacks_after_blockers;
+}
+
+// Gets bishop attacks dependent on blockers (used to precompute attacks which correspond to the magic indexes)
+u64 Magics::pseudo_legalise_bishop_attacks_slow(int square, u64 blockers)
+{
+    // Shift in all directions until meet certain criteria
+    u64 attacks_after_blockers = 0;
+    int temp_square = 0; 
+    u64 temp_bb;
+
+    for (temp_square = square + 9; temp_square < 64 && (temp_square % 8 != 0); temp_square += 9) 
+    { // Checking Right Up
+        temp_bb = 1ULL << temp_square;
+        attacks_after_blockers |= temp_bb;
+        if((blockers & temp_bb) && (temp_square != square)) {
+            break;
+        }
+    }
+
+    for (temp_square = square + 7; temp_square < 64 && ((temp_square + 1) % 8 != 0); temp_square += 7)
+    { // Checking Left Up
+        temp_bb = 1ULL << temp_square;
+        attacks_after_blockers |= temp_bb;
+        if((blockers & temp_bb) && (temp_square != square)) {
+            break;
+        }
+    }   
+    for (temp_square = square - 7; temp_square >= 0 && (temp_square % 8 != 0); temp_square -= 7) 
+    { // Checking Right Down
+        temp_bb = 1ULL << temp_square;
+        attacks_after_blockers |= temp_bb;
+        if((blockers & temp_bb) && (temp_square != square)) {
+            break;
+        }
+    }
+    for (temp_square = square - 9; temp_square >= 0 && ((temp_square + 1) % 8 != 0); temp_square -= 9) 
+    { // Checking Left Down
+        temp_bb = 1ULL << temp_square;
+        attacks_after_blockers |= temp_bb;
+        if((blockers & temp_bb) && (temp_square != square)) {
+            break;
+        }
+    }
+    attacks_after_blockers ^= 1ULL << square; // Remove current square
+    return attacks_after_blockers;
 }

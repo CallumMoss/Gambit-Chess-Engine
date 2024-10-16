@@ -30,6 +30,7 @@ extern bb_vector rook_magics_table[64];
 
 // Holds the magic number for each square, that was found previously to generate the tables upon initialisation.
 extern u64 rook_magics[64];
+extern u64 bishop_magics[64];
 
 // 64 - magic.index_bits
 extern u64 ROOK_SHIFTS[64];
@@ -40,6 +41,7 @@ namespace Magics {
     bb_vector get_blocker_combinations(u64 blockers);
     bb_vector get_attacks_after_blockers(int square, u64 attacks, bb_vector blocking_squares);
     u64 pseudo_legalise_rook_attacks_slow(int square, u64 attacks);
+    u64 pseudo_legalise_bishop_attacks_slow(int square, u64 blockers);
 
     Final_Magic find_magic(Piece piece_type, int square);
     bb_vector create_magic_table(Piece piece_type, u64 magic, int square);
