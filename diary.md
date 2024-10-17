@@ -1,3 +1,6 @@
+17/10/2024
+Used current magic techniques to generate all moves for all sliding pieces on all squares. En passant, castling and promotions to be done.
+
 16/10/2024
 Worked on generating move tables for sliding pieces using precomputed magics. Can now generate rook moves for all positions.
 

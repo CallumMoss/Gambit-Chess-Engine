@@ -262,7 +262,7 @@ std::vector<bb_vector> Position::generate_all_moves(Position pos) // uses the bo
     }
 
 u64 Position::get_rook_moves(Position pos, int square) {
-    // Returns the long table of moves for a rook on that square. To choose which ones apply, you should return 
+    // Returns the attack mask of a rook on a given square
     bb_vector attacks_on_square = rook_magics_table[square];
     MagicEntry magic;
     magic.magic_number = rook_magics[square];
@@ -276,8 +276,30 @@ u64 Position::get_rook_moves(Position pos, int square) {
     return attacks & ~get_black_pieces();
 }
 
-	// Final_Magic fm = Magics::find_magic(Piece::ROOK, i);
-	// u64 attacks = fm.table[Magics::get_magic_index(fm.magic, Magics::get_blockers(i, pos.get_board()))];
+u64 Position::get_bishop_moves(Position pos, int square) {
+    // Returns the long table of moves for a rook on that square. To choose which ones apply, you should return 
+    bb_vector attacks_on_square = bishop_magics_table[square];
+    MagicEntry magic;
+    magic.magic_number = bishop_magics[square];
+    magic.mask = Magics::get_relevant_blocker_squares(Piece::BISHOP, square);
+    magic.index_bits = Utils::count_number_of_1bs(magic.mask);
+    u64 blockers = Magics::get_blockers(Piece::BISHOP, square, pos.get_board());
+    u64 attacks = attacks_on_square[Magics::get_magic_index(magic, blockers)];
+    if(get_turn() == Turn::WHITE) {
+        return attacks & ~get_white_pieces();
+    }
+    return attacks & ~get_black_pieces();
+}
+
+u64 Position::get_queen_moves(Position pos, int square) {
+    // Returns the attack mask of a queen on a given square
+    // Does this by glueing a rook and bishop on the same square together
+    u64 attacks = get_rook_moves(pos, square) | get_bishop_moves(pos, square);
+    if(get_turn() == Turn::WHITE) {
+        return attacks & ~get_white_pieces();
+    }
+    return attacks & ~get_black_pieces();
+}
 
 bb_vector Position::generate_piece_moves(Position pos, Piece type, int square) { // will be used when searching for both sides, so will use Turn.
     u64 attacks = 0ULL;
@@ -290,13 +312,13 @@ bb_vector Position::generate_piece_moves(Position pos, Piece type, int square) {
             attacks = Utils::KNIGHT_ATTACKS[square];
             break;
         case Piece::BISHOP:
-            attacks = Utils::BISHOP_ATTACKS[square];
+            attacks = get_bishop_moves(pos, square);
             break;
         case Piece::ROOK:
             attacks = get_rook_moves(pos, square);
             break;
         case Piece::QUEEN:
-            attacks = Utils::QUEEN_ATTACKS[square];
+            attacks = get_queen_moves(pos, square);
             break;
         case Piece::KING:
             attacks = Utils::KING_ATTACKS[square];

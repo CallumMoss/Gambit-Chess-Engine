@@ -420,58 +420,117 @@ TEST(GEN_MOVES_VALIDATION, queen_precalculations) {
 // 	Utils::PrintBB(rook_moves, square, true);
 // }
 
-// TEST(GEN_MOVES_VALIDATION, using_generated_magics3)
-// {
-// 	Position pos = Position("8/3P4/5p2/8/2pR1P2/5P2/8/3p4 w - - 0 1");
-// 	Magics::init();
-// 	int square = 27;
-// 	bb_vector rook_moves = pos.generate_piece_moves(pos, Piece::ROOK, square);
-// 	for(u64 rook_move : rook_moves) {
-// 		Utils::PrintBB(rook_move, square, true);
+TEST(GEN_MOVES_VALIDATION, using_generated_magics3)
+{
+	Position pos = Position("8/3P4/5p2/8/2pR1P2/5P2/8/3p4 w - - 0 1");
+	Magics::init();
+	int square = 27;
+	bb_vector rook_moves = pos.generate_piece_moves(pos, Piece::ROOK, square);
+	for(u64 rook_move : rook_moves) {
+		Utils::PrintBB(rook_move, square, true);
+	}
+}
+
+// Manually reviewing bishop moves (passes regardless)
+// TEST(GEN_MOVES_VALIDATION, bishop_slow_move_gen_no_blockers) {
+// 	Position pos = Position();
+// 	pos.set_turn(Turn::WHITE);
+// 	u64 moves;
+// 	for(int i = 0; i < 64; i++) {
+// 		moves = Magics::pseudo_legalise_bishop_attacks_slow(i, 0);
+// 		Utils::PrintBB(moves, i, true);
 // 	}
 // }
 
-// Manually reviewing bishop moves (passes regardless)
-TEST(GEN_MOVES_VALIDATION, bishop_slow_move_gen_no_blockers) {
-	Position pos = Position();
-	pos.set_turn(Turn::WHITE);
-	u64 moves;
-	for(int i = 0; i < 64; i++) {
-		moves = Magics::pseudo_legalise_bishop_attacks_slow(i, 0);
-		Utils::PrintBB(moves, i, true);
-	}
-}
+// // Manually reviewing bishop moves (passes regardless)
+// TEST(GEN_MOVES_VALIDATION, bishop_slow_move_gen_blockers) {
+// 	Position pos = Position();
+// 	pos.set_turn(Turn::WHITE);
+// 	u64 moves;
+// 	for(int i = 0; i < 64; i++) {
+// 		moves = Magics::pseudo_legalise_bishop_attacks_slow(i, Magics::get_blockers(Piece::BISHOP, i, pos.get_board()));
+// 		Utils::PrintBB(moves, i, true);
+// 	}
+// }
 
-// Manually reviewing bishop moves (passes regardless)
-TEST(GEN_MOVES_VALIDATION, bishop_slow_move_gen_blockers) {
-	Position pos = Position();
-	pos.set_turn(Turn::WHITE);
-	u64 moves;
-	for(int i = 0; i < 64; i++) {
-		moves = Magics::pseudo_legalise_bishop_attacks_slow(i, Magics::get_blockers(Piece::BISHOP, i, pos.get_board()));
-		Utils::PrintBB(moves, i, true);
-	}
-}
-
-// Manually reviewing bishop moves (passes regardless)
-TEST(GEN_MOVES_VALIDATION, bishop_find_magics) {
-	Position pos = Position();
-	Magics::init();
-	for(Final_Magic magic : bishop_magics_table) {
-		std::cout << magic.magic.magic_number << std::endl;
-	}
-}
+// // Manually reviewing bishop moves (passes regardless)
+// TEST(GEN_MOVES_VALIDATION, bishop_find_magics) {
+// 	Position pos = Position();
+// 	Magics::init();
+// 	for(Final_Magic magic : bishop_magics_table) {
+// 		std::cout << magic.magic.magic_number << std::endl;
+// 	}
+// }
 
 // // Tests finding of magics
 // TEST(GEN_MOVES_VALIDATION, testing_move_gen) {
 // 	Position pos = Position("8/3P4/5p2/8/2pR1P2/5P2/8/3p4 w - - 0 1");
-// 	Magics::init(pos);
+// 	Magics::init();
 // 	int square = 27;
 // 	bb_vector moves = pos.generate_piece_moves(pos, Piece::ROOK, square);
 // 	for(u64 move : moves) {
 // 		Utils::PrintBB(move, square, true);
 // 	}
 // }
+
+// Tests use of magics
+TEST(GEN_MOVES_VALIDATION, testing_move_gen2) {
+	Position pos = Position("8/p2P4/5p2/4P3/3B4/4pP2/8/3p4 w - - 0 1");
+	Magics::init();
+	int square = 27;
+	bb_vector moves = pos.generate_piece_moves(pos, Piece::BISHOP, square);
+	for(u64 move : moves) {
+		Utils::PrintBB(move, square, true);
+	}
+}
+
+// Tests use of magics
+TEST(GEN_MOVES_VALIDATION, testing_move_gen3) {
+	Position pos = Position("8/p2P4/5p2/1p2P3/2pQ2P1/4pP2/8/3p4 w - - 0 1");
+	pos.set_turn(Turn::BLACK);
+	Magics::init();
+	int square = 27;
+	bb_vector moves = pos.generate_piece_moves(pos, Piece::QUEEN, square);
+	for(u64 move : moves) {
+		Utils::PrintBB(move, square, true);
+	}
+}
+
+// Tests use of magics
+TEST(GEN_MOVES_VALIDATION, testing_black_bishop) {
+	Position pos = Position("8/p2P4/5p2/1p2P3/2pb2P1/4pP2/8/3p4 w - - 0 1");
+	pos.set_turn(Turn::BLACK);
+	Magics::init();
+	int square = 27;
+	bb_vector moves = pos.generate_piece_moves(pos, Piece::BISHOP, square);
+	for(u64 move : moves) {
+		Utils::PrintBB(move, square, true);
+	}
+}
+
+// Tests use of magics
+TEST(GEN_MOVES_VALIDATION, testing_black_rook) {
+	Position pos = Position("8/p2P4/5p2/1p2P3/2pr2P1/4pP2/8/3p4 w - - 0 1");
+	pos.set_turn(Turn::BLACK);
+	Magics::init();
+	int square = 27;
+	bb_vector moves = pos.generate_piece_moves(pos, Piece::ROOK, square);
+	for(u64 move : moves) {
+		Utils::PrintBB(move, square, true);
+	}
+}
+
+// Tests use of magics
+TEST(GEN_MOVES_VALIDATION, testing_black_queen) {
+	Position pos = Position("8/p2P4/5p2/1p2P3/2pq2P1/4pP2/8/3p4 w - - 0 1");
+	pos.set_turn(Turn::BLACK);
+	Magics::init();
+	int square = 27;
+	bb_vector moves = pos.generate_piece_moves(pos, Piece::QUEEN, square);
+	for(u64 move : moves) {
+		Utils::PrintBB(move, square, true);
+	}
+}
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
