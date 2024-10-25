@@ -172,7 +172,7 @@ void Position::print_board(std::array<char, 64> board) {
 // Sets the turn to white or black
 void Position::set_turn(Turn turn) {this->turn = turn;}
 
-u64 Position::generate_pawn_attacks(int square) {
+u64 Position::generate_pawn_attacks(int square, bool en_passant) {
     // Generate pawn attacks
     // Pawn can move twice if it is in the 2nd rank of its colour (hasnt moved).
     // Pawn cannot move 1 or 2 if any colour piece is in the way
@@ -203,6 +203,9 @@ u64 Position::generate_pawn_attacks(int square) {
         attacks |= Utils::shift_down(Utils::shift_left(pawn_pos));
         attacks |= Utils::shift_down(Utils::shift_right(pawn_pos));
         attacks = attacks & get_white_pieces();
+    }
+    if(en_passant) {
+        attacks |= en_passant_target;
     }
     attacks |= moves;
     return attacks;
@@ -306,7 +309,23 @@ bb_vector Position::generate_piece_moves(Position pos, Piece type, int square) {
     u64 blockers = 0ULL;
     switch(type) {
         case Piece::PAWN:
-            attacks = generate_pawn_attacks(square);
+            if(en_passant_target != 0ULL) {
+                if(turn == Turn::WHITE) {
+                    if(1ULL << square + 7 == en_passant_target || 1ULL << square + 9 == en_passant_target) {
+                        // If there is a pawn which can target the en passant target, en passant is true
+                        attacks = generate_pawn_attacks(square, true);
+                    }
+                }
+                else {
+                    if(1ULL << square - 7 == en_passant_target || 1ULL << square - 9 == en_passant_target) {
+                        // If there is a pawn which can target the en passant target, en passant is true
+                        attacks = generate_pawn_attacks(square, true);
+                    }
+                }
+            }
+            else {
+                attacks = generate_pawn_attacks(square, false);
+            }
             return extract_piece_moves(attacks);
         case Piece::KNIGHT:
             attacks = Utils::KNIGHT_ATTACKS[square];

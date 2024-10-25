@@ -1,3 +1,9 @@
+25/10/2024
+Added protocol for if there is an enpassant. Checking if en passant is caused to be done.
+
+18/10/2024 - 24/10/2024
+Applying to jobs and doing interviews
+
 17/10/2024
 Used current magic techniques to generate all moves for all sliding pieces on all squares. En passant, castling and promotions to be done.
 

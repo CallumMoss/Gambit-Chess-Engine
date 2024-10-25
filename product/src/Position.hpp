@@ -19,7 +19,7 @@ class Position { // Game state class
         std::array<char, 64> board_to_char_array(u64 board);
         void print_board(std::array<char, 64> board);
 
-        u64 generate_pawn_attacks(int square);
+        u64 generate_pawn_attacks(int square, bool en_passant);
         u64 get_bishop_moves(Position pos, int square);
         u64 get_rook_moves(Position pos, int square);
         u64 get_queen_moves(Position pos, int square);
@@ -80,6 +80,28 @@ class Position { // Game state class
 		int full_move_counter; // how many moves have been played
         u8 castling_rights; // XXXX-BL-BS-WL-WS, last 4 bits, 0 if cannot castle
         Turn turn;
+
+        // //if pawn starting square is on the right rank and destination is next to pawn of opposing colour on the right rank
+
+        // Move List
+        // If this move causes en passant next move, turn on the en passant flag 
+
+        // 8 - 15 source squares
+        // en_passant ranks: 48 - 55,
+
+
+        // check if a move causes en passant, set flag to that square
+
+        // check if en passant is an option currently available
+        // if en passant flag is true, check its target square, check if there is a pawn on a square that could target it
+        
+        // for example, for a given colour and target square, possible squares a pawn must be on would be +7 and +9 of the target square
+        // then we & with the pawns
+        // struct Move {
+        //     u8 starting_square;
+        //     u8 destination_square;
+        // }
+
 };
 
 #endif // #ifndef POSITION_HPP
