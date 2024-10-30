@@ -355,6 +355,48 @@ bb_vector Position::generate_piece_moves(Position pos, Piece type, int square) {
     return extract_piece_moves(attacks);
 }
 
+void copy_make(Move move) // simpler than make, unmake but slightly slower.
+{
+    // Keeps a stack of board states
+    Position current_pos = *self pos*;
+    std::vector<Position> pos_vector;
+    // make move
+    pos_vector.append(make_move(self, move));
+    // check if king is in check
+    // if king is in check, unmake move
+    current_pos = pos_vector.top();
+}
+
+Position make_move(Move move, Position pos) {
+
+    // make move
+    switch(pos.get_piece_type(move.src_square)) {
+        // if its a capture,
+        what piece its capturing
+        case(Piece::PAWN):
+            pos.set_pawns()
+            break;
+        case(Piece::KNIGHT):
+            break;
+        case(Piece::BISHOP):
+            break;
+        case(Piece::ROOK):
+            break;
+        case(Piece::QUEEN):
+            break;
+        case(Piece::KING):
+            break;
+    }
+    do stuff to pos with move
+
+
+    return pos;
+}
+
+void set_bitboard(Position pos, Piece piece_type) {
+
+}
+
 std::array<u64, 6> Position::get_pieces() { return pieces; }
 std::array<u64, 2> Position::get_colours() { return colours; }
 u64 Position::get_en_passant_target() { return en_passant_target; }

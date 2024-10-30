@@ -1,3 +1,10 @@
+29/10/2024
+Began thinking about copy-make, legality checks and en-passant. Could check any blockers for the king, then work from there.
+Or could get attack mask post blockers and & with king. Would simply use the magic gen but not split the moves into many.
+
+26/10/2024 - 29/10/2024
+Doing assignments and more interviews
+
 25/10/2024
 Added protocol for if there is an enpassant. Checking if en passant is caused to be done.
 

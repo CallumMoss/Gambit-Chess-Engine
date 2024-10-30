@@ -89,6 +89,8 @@ class Position { // Game state class
         // 8 - 15 source squares
         // en_passant ranks: 48 - 55,
 
+void copy_make(Move move); // simpler than make, unmake but slightly slower.
+
 
         // check if a move causes en passant, set flag to that square
 
@@ -97,10 +99,13 @@ class Position { // Game state class
         
         // for example, for a given colour and target square, possible squares a pawn must be on would be +7 and +9 of the target square
         // then we & with the pawns
-        // struct Move {
-        //     u8 starting_square;
-        //     u8 destination_square;
-        // }
+    struct Move {
+        u8 starting_square;
+        u8 destination_square;
+        Piece promotion_type; // If there isnt a piece promoting, this value can be whatever as we wont use it
+        u8 en_passant_square;
+    //this would be decided by the search / eval and youll try each piece promotion type to see which eval is the best.
+    };
 
 };
 
