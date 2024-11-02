@@ -136,7 +136,7 @@ TEST(FEN_And_Pos_Rep, complex_position) {
 // TEST(PRECOMPUTATION_VALIDATION, knight_move_extraction) {
 // 	Position pos = Position();
 // 	int i = 30;
-// 	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::KNIGHT, i);
+// 	std::vector<u64> moves = pos.generate_piece_moves(Piece::KNIGHT, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 // 		Utils::PrintBB(moves[q], i, true);
 // 	}
@@ -146,7 +146,7 @@ TEST(FEN_And_Pos_Rep, complex_position) {
 // TEST(PRECOMPUTATION_VALIDATION, bishop_move_extraction) {
 // 	Position pos = Position();
 // 	int i = 30;
-// 	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::BISHOP, i);
+// 	std::vector<u64> moves = pos.generate_piece_moves(Piece::BISHOP, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 // 		Utils::PrintBB(moves[q], i, true);
 // 	}
@@ -156,7 +156,7 @@ TEST(FEN_And_Pos_Rep, complex_position) {
 // TEST(PRECOMPUTATION_VALIDATION, rook_move_extraction) {
 // 	Position pos = Position("8/8/8/8/6R1/8/8/8 w - - 0 1");
 // 	int i = 30;
-// 	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::ROOK, i);
+// 	std::vector<u64> moves = pos.generate_piece_moves(Piece::ROOK, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 // 		Utils::PrintBB(moves[q], i, true);
 // 	}
@@ -166,7 +166,7 @@ TEST(FEN_And_Pos_Rep, complex_position) {
 // TEST(PRECOMPUTATION_VALIDATION, queen_move_extraction) {
 // 	Position pos = Position();
 // 	int i = 30;
-// 	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::QUEEN, i);
+// 	std::vector<u64> moves = pos.generate_piece_moves(Piece::QUEEN, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 // 		Utils::PrintBB(moves[q], i, true);
 // 	}
@@ -176,7 +176,7 @@ TEST(FEN_And_Pos_Rep, complex_position) {
 // TEST(PRECOMPUTATION_VALIDATION, king_move_extraction) {
 // 	Position pos = Position();
 // 	int i = 30;
-// 	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::KING, i);
+// 	std::vector<u64> moves = pos.generate_piece_moves(Piece::KING, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 // 		Utils::PrintBB(moves[q], i, true);
 // 	}
@@ -186,7 +186,7 @@ TEST(FEN_And_Pos_Rep, complex_position) {
 TEST(GEN_MOVES_VALIDATION, pawns) {
 	Position pos = Position();
 	int i = 12;
-	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::PAWN, i);
+	std::vector<u64> moves = pos.generate_piece_moves(Piece::PAWN, i);
 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 		Utils::PrintBB(moves[q], i, true);
 	}
@@ -196,7 +196,7 @@ TEST(GEN_MOVES_VALIDATION, pawns) {
 TEST(GEN_MOVES_VALIDATION, pawns_diagonal) {
 	Position pos = Position();
 	int i = 12 + (4*8);
-	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::PAWN, i);
+	std::vector<u64> moves = pos.generate_piece_moves(Piece::PAWN, i);
 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 		Utils::PrintBB(moves[q], i, true);
 	}
@@ -207,7 +207,7 @@ TEST(GEN_MOVES_VALIDATION, pawns_black) {
 	Position pos = Position();
 	pos.set_turn(Turn::BLACK);
 	int i = 12 + (5*8);
-	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::PAWN, i);
+	std::vector<u64> moves = pos.generate_piece_moves(Piece::PAWN, i);
 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 		Utils::PrintBB(moves[q], i, true);
 	}
@@ -218,7 +218,7 @@ TEST(GEN_MOVES_VALIDATION, pawns_black_diagonal) {
 	Position pos = Position();
 	pos.set_turn(Turn::BLACK);
 	int i = 20;
-	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::PAWN, i);
+	std::vector<u64> moves = pos.generate_piece_moves(Piece::PAWN, i);
 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 		Utils::PrintBB(moves[q], i, true);
 	}
@@ -229,7 +229,7 @@ TEST(GEN_MOVES_VALIDATION, pawns_forward_double) {
 	Position pos = Position();
 	pos.set_turn(Turn::WHITE);
 	int i = 20;
-	std::vector<u64> moves = pos.generate_piece_moves(pos, Piece::PAWN, i);
+	std::vector<u64> moves = pos.generate_piece_moves(Piece::PAWN, i);
 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
 		Utils::PrintBB(moves[q], i, true);
 	}
@@ -425,7 +425,7 @@ TEST(GEN_MOVES_VALIDATION, using_generated_magics3)
 	Position pos = Position("8/3P4/5p2/8/2pR1P2/5P2/8/3p4 w - - 0 1");
 	Magics::init();
 	int square = 27;
-	bb_vector rook_moves = pos.generate_piece_moves(pos, Piece::ROOK, square);
+	bb_vector rook_moves = pos.generate_piece_moves(Piece::ROOK, square);
 	for(u64 rook_move : rook_moves) {
 		Utils::PrintBB(rook_move, square, true);
 	}
@@ -467,7 +467,7 @@ TEST(GEN_MOVES_VALIDATION, using_generated_magics3)
 // 	Position pos = Position("8/3P4/5p2/8/2pR1P2/5P2/8/3p4 w - - 0 1");
 // 	Magics::init();
 // 	int square = 27;
-// 	bb_vector moves = pos.generate_piece_moves(pos, Piece::ROOK, square);
+// 	bb_vector moves = pos.generate_piece_moves(Piece::ROOK, square);
 // 	for(u64 move : moves) {
 // 		Utils::PrintBB(move, square, true);
 // 	}
@@ -478,7 +478,7 @@ TEST(GEN_MOVES_VALIDATION, testing_move_gen2) {
 	Position pos = Position("8/p2P4/5p2/4P3/3B4/4pP2/8/3p4 w - - 0 1");
 	Magics::init();
 	int square = 27;
-	bb_vector moves = pos.generate_piece_moves(pos, Piece::BISHOP, square);
+	bb_vector moves = pos.generate_piece_moves(Piece::BISHOP, square);
 	for(u64 move : moves) {
 		Utils::PrintBB(move, square, true);
 	}
@@ -490,7 +490,7 @@ TEST(GEN_MOVES_VALIDATION, testing_move_gen3) {
 	pos.set_turn(Turn::BLACK);
 	Magics::init();
 	int square = 27;
-	bb_vector moves = pos.generate_piece_moves(pos, Piece::QUEEN, square);
+	bb_vector moves = pos.generate_piece_moves(Piece::QUEEN, square);
 	for(u64 move : moves) {
 		Utils::PrintBB(move, square, true);
 	}
@@ -502,7 +502,7 @@ TEST(GEN_MOVES_VALIDATION, testing_black_bishop) {
 	pos.set_turn(Turn::BLACK);
 	Magics::init();
 	int square = 27;
-	bb_vector moves = pos.generate_piece_moves(pos, Piece::BISHOP, square);
+	bb_vector moves = pos.generate_piece_moves(Piece::BISHOP, square);
 	for(u64 move : moves) {
 		Utils::PrintBB(move, square, true);
 	}
@@ -514,7 +514,7 @@ TEST(GEN_MOVES_VALIDATION, testing_black_rook) {
 	pos.set_turn(Turn::BLACK);
 	Magics::init();
 	int square = 27;
-	bb_vector moves = pos.generate_piece_moves(pos, Piece::ROOK, square);
+	bb_vector moves = pos.generate_piece_moves(Piece::ROOK, square);
 	for(u64 move : moves) {
 		Utils::PrintBB(move, square, true);
 	}
@@ -526,7 +526,7 @@ TEST(GEN_MOVES_VALIDATION, testing_black_queen) {
 	pos.set_turn(Turn::BLACK);
 	Magics::init();
 	int square = 27;
-	bb_vector moves = pos.generate_piece_moves(pos, Piece::QUEEN, square);
+	bb_vector moves = pos.generate_piece_moves(Piece::QUEEN, square);
 	for(u64 move : moves) {
 		Utils::PrintBB(move, square, true);
 	}

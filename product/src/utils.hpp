@@ -6,11 +6,9 @@
 #include <string>
 #include <iostream>
 #include "Types.hpp"
-struct Move {
-    unsigned int src_square: 6;
-    unsigned int dest_square: 6;
-    unsigned int flags: 4;
-};
+
+
+
 
 enum Piece
 {
@@ -49,6 +47,15 @@ enum Castling_Rights
     BLACK_SHORT = 2,
     BLACK_LONG = 3
 };
+
+struct Move {
+    u8 starting_square;
+    u8 destination_square;
+    Piece promotion_type; // If there isnt a piece promoting, this value can be whatever as we wont use it
+    u8 en_passant_square;
+//this would be decided by the search / eval and youll try each piece promotion type to see which eval is the best.
+};
+
 namespace Utils {
     u64 shift_up(u64 board); // replace bit with 0, replace bit shifted 8 left with 1
     u64 shift_down(u64 board);

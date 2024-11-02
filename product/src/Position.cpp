@@ -240,22 +240,22 @@ bb_vector Position::extract_piece_moves(u64 attacks) {
     return attacks_vector;
 }
 
-std::vector<bb_vector> Position::generate_all_moves(Position pos) // uses the board state to generate all moves for a given colour 
+std::vector<bb_vector> Position::generate_all_moves() // uses the board state to generate all moves for a given colour 
     {
         std::vector<bb_vector> moves;
         u64 pieces;
-        if(pos.get_turn() == Turn::WHITE) {
-            pieces = pos.get_white_pieces();
+        if(get_turn() == Turn::WHITE) {
+            pieces = get_white_pieces();
         }
         else {
-            pieces = pos.get_black_pieces();
+            pieces = get_black_pieces();
         }
         bb_vector square_moves;
         bb_vector empty_vector; // no moves for this square as the player whos turn it is does not have a piece on it
         for(int square = 0; square < 64; square++) {
             if(1ULL << square & pieces) { // if the person whos turn it is has a piece on this square, gen its moves
-                Piece piece_type = pos.get_piece_type(square);
-                square_moves = pos.generate_piece_moves(pos, piece_type, square);
+                Piece piece_type = get_piece_type(square);
+                square_moves = generate_piece_moves(piece_type, square);
                 moves.push_back(square_moves);
                 continue;
             }
@@ -264,14 +264,14 @@ std::vector<bb_vector> Position::generate_all_moves(Position pos) // uses the bo
         return moves;
     }
 
-u64 Position::get_rook_moves(Position pos, int square) {
+u64 Position::get_rook_moves(int square) {
     // Returns the attack mask of a rook on a given square
     bb_vector attacks_on_square = rook_magics_table[square];
     MagicEntry magic;
     magic.magic_number = rook_magics[square];
     magic.mask = Magics::get_relevant_blocker_squares(Piece::ROOK, square);
     magic.index_bits = Utils::count_number_of_1bs(magic.mask);
-    u64 blockers = Magics::get_blockers(Piece::ROOK, square, pos.get_board());
+    u64 blockers = Magics::get_blockers(Piece::ROOK, square, get_board());
     u64 attacks = attacks_on_square[Magics::get_magic_index(magic, blockers)];
     if(get_turn() == Turn::WHITE) {
         return attacks & ~get_white_pieces();
@@ -279,14 +279,14 @@ u64 Position::get_rook_moves(Position pos, int square) {
     return attacks & ~get_black_pieces();
 }
 
-u64 Position::get_bishop_moves(Position pos, int square) {
+u64 Position::get_bishop_moves(int square) {
     // Returns the long table of moves for a rook on that square. To choose which ones apply, you should return 
     bb_vector attacks_on_square = bishop_magics_table[square];
     MagicEntry magic;
     magic.magic_number = bishop_magics[square];
     magic.mask = Magics::get_relevant_blocker_squares(Piece::BISHOP, square);
     magic.index_bits = Utils::count_number_of_1bs(magic.mask);
-    u64 blockers = Magics::get_blockers(Piece::BISHOP, square, pos.get_board());
+    u64 blockers = Magics::get_blockers(Piece::BISHOP, square, get_board());
     u64 attacks = attacks_on_square[Magics::get_magic_index(magic, blockers)];
     if(get_turn() == Turn::WHITE) {
         return attacks & ~get_white_pieces();
@@ -294,17 +294,17 @@ u64 Position::get_bishop_moves(Position pos, int square) {
     return attacks & ~get_black_pieces();
 }
 
-u64 Position::get_queen_moves(Position pos, int square) {
+u64 Position::get_queen_moves(int square) {
     // Returns the attack mask of a queen on a given square
     // Does this by glueing a rook and bishop on the same square together
-    u64 attacks = get_rook_moves(pos, square) | get_bishop_moves(pos, square);
+    u64 attacks = get_rook_moves(square) | get_bishop_moves(square);
     if(get_turn() == Turn::WHITE) {
         return attacks & ~get_white_pieces();
     }
     return attacks & ~get_black_pieces();
 }
 
-bb_vector Position::generate_piece_moves(Position pos, Piece type, int square) { // will be used when searching for both sides, so will use Turn.
+bb_vector Position::generate_piece_moves(Piece type, int square) { // will be used when searching for both sides, so will use Turn.
     u64 attacks = 0ULL;
     u64 blockers = 0ULL;
     switch(type) {
@@ -331,13 +331,13 @@ bb_vector Position::generate_piece_moves(Position pos, Piece type, int square) {
             attacks = Utils::KNIGHT_ATTACKS[square];
             break;
         case Piece::BISHOP:
-            attacks = get_bishop_moves(pos, square);
+            attacks = get_bishop_moves(square);
             break;
         case Piece::ROOK:
-            attacks = get_rook_moves(pos, square);
+            attacks = get_rook_moves(square);
             break;
         case Piece::QUEEN:
-            attacks = get_queen_moves(pos, square);
+            attacks = get_queen_moves(square);
             break;
         case Piece::KING:
             attacks = Utils::KING_ATTACKS[square];
@@ -355,47 +355,57 @@ bb_vector Position::generate_piece_moves(Position pos, Piece type, int square) {
     return extract_piece_moves(attacks);
 }
 
-void copy_make(Move move) // simpler than make, unmake but slightly slower.
-{
-    // Keeps a stack of board states
-    Position current_pos = *self pos*;
-    std::vector<Position> pos_vector;
-    // make move
-    pos_vector.append(make_move(self, move));
-    // check if king is in check
-    // if king is in check, unmake move
-    current_pos = pos_vector.top();
-}
+// bool legality_check() {
+//     do i need to pass pos in every time? surely i can just call from it?
+// }
 
-Position make_move(Move move, Position pos) {
+// void copy_make(Position pos, Move move) // simpler than make, unmake but slightly slower.
+// {
+//     // Keeps a stack of board states
+//     Position current_pos = pos;
+//     std::vector<Position> pos_vector;
+//     // make move
+//     pos_vector.push_back(make_move(pos, move));
+//     // check if king is in check
+//     if(current_pos.legality_check()) {
+//         move is fine
+//     }
+//     else {
+//         unmake move by popping from stack
+//     }
+//     // if king is in check, unmake move
+//     current_pos = pos_vector.top();
+// }
 
-    // make move
-    switch(pos.get_piece_type(move.src_square)) {
-        // if its a capture,
-        what piece its capturing
-        case(Piece::PAWN):
-            pos.set_pawns()
-            break;
-        case(Piece::KNIGHT):
-            break;
-        case(Piece::BISHOP):
-            break;
-        case(Piece::ROOK):
-            break;
-        case(Piece::QUEEN):
-            break;
-        case(Piece::KING):
-            break;
-    }
-    do stuff to pos with move
+// Position make_move(Position pos, Move move) {
+
+//     // make move
+//     switch(pos.get_piece_type(move.src_square)) {
+//         // if its a capture,
+//         what piece its capturing
+//         case(Piece::PAWN):
+//             pos.set_pawns()
+//             break;
+//         case(Piece::KNIGHT):
+//             break;
+//         case(Piece::BISHOP):
+//             break;
+//         case(Piece::ROOK):
+//             break;
+//         case(Piece::QUEEN):
+//             break;
+//         case(Piece::KING):
+//             break;
+//     }
+//     do stuff to pos with move
 
 
-    return pos;
-}
+//     return pos;
+// }
 
-void set_bitboard(Position pos, Piece piece_type) {
+// void set_bitboard(Position pos, Piece piece_type) {
 
-}
+// }
 
 std::array<u64, 6> Position::get_pieces() { return pieces; }
 std::array<u64, 2> Position::get_colours() { return colours; }

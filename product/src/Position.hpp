@@ -20,11 +20,11 @@ class Position { // Game state class
         void print_board(std::array<char, 64> board);
 
         u64 generate_pawn_attacks(int square, bool en_passant);
-        u64 get_bishop_moves(Position pos, int square);
-        u64 get_rook_moves(Position pos, int square);
-        u64 get_queen_moves(Position pos, int square);
-        std::vector<bb_vector> generate_all_moves(Position pos);
-        bb_vector generate_piece_moves(Position pos, Piece type, int square);
+        u64 get_bishop_moves(int square);
+        u64 get_rook_moves(int square);
+        u64 get_queen_moves(int square);
+        std::vector<bb_vector> generate_all_moves();
+        bb_vector generate_piece_moves(Piece type, int square);
         std::vector<u64> extract_piece_moves(u64 attacks);
 
         Piece get_piece_type(int square);
@@ -99,13 +99,6 @@ void copy_make(Move move); // simpler than make, unmake but slightly slower.
         
         // for example, for a given colour and target square, possible squares a pawn must be on would be +7 and +9 of the target square
         // then we & with the pawns
-    struct Move {
-        u8 starting_square;
-        u8 destination_square;
-        Piece promotion_type; // If there isnt a piece promoting, this value can be whatever as we wont use it
-        u8 en_passant_square;
-    //this would be decided by the search / eval and youll try each piece promotion type to see which eval is the best.
-    };
 
 };
 
