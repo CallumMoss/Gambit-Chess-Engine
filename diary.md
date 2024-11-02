@@ -1,3 +1,12 @@
+02/11/2024
+Refactored parameters for methods in position class. Looked into doxygen for proper commenting as aim to clean up code before moving forwards.
+
+01/11/2024
+Meeting with Eduard to discuss project progress
+
+30/10/2024 - 31/10/2024
+N/A
+
 29/10/2024
 Began thinking about copy-make, legality checks and en-passant. Could check any blockers for the king, then work from there.
 Or could get attack mask post blockers and & with king. Would simply use the magic gen but not split the moves into many.
