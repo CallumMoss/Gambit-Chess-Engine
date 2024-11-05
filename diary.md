@@ -1,3 +1,10 @@
+
+05/11/2024
+Started work on search and eval.
+
+03/11/2024 - 04/11/2024
+Working on machine learning assignment
+
 02/11/2024
 Refactored parameters for methods in position class. Looked into doxygen for proper commenting as aim to clean up code before moving forwards.
 
