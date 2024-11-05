@@ -19,6 +19,7 @@ class Position { // Game state class
         std::array<char, 64> board_to_char_array(u64 board);
         void print_board(std::array<char, 64> board);
 
+        // Move Gen:
         u64 generate_pawn_attacks(int square, bool en_passant);
         u64 get_bishop_moves(int square);
         u64 get_rook_moves(int square);
@@ -26,6 +27,7 @@ class Position { // Game state class
         std::vector<bb_vector> generate_all_moves();
         bb_vector generate_piece_moves(Piece type, int square);
         std::vector<u64> extract_piece_moves(u64 attacks);
+        Move find_best_move(int depth);
 
         Piece get_piece_type(int square);
         std::array<u64, 6> get_pieces();
@@ -64,6 +66,8 @@ class Position { // Game state class
         u64 get_black_pieces();
 
         u64 get_board();
+
+        void set_pawns(u64 pawns);
 
         bool get_wscr(); // returns true if white has short castling rights
         bool get_wlcr();

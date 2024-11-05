@@ -355,53 +355,131 @@ bb_vector Position::generate_piece_moves(Piece type, int square) { // will be us
     return extract_piece_moves(attacks);
 }
 
-// bool legality_check() {
-//     do i need to pass pos in every time? surely i can just call from it?
-// }
+// Finds the best move for the current position using negamax
+// Initial call for negamax for each move up to a line depth provided
+Move find_best_move(int depth) {
+    // Currently do not keep track of eval after end
+    // If wish to do this for programming analysis, can
+    // just use prints
+     int best_eval = INT_MIN;
+     Move best_move;
+    int eval;
+    // Need to convert this to return moves instead of bitboards
+     std::vector<Move> moves = generate_all_moves();
 
-// void copy_make(Position pos, Move move) // simpler than make, unmake but slightly slower.
-// {
-//     // Keeps a stack of board states
-//     Position current_pos = pos;
-//     std::vector<Position> pos_vector;
-//     // make move
-//     pos_vector.push_back(make_move(pos, move));
-//     // check if king is in check
-//     if(current_pos.legality_check()) {
-//         move is fine
-//     }
-//     else {
-//         unmake move by popping from stack
-//     }
-//     // if king is in check, unmake move
-//     current_pos = pos_vector.top();
-// }
+     for(Move move : moves) {
+        // Does this edit our current one, or does it create a new version to use?
+        Position new_pos = make_move(move); // apply move to current pos
+        // depth - 1 because we have already looked at this depth
+        // eg: depth 1 = our move
+        // eg: depth 2 = opponents response
+        // uses depth of half moves
 
-// Position make_move(Position pos, Move move) {
+        // Should figure out how to make use of turns
+        // in this case, it should be called with the turn that isnt ours
+        // for simplicity we assume we are white for now
+        // calls -negamax as to flip the eval back to our perspective
+        eval = -negamax(new_pos, depth - 1, INT_MIN, INT_MAX, Turn::BLACK);
 
-//     // make move
-//     switch(pos.get_piece_type(move.src_square)) {
-//         // if its a capture,
-//         what piece its capturing
-//         case(Piece::PAWN):
-//             pos.set_pawns()
-//             break;
-//         case(Piece::KNIGHT):
-//             break;
-//         case(Piece::BISHOP):
-//             break;
-//         case(Piece::ROOK):
-//             break;
-//         case(Piece::QUEEN):
-//             break;
-//         case(Piece::KING):
-//             break;
-//     }
-//     do stuff to pos with move
+        if(eval > best_eval) {
+            best_eval = eval;
+            best_move = move;
+        }
+     }
+     return best_move;
+}
+
+// Inspired from the chess programming wiki (standard convention)
+// Search algorithm which produces the same output as minimax but is simpler to implement
+int negamax(Position pos, int depth, int alpha, int beta, Turn turn) {
+    if (depth == 0) { // or if checkmate?
+        // returns eval of the position at a given depth
+        return evaluate(pos);
+    }
+
+    std::vector<Move> moves = pos.generate_all_moves();
+
+    for(Move move : moves) {
+        Position new_pos = pos.make_move(move);
+
+        int eval = -negamax(new_pos, depth - 1, -beta, -alpha, pos.get_next_turn())
+        // do i need to undo the move? shouldnt need to if i copy positions instead
+        // of editing our one position
+
+        best_eval = max(best_eval, eval);
+        
+        alpha = max(alpha, eval);
+
+        // this implements pruning of branches
+        if(alpha >= beta) {
+            break;
+        }
+    }
+
+    return best_eval;
+
+}
+
+int evaluate(Position pos) {
+    return count_material(pos.get_turn());
+}
+
+bool legality_check() {
+    do i need to pass pos in every time? surely i can just call from it?
+}
+
+void copy_make(Move move) // simpler than make, unmake but slightly slower.
+{
+    // Keeps a stack of board states
+    std::vector<Position> pos_vector;
+    // make move
+    pos_vector.push_back(make_move(pos, move));
+    // check if king is in check
+    if(current_pos.legality_check()) {
+        move is fine
+    }
+    else {
+        unmake move by popping from stack
+    }
+    // if king is in check, unmake move
+    current_pos = pos_vector.top();
+}
+
+Position make_move(Position pos, Move move) {
+
+    // Recieves: a move and Position
+    // Must apply this move to the Position
+    // From src square can determine piece type to edit
+    // From turn can determine colour type to edit
+    // From dest square, can use piece_type_at_square to determine which to edit
+
+    u64 new_board = pos.get_board() | 1ULL << move.src_square;
+    //new_board = Utils::clear_bit(new_board);
+    pos.increment_half_moves();
+    if(pos.turn() == Turn::WHITE) {
+
+    }
+    // make move
+    switch(pos.get_piece_type(move.src_square)) {
+        case(Piece::PAWN):
+            pos.set_pawns(Utils::clear_bit(pos.get_pawns(), move.src_square));
+            break;
+        case(Piece::KNIGHT):
+            break;
+        case(Piece::BISHOP):
+            break;
+        case(Piece::ROOK):
+            break;
+        case(Piece::QUEEN):
+            break;
+        case(Piece::KING):
+            break;
+    }
+    do stuff to pos with move
 
 
-//     return pos;
-// }
+    return pos;
+}
 
 // void set_bitboard(Position pos, Piece piece_type) {
 
@@ -448,3 +526,15 @@ bool Position::get_wscr() { return castling_rights & (1 << Castling_Rights::WHIT
 bool Position::get_wlcr() { return castling_rights & (1 << Castling_Rights::WHITE_LONG); }
 bool Position::get_bscr() { return castling_rights & (1 << Castling_Rights::BLACK_SHORT); }
 bool Position::get_blcr() { return castling_rights & (1 << Castling_Rights::BLACK_LONG); }
+
+void Position::set_pawns(u64 new_pawns) { pieces[Piece::PAWN] = pawns; }
+void Position::set_knights(u64 knights) { pieces[Piece::KNIGHTS] = knights; }
+void Position::set_pawns(u64 pawns) { pieces[Piece::PAWN] = pawns; }
+void Position::set_pawns(u64 pawns) { pieces[Piece::PAWN] = pawns; }
+void Position::set_pawns(u64 pawns) { pieces[Piece::PAWN] = pawns; }
+void Position::set_pawns(u64 pawns) { pieces[Piece::PAWN] = pawns; }
+
+void Position::set_white_pawns(u64 pawns, u64 white_pieces) {
+    set_pawns(pawns);
+    colours[Colour::WHITE] = white_pieces;    
+}

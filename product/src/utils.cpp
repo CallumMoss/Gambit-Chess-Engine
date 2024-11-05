@@ -72,3 +72,7 @@ void Utils::PrintBB(u64 board, int board_center, bool mirrored) {
         output += mirrored ? "A B C D E F G H" : "H G F E D C B A";
         std::cout << output << "\n\n";
 }
+
+u64 clear_bit(u64 board, int index) {
+    return board &= ~(1ULL << index);
+}

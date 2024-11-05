@@ -49,8 +49,8 @@ enum Castling_Rights
 };
 
 struct Move {
-    u8 starting_square;
-    u8 destination_square;
+    u8 src_square;
+    u8 dest_square;
     Piece promotion_type; // If there isnt a piece promoting, this value can be whatever as we wont use it
     u8 en_passant_square;
 //this would be decided by the search / eval and youll try each piece promotion type to see which eval is the best.
@@ -66,6 +66,7 @@ namespace Utils {
     void PrintBB(u64 board, int board_center, bool mirrored);
     int count_number_of_1bs(u64 board);
     int find_piece_index(u64 bitboard);
+    u64 clear_bit(u64 board, int index);
     // Credit for precomputations of KNIGHT_ATTACKS and KING_ATTACKS to https://github.com/simpleguy747/MollyChessBot/blob/initial-commit-fen-parser/src/attacks.c
     // A knight's attacks for any given square is all the pseudo-legal squares it could move to (meaning it doesnt take into account whether your own pieces are on those squares etc)
     constexpr u64 KNIGHT_ATTACKS[64] = {
