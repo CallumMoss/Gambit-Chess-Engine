@@ -14,29 +14,40 @@ enum class Turn: u8 {
 class Position { // Game state class
     public:
         Position(const std::string& fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-        bool piece_is_at_square(uint64_t board, int square);
         void print_position();
         std::array<char, 64> board_to_char_array(u64 board);
         void print_board(std::array<char, 64> board);
 
         // Move Gen:
-        u64 generate_pawn_attacks(int square, bool en_passant);
-        u64 get_bishop_moves(int square);
-        u64 get_rook_moves(int square);
-        u64 get_queen_moves(int square);
-        std::vector<bb_vector> generate_all_moves();
-        bb_vector generate_piece_moves(Piece type, int square);
+        u64 get_pawn_attacks(u8 square);
+        u64 get_knight_moves(u8 square);
+        u64 get_king_moves(u8 square);
+        u64 get_bishop_moves(u8 square);
+        u64 get_rook_moves(u8 square);
+        u64 get_queen_moves(u8 square);
+        std::vector<Move> generate_all_moves();
+        std::vector<Move> generate_piece_moves(Piece type, u8 square);
         std::vector<u64> extract_piece_moves(u64 attacks);
-        Move find_best_move(int depth);
+        std::vector<Move> bb_to_move_list(Piece type, u8 square, u64 attacks);
+        Move encode_move(Piece type, u8 src_square, u8 dest_square);
 
-        Piece get_piece_type(int square);
-        std::array<u64, 6> get_pieces();
-        std::array<u64, 2> get_colours();
+        Move find_best_move(const Position& current_position, u8 depth);
+        int evaluate(Position pos);
+        u8 count_material(Turn turn);
+        int negamax(Position pos, u8 depth);
+        int negamax_ab(Position pos, u8 depth, int alpha, int beta);
+        void copy_make(Move move, Position& pos);
+        bool legality_check();
+
+        Piece get_piece_type_from_square(u8 square);
+        const std::array<u64, 6>& get_pieces();
+        const std::array<u64, 2>& get_colours();
         u64 get_en_passant_target();
-        int get_half_move_clock();
-        int get_full_move_counter();
+        u8 get_half_move_clock();
+        u8 get_full_move_counter();
         u8 get_castling_rights();
         Turn get_turn();
+        Turn get_opp_turn();
 
         u64 get_pawns();
         u64 get_white_pawns();
@@ -65,9 +76,8 @@ class Position { // Game state class
         u64 get_white_pieces();
         u64 get_black_pieces();
 
+        u64 get_pieces_from_current_turn();
         u64 get_board();
-
-        void set_pawns(u64 pawns);
 
         bool get_wscr(); // returns true if white has short castling rights
         bool get_wlcr();
@@ -75,13 +85,15 @@ class Position { // Game state class
         bool get_blcr();
 
         void set_turn(Turn);
+        void set_pieces_and_colours(const Piece& moved_piece_type, const Piece& captured_piece_type, const Piece& promoted_piece_type, const Turn& turn, const u8& src_square, const u8& dest_square, bool is_en_passant);
+
     private:
         // Piece-centric bitboards for storing the position of the pieces by types and colour
         std::array<u64, 6> pieces;
         std::array<u64, 2> colours;
-		u64 en_passant_target;
-        int half_move_clock; // number of half moves, to test for 50 move rule
-		int full_move_counter; // how many moves have been played
+		u8 en_passant_target = Utils::NULL_EN_PASSANT; // 64 if not applicable. This is the square of the pawn that just moved twice. Not the dest square of en passant.
+        u8 half_move_clock; // number of half moves, to test for 50 move rule
+		u8 full_move_counter; // how many moves have been played
         u8 castling_rights; // XXXX-BL-BS-WL-WS, last 4 bits, 0 if cannot castle
         Turn turn;
 
@@ -93,7 +105,6 @@ class Position { // Game state class
         // 8 - 15 source squares
         // en_passant ranks: 48 - 55,
 
-void copy_make(Move move); // simpler than make, unmake but slightly slower.
 
 
         // check if a move causes en passant, set flag to that square

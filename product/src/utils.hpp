@@ -7,9 +7,6 @@
 #include <iostream>
 #include "Types.hpp"
 
-
-
-
 enum Piece
 {
     PAWN = 0,
@@ -31,7 +28,6 @@ enum Piece_Values
     BISHOP_VALUE = 3,
     ROOK_VALUE = 5,
     QUEEN_VALUE = 9,
-    KING_VALUE = INT_MAX
 };
 
 enum Colour
@@ -48,12 +44,116 @@ enum Castling_Rights
     BLACK_LONG = 3
 };
 
+// Inspired by Starzix flags:
+// https://github.com/zzzzz151/Starzix/blob/main/src/move.hpp
+enum Move_Flag: u8 {
+    NULL_FLAG             = 0x00,
+    PAWN_FLAG             = 0x01,
+    KNIGHT_FLAG           = 0x02,
+    BISHOP_FLAG           = 0x03,
+    ROOK_FLAG             = 0x04,
+    QUEEN_FLAG            = 0x05,
+    KING_FLAG             = 0x06,
+
+    // Only 1 flag can be used at a time, however the piece type can be inferred from any of these special flags
+    PAWN_TWO_FORWARD_FLAG = 0x07,
+    EN_PASSANT_FLAG       = 0x08,
+    KNIGHT_PROMOTION_FLAG = 0x09,
+    BISHOP_PROMOTION_FLAG = 0x0A,
+    ROOK_PROMOTION_FLAG   = 0x0B,
+    QUEEN_PROMOTION_FLAG  = 0x0C,
+    CASTLING_FLAG         = 0x0D
+};
 struct Move {
-    u8 src_square;
-    u8 dest_square;
-    Piece promotion_type; // If there isnt a piece promoting, this value can be whatever as we wont use it
-    u8 en_passant_square;
-//this would be decided by the search / eval and youll try each piece promotion type to see which eval is the best.
+    // 16 bits from right to left:
+    // 4: move_flag
+    // 6: dest square
+    // 6: src square
+    // EG: 000000 0000000 0000
+    //     src    dest    flag
+    u16 move = 0;
+
+    Move(u8 src_square, u8 dest_square, Move_Flag move_flag) {
+        // &s with bitstring of desired length to ensure the correct bits are being updated.
+        move |= (move_flag & 0x0F);                  // Move flag (4 bits) - bits 0-3
+        move |= ((dest_square & 0x3F) << 4);         // Destination square (6 bits) - bits 4-9
+        move |= ((src_square & 0x3F) << 10);         // Source square (6 bits) - bits 10-15
+    }
+
+    Move_Flag get_flag() {
+        switch(move & 0x0F) {
+            case PAWN_FLAG:
+                return PAWN_FLAG;
+            case KNIGHT_FLAG:
+                return KNIGHT_FLAG;
+            case BISHOP_FLAG:
+                return BISHOP_FLAG;
+            case ROOK_FLAG:
+                return ROOK_FLAG;
+            case QUEEN_FLAG:
+                return QUEEN_FLAG;
+            case KING_FLAG:
+                return KING_FLAG;
+            case PAWN_TWO_FORWARD_FLAG:
+                return PAWN_TWO_FORWARD_FLAG;
+            case EN_PASSANT_FLAG:
+                return EN_PASSANT_FLAG;
+            case KNIGHT_PROMOTION_FLAG:
+                return KNIGHT_PROMOTION_FLAG;
+            case BISHOP_PROMOTION_FLAG:
+                return BISHOP_PROMOTION_FLAG;
+            case ROOK_PROMOTION_FLAG:
+                return ROOK_PROMOTION_FLAG;
+            case QUEEN_PROMOTION_FLAG:
+                return QUEEN_PROMOTION_FLAG;
+            case CASTLING_FLAG:
+                return CASTLING_FLAG;
+            default:
+                return NULL_FLAG;  // Return a default value if unknown flag
+        }
+    }
+
+    Piece get_piece_type_from_flag() { // infers piece type from flag
+        switch(move & 0x0F) {
+            case PAWN_FLAG:
+                return Piece::PAWN;
+            case KNIGHT_FLAG:
+                return Piece::KNIGHT;
+            case BISHOP_FLAG:
+                return Piece::BISHOP;
+            case ROOK_FLAG:
+                return Piece::ROOK;
+            case QUEEN_FLAG:
+                return Piece::QUEEN;
+            case KING_FLAG:
+                return Piece::KING;
+            case PAWN_TWO_FORWARD_FLAG:
+                return Piece::PAWN;
+            case EN_PASSANT_FLAG:
+                return Piece::PAWN;
+            case KNIGHT_PROMOTION_FLAG:
+                return Piece::KNIGHT;
+            case BISHOP_PROMOTION_FLAG:
+                return Piece::BISHOP;
+            case ROOK_PROMOTION_FLAG:
+                return Piece::ROOK;
+            case QUEEN_PROMOTION_FLAG:
+                return Piece::QUEEN;
+            case CASTLING_FLAG:
+                return Piece::KING;
+            default:
+                return Piece::INVALID;  // Default piece
+        }
+    }
+
+    u8 get_src_square() {
+        return (move >> 4) & 0x3F;
+    }
+
+    u8 get_dest_square() {
+        return (move >> 10) & 0x3F;
+    }
+
 };
 
 namespace Utils {
@@ -65,8 +165,33 @@ namespace Utils {
     u64 get_ls1b(u64 board); // gets the least significant bit that is 1 (furthest right in bitstring)
     void PrintBB(u64 board, int board_center, bool mirrored);
     int count_number_of_1bs(u64 board);
-    int find_piece_index(u64 bitboard);
+    u8 find_piece_index(u64 bitboard);
     u64 clear_bit(u64 board, int index);
+
+    static constexpr u8 NULL_EN_PASSANT = 64;
+
+    constexpr u64 WHITE_PAWN_ATTACKS[64] {
+        0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, // although a white pawn from here could move, there should never be one here
+        0x1030000ULL, 0x2070000ULL, 0x40e0000ULL, 0x81c0000ULL, 0x10380000ULL, 0x20700000ULL, 1088421888ULL, 0x80c00000ULL,
+        0x3000000ULL, 0x7000000ULL, 0xe000000ULL, 0x1c000000ULL, 0x38000000ULL, 0x70000000ULL, 0xe0000000ULL, 0xc0000000ULL,
+        0x300000000ULL, 0x700000000ULL, 0xe00000000ULL, 0x1c00000000ULL, 0x3800000000ULL, 0x7000000000ULL, 0xe000000000ULL, 0xc000000000ULL,
+        0x30000000000ULL, 0x70000000000ULL, 0xe0000000000ULL,  0x1c0000000000ULL, 0x380000000000ULL, 0x700000000000ULL, 0xe00000000000ULL, 0xc00000000000ULL,
+        0x3000000000000ULL, 0x7000000000000ULL, 0xe000000000000ULL, 0x1c000000000000ULL, 0x38000000000000ULL, 0x70000000000000ULL, 0xe0000000000000, 0xc0000000000000ULL,
+        0x300000000000000ULL, 0x700000000000000ULL, 0xe00000000000000ULL, 0x1c00000000000000ULL, 0x3800000000000000ULL, 0x7000000000000000ULL, 0xe000000000000000ULL, 0xc000000000000000ULL,
+        0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL // end of board
+    };
+
+    constexpr u64 BLACK_PAWN_ATTACKS[64] {
+        0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, // end of board
+        0x3ULL, 0x7ULL, 0xeULL, 0x1cULL, 0x38ULL, 0x70ULL, 0xe0ULL, 0xc0ULL,
+        0x300ULL, 0x700ULL, 0xe00ULL, 0x1c00ULL, 0x3800ULL, 0x7000ULL, 0xe000ULL, 0xc000ULL,
+        0x30000ULL, 0x70000ULL, 0xe0000ULL, 0x1c0000ULL, 0x380000ULL, 0x700000ULL, 0xe00000ULL, 0xc00000ULL,
+        0x3000000ULL, 0x7000000ULL, 0xe000000ULL,  0x1c000000ULL, 0x38000000ULL, 0x70000000ULL, 0xe0000000ULL, 0xc0000000ULL,
+        0x300000000ULL, 0x700000000ULL, 0xe00000000ULL, 0x1c00000000ULL, 0x3800000000ULL, 0x7000000000ULL, 0xe000000000ULL, 0xc000000000ULL,
+        0x30100000000ULL, 0x70200000000ULL, 0xe0400000000ULL, 0x1c0800000000ULL, 0x381000000000ULL, 0x702000000000ULL, 0xe04000000000ULL, 0xc08000000000ULL,
+        0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL // although a black pawn from here could move, there should never be one here
+    };
+
     // Credit for precomputations of KNIGHT_ATTACKS and KING_ATTACKS to https://github.com/simpleguy747/MollyChessBot/blob/initial-commit-fen-parser/src/attacks.c
     // A knight's attacks for any given square is all the pseudo-legal squares it could move to (meaning it doesnt take into account whether your own pieces are on those squares etc)
     constexpr u64 KNIGHT_ATTACKS[64] = {

@@ -17,7 +17,7 @@ u64 Utils::shift_right(u64 board) { // Moving the board right a file
     return board >> 1;
 }
 
-bool Utils::piece_is_at_square(uint64_t board, int square) { // Checking whether a piece is at a given square on the provided board (can be added as any type of board, the entire or just one piece etc.)
+bool Utils::piece_is_at_square(u64 board, int square) { // Checking whether a piece is at a given square on the provided board (can be added as any type of board, the entire or just one piece etc.)
     return (board & (1ULL << square)) != 0;
 }
 
@@ -28,7 +28,7 @@ int Utils::count_number_of_1bs(u64 board) {
 // Use this to determine whether there is a piece of same colour on corresponding square (can check if & 1 << square_of_ls1b)
 // Finds the position of the ls1b
 // Credit to https://www.chessprogramming.org/BitScan#DeBruijnMultiplation and Reference: Hacker's Delight by Henry S. Warren, Jr. and ChatGPT
-int Utils::find_piece_index(u64 bitboard) {
+u8 Utils::find_piece_index(u64 bitboard) {
     static const int index64[64] = {
          0,  1, 48,  2, 57, 49, 28,  3,
         61, 58, 50, 42, 38, 29, 17,  4,
@@ -41,7 +41,7 @@ int Utils::find_piece_index(u64 bitboard) {
     };
 
     const uint64_t debruijn64 = 0x03f79d71b4cb0a89;
-    return index64[((bitboard & -bitboard) * debruijn64) >> 58];
+    return (u8)index64[((bitboard & -bitboard) * debruijn64) >> 58];
 }
 
 // Prints the board in bit representation, puts an X where the piece by specifying board center
@@ -73,6 +73,6 @@ void Utils::PrintBB(u64 board, int board_center, bool mirrored) {
         std::cout << output << "\n\n";
 }
 
-u64 clear_bit(u64 board, int index) {
+u64 Utils::clear_bit(u64 board, int index) {
     return board &= ~(1ULL << index);
 }

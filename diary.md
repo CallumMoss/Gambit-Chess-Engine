@@ -1,4 +1,7 @@
 
+06/11/2024
+Research into implementation of alpha beta and negamax
+
 05/11/2024
 Started work on search and eval.
 
