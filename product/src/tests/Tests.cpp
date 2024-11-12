@@ -1,8 +1,8 @@
-// #include <gtest/gtest.h>
-// #include "../Position.hpp"
-// #include "../utils.hpp"
-// #include "../Magics.hpp"
-// #include <iostream>
+#include <gtest/gtest.h>
+#include "../Position.hpp"
+#include "../utils.hpp"
+#include "../Magics.hpp"
+#include <iostream>
 
 // // Testing getters and FEN parser.
 // TEST(FEN_And_Pos_Rep, initial_position) {
@@ -114,73 +114,73 @@
 // 	EXPECT_EQ(pos.get_full_move_counter(), 14) << "Expected the full move clock to be 14, but it is not.";
 // }
 
+// Manually reviewing precomputations (passes regardless)
+// TEST(PRECOMPUTATION_VALIDATION, all_pieces_validation) {
+// 	for(int i = 0; i < 64; i++) {
+// 		Utils::PrintBB(Utils::ROOK_ATTACKS[i], i, true);
+// 	}
+// 	for(int i = 0; i < 64; i++) {
+// 		Utils::PrintBB(Utils::BISHOP_ATTACKS[i], i, true);
+// 	}
+// 	for(int i = 0; i < 64; i++) {
+// 		Utils::PrintBB(Utils::KNIGHT_ATTACKS[i], i, true);
+// 	}
+// 	for(int i = 0; i < 64; i++) {
+// 		Utils::PrintBB(Utils::QUEEN_ATTACKS[i], i, true);
+// 	}
+// 	for(int i = 0; i < 64; i++) {
+// 		Utils::PrintBB(Utils::KING_ATTACKS[i], i, true);
+// 	}
+// }
+// Manually reviewing precomputations (passes regardless)
+// TEST(PRECOMPUTATION_VALIDATION, knight_move_extraction) {
+// 	Position pos = Position();
+// 	int i = 30;
+// 	std::vector<u64> moves = pos.generate_piece_moves(Piece::KNIGHT, i);
+// 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
+// 		Utils::PrintBB(moves[q], i, true);
+// 	}
+// }
+
 // // Manually reviewing precomputations (passes regardless)
-// // TEST(PRECOMPUTATION_VALIDATION, all_pieces_validation) {
-// // 	for(int i = 0; i < 64; i++) {
-// // 		Utils::PrintBB(Utils::ROOK_ATTACKS[i], i, true);
-// // 	}
-// // 	for(int i = 0; i < 64; i++) {
-// // 		Utils::PrintBB(Utils::BISHOP_ATTACKS[i], i, true);
-// // 	}
-// // 	for(int i = 0; i < 64; i++) {
-// // 		Utils::PrintBB(Utils::KNIGHT_ATTACKS[i], i, true);
-// // 	}
-// // 	for(int i = 0; i < 64; i++) {
-// // 		Utils::PrintBB(Utils::QUEEN_ATTACKS[i], i, true);
-// // 	}
-// // 	for(int i = 0; i < 64; i++) {
-// // 		Utils::PrintBB(Utils::KING_ATTACKS[i], i, true);
-// // 	}
-// // }
+// TEST(PRECOMPUTATION_VALIDATION, bishop_move_extraction) {
+// 	Position pos = Position();
+// 	int i = 30;
+// 	std::vector<u64> moves = pos.generate_piece_moves(Piece::BISHOP, i);
+// 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
+// 		Utils::PrintBB(moves[q], i, true);
+// 	}
+// }
+
 // // Manually reviewing precomputations (passes regardless)
-// // TEST(PRECOMPUTATION_VALIDATION, knight_move_extraction) {
-// // 	Position pos = Position();
-// // 	int i = 30;
-// // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::KNIGHT, i);
-// // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// // 		Utils::PrintBB(moves[q], i, true);
-// // 	}
-// // }
+// TEST(PRECOMPUTATION_VALIDATION, rook_move_extraction) {
+// 	Position pos = Position("8/8/8/8/6R1/8/8/8 w - - 0 1");
+// 	int i = 30;
+// 	std::vector<u64> moves = pos.generate_piece_moves(Piece::ROOK, i);
+// 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
+// 		Utils::PrintBB(moves[q], i, true);
+// 	}
+// }
 
-// // // Manually reviewing precomputations (passes regardless)
-// // TEST(PRECOMPUTATION_VALIDATION, bishop_move_extraction) {
-// // 	Position pos = Position();
-// // 	int i = 30;
-// // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::BISHOP, i);
-// // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// // 		Utils::PrintBB(moves[q], i, true);
-// // 	}
-// // }
+// // Manually reviewing precomputations (passes regardless)
+// TEST(PRECOMPUTATION_VALIDATION, queen_move_extraction) {
+// 	Position pos = Position();
+// 	int i = 30;
+// 	std::vector<u64> moves = pos.generate_piece_moves(Piece::QUEEN, i);
+// 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
+// 		Utils::PrintBB(moves[q], i, true);
+// 	}
+// }
 
-// // // Manually reviewing precomputations (passes regardless)
-// // TEST(PRECOMPUTATION_VALIDATION, rook_move_extraction) {
-// // 	Position pos = Position("8/8/8/8/6R1/8/8/8 w - - 0 1");
-// // 	int i = 30;
-// // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::ROOK, i);
-// // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// // 		Utils::PrintBB(moves[q], i, true);
-// // 	}
-// // }
-
-// // // Manually reviewing precomputations (passes regardless)
-// // TEST(PRECOMPUTATION_VALIDATION, queen_move_extraction) {
-// // 	Position pos = Position();
-// // 	int i = 30;
-// // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::QUEEN, i);
-// // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// // 		Utils::PrintBB(moves[q], i, true);
-// // 	}
-// // }
-
-// // // Manually reviewing precomputations (passes regardless)
-// // TEST(PRECOMPUTATION_VALIDATION, king_move_extraction) {
-// // 	Position pos = Position();
-// // 	int i = 30;
-// // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::KING, i);
-// // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// // 		Utils::PrintBB(moves[q], i, true);
-// // 	}
-// // }
+// // Manually reviewing precomputations (passes regardless)
+// TEST(PRECOMPUTATION_VALIDATION, king_move_extraction) {
+// 	Position pos = Position();
+// 	int i = 30;
+// 	std::vector<u64> moves = pos.generate_piece_moves(Piece::KING, i);
+// 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
+// 		Utils::PrintBB(moves[q], i, true);
+// 	}
+// }
 
 // // Manually reviewing pawn moves (passes regardless)
 // TEST(GEN_MOVES_VALIDATION, pawns) {
@@ -327,98 +327,98 @@
 // 	}
 // }
 
-// // // Manually reviewing bishop moves (passes regardless)
-// // TEST(GEN_MOVES_VALIDATION, queen_no_edges_precalculations) {
-// // 	Position pos = Position();
-// // 	pos.set_turn(Turn::WHITE);
-// // 	for(int i = 0; i < 64; i++) {
-// // 		u64 queen_attacks = Utils::BISHOP_ATTACKS_NO_EDGES[i] | Utils::ROOK_ATTACKS_NO_EDGES[i];
-// // 		std::cout << queen_attacks << std::endl;
-// // 		//Utils::PrintBB(queen_attacks, i, true);
-// // 	}
-// // }
+// // Manually reviewing bishop moves (passes regardless)
+// TEST(GEN_MOVES_VALIDATION, queen_no_edges_precalculations) {
+// 	Position pos = Position();
+// 	pos.set_turn(Turn::WHITE);
+// 	for(int i = 0; i < 64; i++) {
+// 		u64 queen_attacks = Utils::BISHOP_ATTACKS_NO_EDGES[i] | Utils::ROOK_ATTACKS_NO_EDGES[i];
+// 		std::cout << queen_attacks << std::endl;
+// 		//Utils::PrintBB(queen_attacks, i, true);
+// 	}
+// }
 
-// // // Manually reviewing rook moves (passes regardless)
-// // TEST(GEN_MOVES_VALIDATION, rook_no_edges_precalculations) {
-// // 	Position pos = Position();
-// // 	pos.set_turn(Turn::WHITE);
-// // 	for(int i = 0; i < 64; i++) {
-// // 		Utils::PrintBB(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
-// // 	}
-// // }
+// // Manually reviewing rook moves (passes regardless)
+// TEST(GEN_MOVES_VALIDATION, rook_no_edges_precalculations) {
+// 	Position pos = Position();
+// 	pos.set_turn(Turn::WHITE);
+// 	for(int i = 0; i < 64; i++) {
+// 		Utils::PrintBB(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
+// 	}
+// }
 
-// // // Manually reviewing rook moves (passes regardless)
-// // TEST(GEN_MOVES_VALIDATION, finding_magic) {
-// // 	Position pos = Position();
-// // 	pos.set_turn(Turn::WHITE);
-// // 	int square = 0;
-// // 	u64 blocker_squares = pos.get_relevant_blocker_squares(square);
-// // 	Utils::PrintBB(blocker_squares, square, true);
-// // 	Final_Magic magic = pos.find_magic(square);
-// // 	std::cout << "Done";
-// // 	std::cout << "\nMagic Number: " << magic.magic.magic_number << "\n";
-// // 	for(size_t i = 0; i < magic.table.size(); i++) {
-// // 		std::cout << magic.table[i] << "\n ########################################### \n";
-// // 	}
-// // }
+// // Manually reviewing rook moves (passes regardless)
+// TEST(GEN_MOVES_VALIDATION, finding_magic) {
+// 	Position pos = Position();
+// 	pos.set_turn(Turn::WHITE);
+// 	int square = 0;
+// 	u64 blocker_squares = pos.get_relevant_blocker_squares(square);
+// 	Utils::PrintBB(blocker_squares, square, true);
+// 	Final_Magic magic = pos.find_magic(square);
+// 	std::cout << "Done";
+// 	std::cout << "\nMagic Number: " << magic.magic.magic_number << "\n";
+// 	for(size_t i = 0; i < magic.table.size(); i++) {
+// 		std::cout << magic.table[i] << "\n ########################################### \n";
+// 	}
+// }
 
+// Tests finding of magics
+// TEST(GEN_MOVES_VALIDATION, find_magic) {
+// 	// 8/3N4/1p3P2/8/3B4/5p2/5P2/8 w - - 0 1 Bishop testing position
+// 	Position pos = Position("8/3P4/5p2/8/2pR4/5P2/8/3p4 w - - 0 1");
+// 	pos.set_turn(Turn::WHITE);
+// 	int i = 27;
+// 	Final_Magic fm = Magics::find_magic(Piece::ROOK, i);
+// 	u64 attacks = fm.table[Magics::get_magic_index(fm.magic, Magics::get_blockers(i, pos.get_board()))];
+// 	Utils::PrintBB(pos.get_board(), i, true);
+// 	Utils::PrintBB(Utils::ROOK_ATTACKS[i], i, true);
+// 	Utils::PrintBB(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
+// 	Utils::PrintBB(Magics::get_blockers(i, pos.get_board()), i, true);
+// 	Utils::PrintBB(attacks, i, true);
+// }
+
+// ARCHIVED:
 // // Tests finding of magics
-// // TEST(GEN_MOVES_VALIDATION, find_magic) {
-// // 	// 8/3N4/1p3P2/8/3B4/5p2/5P2/8 w - - 0 1 Bishop testing position
-// // 	Position pos = Position("8/3P4/5p2/8/2pR4/5P2/8/3p4 w - - 0 1");
-// // 	pos.set_turn(Turn::WHITE);
-// // 	int i = 27;
-// // 	Final_Magic fm = Magics::find_magic(Piece::ROOK, i);
-// // 	u64 attacks = fm.table[Magics::get_magic_index(fm.magic, Magics::get_blockers(i, pos.get_board()))];
-// // 	Utils::PrintBB(pos.get_board(), i, true);
-// // 	Utils::PrintBB(Utils::ROOK_ATTACKS[i], i, true);
-// // 	Utils::PrintBB(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
-// // 	Utils::PrintBB(Magics::get_blockers(i, pos.get_board()), i, true);
-// // 	Utils::PrintBB(attacks, i, true);
-// // }
+// TEST(GEN_MOVES_VALIDATION, getting_magics) {
+// 	// I used this function to get the magics:
+// 	Position pos = Position();
+// 	Magics::init(pos);
+// 	for(Final_Magic magic : rook_magics_table) {
+// 		std::cout << magic.magic.magic_number << std::endl;
+// 	}
+// }
 
-// // ARCHIVED:
-// // // Tests finding of magics
-// // TEST(GEN_MOVES_VALIDATION, getting_magics) {
-// // 	// I used this function to get the magics:
-// // 	Position pos = Position();
-// // 	Magics::init(pos);
-// // 	for(Final_Magic magic : rook_magics_table) {
-// // 		std::cout << magic.magic.magic_number << std::endl;
-// // 	}
-// // }
+// TEST(GEN_MOVES_VALIDATION, using_generated_magics) {
+// 	Position pos = Position();
+// 	Magics::init();
+// 	int square = 0;
+// 	bb_vector attack_table_for_square = rook_magics_table[square];
+// 	// for(int i = 0; i < (int)attack_table_for_square.size(); i++) {
+// 	// 	Utils::PrintBB(attack_table_for_square[i], square, true);
+// 	// }
+// }
 
-// // TEST(GEN_MOVES_VALIDATION, using_generated_magics) {
-// // 	Position pos = Position();
-// // 	Magics::init();
-// // 	int square = 0;
-// // 	bb_vector attack_table_for_square = rook_magics_table[square];
-// // 	// for(int i = 0; i < (int)attack_table_for_square.size(); i++) {
-// // 	// 	Utils::PrintBB(attack_table_for_square[i], square, true);
-// // 	// }
-// // }
+// TEST(GEN_MOVES_VALIDATION, using_generated_magics) {
+// 	// For an empty board
+// 	Position pos = Position();
+// 	Magics::init(pos);
+// 	int square = 0;
+// 	bb_vector attack_table_for_square = rook_magics_table[square];
+// 	for(int i = 0; i < (int)attack_table_for_square.size(); i++) {
+// 		std::cout << i << std::endl;
+// 		Utils::PrintBB(attack_table_for_square[i], square, true);
+// 	}
+// }
 
-// // TEST(GEN_MOVES_VALIDATION, using_generated_magics) {
-// // 	// For an empty board
-// // 	Position pos = Position();
-// // 	Magics::init(pos);
-// // 	int square = 0;
-// // 	bb_vector attack_table_for_square = rook_magics_table[square];
-// // 	for(int i = 0; i < (int)attack_table_for_square.size(); i++) {
-// // 		std::cout << i << std::endl;
-// // 		Utils::PrintBB(attack_table_for_square[i], square, true);
-// // 	}
-// // }
-
-// // TEST(GEN_MOVES_VALIDATION, using_generated_magics2)
-// // {
-// // 	Position pos = Position("8/3P4/5p2/8/2pR1P2/5P2/8/3p4 w - - 0 1");
-// // 	Magics::init();
-// // 	int square = 27;
-// // 	std::cout << "Hey\n";
-// // 	u64 rook_moves = pos.get_rook_moves(pos, square);
-// // 	Utils::PrintBB(rook_moves, square, true);
-// // }
+// TEST(GEN_MOVES_VALIDATION, using_generated_magics2)
+// {
+// 	Position pos = Position("8/3P4/5p2/8/2pR1P2/5P2/8/3p4 w - - 0 1");
+// 	Magics::init();
+// 	int square = 27;
+// 	std::cout << "Hey\n";
+// 	u64 rook_moves = pos.get_rook_moves(pos, square);
+// 	Utils::PrintBB(rook_moves, square, true);
+// }
 
 // TEST(GEN_MOVES_VALIDATION, using_generated_magics3)
 // {
@@ -532,7 +532,76 @@
 // 	}
 // }
 
-// int main(int argc, char **argv) {
-//   testing::InitGoogleTest(&argc, argv);
-//   return RUN_ALL_TESTS();
+
+
+
+
+
+
+
+// TEST(MAKE_MOVES, testing_forward_pawn_push) {
+// 	Position pos = Position();
+// 	u8 src_square = 12;
+// 	u8 dest_square = 20;
+// 	Move move = Move(src_square, dest_square, Move_Flag::PAWN_FLAG);
+// 	pos.copy_make(move, pos);
+// 	Utils::PrintBB(pos.get_board(), src_square, true);
+// 	Utils::PrintBB(pos.get_pawns(), src_square, true);
+// 	Utils::PrintBB(pos.get_white_pawns(), src_square, true);
+// 	Utils::PrintBB(pos.get_white_pieces(), src_square, true);
 // }
+
+// TEST(MAKE_MOVES, testing_forward_two_pawn_push) {
+// 	Position pos = Position();
+// 	u8 src_square = 12;
+// 	u8 dest_square = 28;
+// 	Move move = Move(src_square, dest_square, Move_Flag::PAWN_TWO_FORWARD_FLAG);
+// 	pos.copy_make(move, pos);
+// 	Utils::PrintBB(pos.get_board(), src_square, true);
+// 	Utils::PrintBB(pos.get_pawns(), src_square, true);
+// 	Utils::PrintBB(pos.get_white_pawns(), src_square, true);
+// 	Utils::PrintBB(pos.get_white_pieces(), src_square, true);
+// }
+
+TEST(PERFT, pos1) {
+	Position pos = Position();
+	Magics::init();
+	std::cout << pos.perft(1, pos) << std::endl;
+}
+
+// TEST(PERFT, pos1_black) {
+// 	Position pos = Position("rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1"); // starting pos
+// 	Magics::init();
+// 	std::cout << pos.perft(1, pos) << std::endl;
+// }
+
+// TEST(FIND_BEST_MOVE, pos1) {
+// 	Position pos = Position();
+// 	Magics::init();
+// 	Move move = pos.find_best_move(pos, 1); // Depth 1 is the eval of root's first move, depth 2 is the eval of the position after roots first move and opponents response
+// 	u8 src_square = move.get_src_square();
+// 	// apply best move
+// 	pos.copy_make(move, pos);
+// 	Utils::PrintBB(pos.get_board(), src_square, true);
+// 	Utils::PrintBB(pos.get_pawns(), src_square, true);
+// 	Utils::PrintBB(pos.get_white_pawns(), src_square, true);
+// 	Utils::PrintBB(pos.get_white_pieces(), src_square, true);
+// }
+
+// TEST(FIND_BEST_MOVE, pos2) {
+// 	Position pos = Position("1k6/8/8/3Pp3/8/8/8/1N2K3 w - e6 0 2");
+// 	Magics::init();
+// 	Move move = pos.find_best_move(pos, 1);
+// 	u8 src_square = move.get_src_square();
+// 	// apply best move
+// 	pos.copy_make(move, pos);
+// 	Utils::PrintBB(pos.get_board(), src_square, true);
+// 	Utils::PrintBB(pos.get_pawns(), src_square, true);
+// 	Utils::PrintBB(pos.get_white_pawns(), src_square, true);
+// 	Utils::PrintBB(pos.get_white_pieces(), src_square, true);
+// }
+
+int main(int argc, char **argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

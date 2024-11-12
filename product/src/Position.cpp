@@ -10,6 +10,7 @@ Position::Position(const std::string& fen):
     pieces(),
         colours(),
             en_passant_target(), // Initializes to the default value. Can alternatively put whatever value here i want.
+            // 64 if not applicable. This is the square of the pawn that just moved twice. Not the dest square of en passant.
                 half_move_clock(),
                     full_move_counter(),
                         castling_rights(),
@@ -42,7 +43,7 @@ Position::Position(const std::string& fen):
             file += (c - '0'); // skips empty files of this amount
         }
         else {
-            uint64_t square = 1ULL << (rank * 8 + file);
+            u64 square = 1ULL << (rank * 8 + file);
             // shifts 1 bit, to represent there is a piece on the square, across the bitboard's bitstring
             // For example, c4 in LERF is 26. So you want to push a 1 onto the 26th bit of the bitstring
             switch (c) {
@@ -101,7 +102,7 @@ Position::Position(const std::string& fen):
                 break;
             case 3: // which squares are being targetted with en passant
                 file_letter = word[0];
-                if (file_letter == '-') { en_passant_target = 64ULL; break; }
+                if (file_letter == '-') { en_passant_target = Utils::NULL_EN_PASSANT; break; }
                 else if (file_letter == 'a') { file_number = 0; }
                 else if (file_letter == 'b') { file_number = 1; }
                 else if (file_letter == 'c') { file_number = 2; }
@@ -110,8 +111,7 @@ Position::Position(const std::string& fen):
                 else if (file_letter == 'f') { file_number = 5; }
                 else if (file_letter == 'g') { file_number = 6; }
                 else { file_number = 7; } // if == 'h'
-
-                en_passant_target = 1ULL << ((word[1] - 1) * 8 + file_number);
+                en_passant_target = (((word[1] - '0' - 1) * 8) + file_number);
                 break;
             case 4: // how many half moves have been played
                 half_move_clock = std::stoi(word); // string to integer
@@ -181,6 +181,17 @@ u64 Position::get_pawn_attacks(u8 square) {
         if(square >= 8 && square <= 15 && Utils::piece_is_at_square(get_board(), square + 16)) { // if can move twice but something is 2 spaces in front, we cant move twice
             attacks &= ~(1ULL << square + 16);
         }
+        if((square + 7 < 64) && !(Utils::piece_is_at_square(get_black_pieces(), square + 7))) { // if an enemy piece is not diagonal, remove diagonal attacks
+            attacks &= ~(1ULL << square + 7);
+        }
+        if((square + 9 < 64) && !(Utils::piece_is_at_square(get_black_pieces(), square + 9))) { 
+            attacks &= ~(1ULL << square + 9);
+        }
+        if(en_passant_target != 64) { // if there is an en passant, add it to relevant pawn attacks
+        if((square == en_passant_target - 7) || (square == en_passant_target - 9)) {
+            attacks |= 1ULL << en_passant_target;
+        }
+    }
     }
     else {
         attacks = Utils::BLACK_PAWN_ATTACKS[square];
@@ -192,11 +203,19 @@ u64 Position::get_pawn_attacks(u8 square) {
         if(square >= 48 && square <= 55 && Utils::piece_is_at_square(get_board(), square - 16)) { // if can move twice but something is 2 spaces in front, we cant move twice
             attacks &= ~(1ULL << square - 16);
         }
+        if((square - 7 >= 0) && !(Utils::piece_is_at_square(get_white_pieces(), square - 7))) { // if an enemy piece is not diagonal, remove diagonal attacks
+            attacks &= ~(1ULL << square - 7);
+        }
+        if((square - 9 >= 0) && !(Utils::piece_is_at_square(get_white_pieces(), square - 9))) { // if an enemy piece is not diagonal, remove diagonal attacks
+            attacks &= ~(1ULL << square - 9);
+        }
+        if(en_passant_target != 64) { // if there is an en passant, add it to relevant pawn attacks
+            if((square == en_passant_target + 7) || (square == en_passant_target + 9)) {
+                attacks |= 1ULL << en_passant_target;
+        }
+    }
     }
 
-    if(en_passant_target != 64) { // if there is an en passant, add it
-        attacks |= 1ULL << en_passant_target;
-    }
     return attacks;
 }
 
@@ -266,15 +285,16 @@ Piece Position::get_piece_type_from_square(u8 square) {
 std::vector<Move> Position::generate_all_moves() // uses the board state to generate all moves for a given colour 
 {
     std::vector<Move> moves;
-    u64 pieces = get_pieces_from_current_turn();
+   u64 pieces = get_pieces_from_current_turn();
     std::vector<Move> square_moves;
     std::vector<Move> empty_vector; // no moves for this square as the player whos turn it is does not have a piece on it
     for(u8 square = 0; square < 64; square++) {
-        if(1ULL << square & pieces) { // if the person whos turn it is has a piece on this square, gen its moves
+        if((1ULL << square) & pieces) { // if the person whos turn it is has a piece on this square, gen its moves
             Piece piece_type = get_piece_type_from_square(square);
             square_moves = generate_piece_moves(piece_type, square);
             for(Move move : square_moves) {
                 moves.push_back(move);
+                // if pawn destination square is unoccupied, en passant flag
             }
         }
     }
@@ -290,10 +310,7 @@ u64 Position::get_rook_moves(u8 square) {
     magic.index_bits = Utils::count_number_of_1bs(magic.mask);
     u64 blockers = Magics::get_blockers(Piece::ROOK, square, get_board());
     u64 attacks = attacks_on_square[Magics::get_magic_index(magic, blockers)];
-    if(get_turn() == Turn::WHITE) {
-        return attacks & ~get_white_pieces();
-    }
-    return attacks & ~get_black_pieces();
+    return attacks & ~get_pieces_from_current_turn();
 }
 
 u64 Position::get_bishop_moves(u8 square) {
@@ -305,25 +322,50 @@ u64 Position::get_bishop_moves(u8 square) {
     magic.index_bits = Utils::count_number_of_1bs(magic.mask);
     u64 blockers = Magics::get_blockers(Piece::BISHOP, square, get_board());
     u64 attacks = attacks_on_square[Magics::get_magic_index(magic, blockers)];
-    if(get_turn() == Turn::WHITE) {
-        return attacks & ~get_white_pieces();
-    }
-    return attacks & ~get_black_pieces();
+    return attacks & ~get_pieces_from_current_turn();
 }
 
 u64 Position::get_queen_moves(u8 square) {
     // Returns the attack mask of a queen on a given square
     // Does this by glueing a rook and bishop on the same square together
     u64 attacks = get_rook_moves(square) | get_bishop_moves(square);
-    if(get_turn() == Turn::WHITE) {
-        return attacks & ~get_white_pieces();
+    return attacks & ~get_pieces_from_current_turn();
+}
+
+u64 Position::generate_piece_attacks(Piece type, u8 square) { // returns u64 without move conversion
+    u64 attacks = 0ULL;
+    switch(type) {
+        case Piece::PAWN:
+            attacks = get_pawn_attacks(square);
+            return attacks; // skip check for piece colours as already handled.
+        case Piece::KNIGHT:
+            attacks = Utils::KNIGHT_ATTACKS[square];
+            break;
+        case Piece::BISHOP:
+            attacks = get_bishop_moves(square);
+            break;
+        case Piece::ROOK:
+            attacks = get_rook_moves(square);
+            break;
+        case Piece::QUEEN:
+            attacks = get_queen_moves(square);
+            break;
+        case Piece::KING:
+            attacks = Utils::KING_ATTACKS[square];
+            break;
+        case Piece::INVALID:
+            attacks = 0;
+            break;
     }
-    return attacks & ~get_black_pieces();
+    // Ensuring it isnt attacking its own piece
+
+    return attacks & ~get_pieces_from_current_turn();
+
+    return attacks;
 }
 
 std::vector<Move> Position::generate_piece_moves(Piece type, u8 square) { // will be used when searching for both sides, so will use Turn.
     u64 attacks = 0ULL;
-    u64 blockers = 0ULL;
     switch(type) {
         case Piece::PAWN:
             attacks = get_pawn_attacks(square);
@@ -347,12 +389,9 @@ std::vector<Move> Position::generate_piece_moves(Piece type, u8 square) { // wil
             attacks = 0;
             break;
     }
-    // if(turn == Turn::WHITE) {
-    //     attacks = attacks & ~get_white_pieces();
-    // }
-    // else {
-    //     attacks = attacks & ~get_black_pieces();
-    // }
+    // Ensuring it isnt attacking its own piece
+
+    attacks &= ~get_pieces_from_current_turn();
 
     return bb_to_move_list(type, square, attacks);
 
@@ -387,6 +426,10 @@ Move Position::encode_move(Piece type, u8 src_square, u8 dest_square) {
         if((src_square == dest_square + 16) || (src_square == dest_square - 16)) { // if is pawn and has moved twice
             flag = Move_Flag::PAWN_TWO_FORWARD_FLAG; // this move gives the option of en_passant for next move
         }
+
+        if(dest_square == en_passant_target) {
+            flag = Move_Flag::EN_PASSANT_FLAG;
+        } // then en passant has occured
     }
     else if(type == Piece::KING) {
         if((src_square == dest_square + 2) || (src_square == dest_square - 2)) { // castling has occured
@@ -421,18 +464,81 @@ Move Position::encode_move(Piece type, u8 src_square, u8 dest_square) {
     return Move(src_square, dest_square, flag);
 }
 
-bool Position::legality_check() {
+// Checks whether after applying a pseudo move, if the position is legal.
+bool Position::legality_check(Position& pos, Move& move)
+{
 
-    // If move type is castling, check if king is in check currently or will be
-    // Also check if the squares between the king and rook are attacked
+    // Finding King Square and opponents pieces:
+    u64 king_square_u64;
+    u64 our_pieces;
+    u64 opponent_pieces;
+    if(pos.get_turn() == Turn::WHITE) {
+        our_pieces = pos.get_white_pieces();
+        opponent_pieces = pos.get_black_pieces();
+        king_square_u64 = pos.get_white_king();
+    }
+    else {
+        our_pieces = pos.get_black_pieces();
+        opponent_pieces = pos.get_white_pieces();
+        king_square_u64 = pos.get_black_king();
+    }
 
-    // Check if king is in check
+    if(king_square_u64 == 0ULL) { // if king has been taken. Should not happen but will be helpful for strange FENs
+        return false;
+    }
+
+    u8 king_square_index = Utils::find_piece_index(king_square_u64);
+
+    // Finding if king is in check
+    // Finding squares where if a piece is on, would see the king.
+    // OR queen attacks from the square with knight attacks
+    // generate attacks for opponents pieces on these squares
+    u64 king_target_mask = Utils::QUEEN_ATTACKS[king_square_index] || Utils::KNIGHT_ATTACKS[king_square_index]; // squares where if opponents piece is on could attack king
+    u64 opponent_relevant_pieces = king_target_mask & opponent_pieces; // squares with an opponents piece on
+
+    // Check if opponents relevant pieces can actually attack the king
+    // Is there a faster way than generating them?
+    // Generate attacks for pieces on these squares
+    // if return val & king_square_u64 then return false
+
+    u8 index;
+    u64 attacks;
+    Piece type;
+    while(opponent_relevant_pieces) {
+        index = Utils::find_piece_index(opponent_relevant_pieces);
+        type = get_piece_type_from_square(index);
+        attacks = generate_piece_attacks(type, index);
+        if(attacks & king_target_mask) { // if there is a piece hitting the king
+            return false;
+        }
+        opponent_relevant_pieces = Utils::clear_bit(opponent_relevant_pieces, index);
+    }
+
+
+    if(move.get_flag() == Move_Flag::CASTLING_FLAG) { // Already checks when generating whether it has the rights to do so
+        // Already checks if king is in check, so now check if rook is in check
+        u64 rook_square_u64 = pos.get_rooks() & our_pieces;
+        u8 rook_square_index = Utils::find_piece_index(rook_square_u64);
+        u64 rook_target_mask = Utils::QUEEN_ATTACKS[rook_square_index] || Utils::KNIGHT_ATTACKS[rook_square_index]; // squares where if opponents piece is on could attack rook
+        opponent_relevant_pieces = rook_target_mask & opponent_pieces; // squares with an opponents piece on
+
+        while(opponent_relevant_pieces) {
+            index = Utils::find_piece_index(opponent_relevant_pieces);
+            type = get_piece_type_from_square(index);
+            attacks = generate_piece_attacks(type, index);
+            if(attacks & rook_target_mask) { // if there is a piece hitting the king
+                return false;
+            }
+            opponent_relevant_pieces = Utils::clear_bit(opponent_relevant_pieces, index);
+        }
+    }
+
     return true;
 }
 
 // Takes a reference to a position where we apply a move to it.
 // Find best move will check if its legal. If it isn't, it will undo the move by making it equal to the original pos
-void Position::copy_make(Move move, Position& pos) // simpler than make, unmake but slightly slower.
+void Position::copy_make(Move move, Position& pos) // simpler than make and unmake but slightly slower.
 {
     // std::array<u64, 6> pieces;
     // std::array<u64, 2> colours;
@@ -454,12 +560,51 @@ void Position::copy_make(Move move, Position& pos) // simpler than make, unmake 
 
     // Adapting for special flags
     switch(flag) {
+        case ROOK_FLAG: // removing castling rights
+            if(pos.castling_rights = 0) { // if already cant castle, ignore removing castling
+                break;
+            }
+            if(src_square == 0) { // no need to check colour as this implies if a rook got here that they cant castle
+                pos.remove_wlcr();
+            }
+            else if(src_square == 7) {
+                pos.remove_wscr();
+            }
+            else if(src_square == 56) {
+                pos.remove_blcr();
+            }
+            else if(src_square == 63) {
+                pos.remove_bscr();
+            }
+            break;
+        case KING_FLAG:
+            if(pos.turn == Turn::WHITE) {
+                pos.remove_wlcr();
+                pos.remove_wscr();
+            }
+            else {
+                pos.remove_blcr();
+                pos.remove_bscr();
+            }
+            break;
+
         case PAWN_TWO_FORWARD_FLAG:
-            pos.en_passant_target = dest_square;
+            if(pos.turn == Turn::WHITE) {
+                pos.en_passant_target = dest_square - 8;
+            }
+            else {
+                pos.en_passant_target = dest_square + 8;
+            }
+
             break;
         case EN_PASSANT_FLAG:
-
+            Utils::PrintBB(pos.get_board(), 0, true);
             set_pieces_and_colours(Piece::PAWN, Piece::PAWN, Piece::INVALID, turn, src_square, dest_square, true);
+            std::cout << "\n\nEN PASSANT\n\n";
+            Utils::PrintBB(pos.get_board(), 0, true);
+            Utils::PrintBB(pos.get_pawns(), 0, true);
+            Utils::PrintBB(pos.get_black_pieces(), 0, true);
+            Utils::PrintBB(pos.get_white_pieces(), 0, true);
              // if this flag, then the dest square and target square are different.
             break;
 
@@ -566,6 +711,11 @@ bool Position::get_wlcr() { return castling_rights & (1 << Castling_Rights::WHIT
 bool Position::get_bscr() { return castling_rights & (1 << Castling_Rights::BLACK_SHORT); }
 bool Position::get_blcr() { return castling_rights & (1 << Castling_Rights::BLACK_LONG); }
 
+void Position::remove_wscr() { castling_rights = castling_rights & ~ 1 << Castling_Rights::WHITE_SHORT; }
+void Position::remove_wlcr() { castling_rights = castling_rights & ~ 1 << Castling_Rights::WHITE_LONG; }
+void Position::remove_bscr() { castling_rights = castling_rights & ~ 1 << Castling_Rights::BLACK_SHORT; }
+void Position::remove_blcr() { castling_rights = castling_rights & ~ 1 << Castling_Rights::BLACK_LONG; }
+
 void Position::set_turn(Turn turn) {this->turn = turn;}
 
 // Updates pieces and colours depending on who moved what and if it took a piece and what the promotion is
@@ -610,10 +760,15 @@ void Position::set_pieces_and_colours(const Piece& moved_piece_type, const Piece
         }
         else if(is_en_passant) { // or if the same type has been captured, it needs to remove the piece at the en passant target.
             u64 captured_piece = pieces[captured_piece_type];
-            captured_piece = Utils::clear_bit(captured_piece, en_passant_target);
+            if(playerB_colour == Colour::WHITE) {
+                captured_piece = Utils::clear_bit(captured_piece, en_passant_target + 8); // we have captured whites piece with en passant
+            }
+            else {
+                captured_piece = Utils::clear_bit(captured_piece, en_passant_target - 8);
+            }
             pieces[captured_piece_type] = captured_piece;
             u64 playerB_pieces = colours[playerB_colour];
-            playerB_pieces = Utils::clear_bit(playerB_pieces, en_passant_target);
+            playerB_pieces = Utils::clear_bit(captured_piece, en_passant_target);
             colours[playerB_colour] = playerB_pieces;
             return;
         }
@@ -632,19 +787,19 @@ Move Position::find_best_move(const Position& current_position, u8 depth) {
     // Currently do not keep track of eval after end
     // If wish to do this for programming analysis, can
     // just use prints
+
     int best_eval = INT_MIN;
     Move best_move = Move(0, 0, Move_Flag::NULL_FLAG);
     int eval;
     // Need to convert this to return moves instead of bitboards
     std::vector<Move> moves = generate_all_moves();
-    Position new_position;
      for(Move move : moves) {
         // Reset position
-        new_position = current_position;
-        
+        Position new_position = current_position; // reset position after every exploration
         // make move
-        copy_make(move, new_position); // apply move to current pos
-        if(!new_position.legality_check()) { // if move isnt legal, skip eval for this move
+        new_position.copy_make(move, new_position); // apply move to current pos
+
+        if(!new_position.legality_check(new_position, move)) { // if move isnt legal, skip eval for this move
             continue;
         }
 
@@ -660,7 +815,6 @@ Move Position::find_best_move(const Position& current_position, u8 depth) {
 
         // AB Negamax:
         eval = -negamax_ab(new_position, depth - 1, INT_MIN, INT_MAX);
-
         if(eval > best_eval) {
             best_eval = eval;
             best_move = move;
@@ -675,18 +829,27 @@ Move Position::find_best_move(const Position& current_position, u8 depth) {
 // Pruning is less helpful for gambit as it aims to find risky moves, therefore pruning could prove bad
 // Added pruning simply but may take it off for the above reason
 // negamax and negamax_ab returns the same best move, therefore chose to implement this version.
-int Position::negamax_ab(Position pos, u8 depth, int alpha, int beta) {
+int Position::negamax_ab(Position current_position, u8 depth, int alpha, int beta) {
     if (depth == 0) { // or if checkmate?
         // returns eval of the position at a given depth
-        return evaluate(pos);
+        //std::cout << evaluate(current_position);
+        return evaluate(current_position);
     }
 
-    std::vector<Move> moves = pos.generate_all_moves();
+    std::vector<Move> moves = current_position.generate_all_moves();
     int best_eval;
     for(Move move : moves) {
-        pos.copy_make(move, pos);
+        // Reset position
+        Position new_position = current_position; // reset position after every exploration
+        
+        // make move
+        new_position.copy_make(move, new_position); // apply move to current pos
+        
+        if(!new_position.legality_check(new_position, move)) { // if move isnt legal, skip eval for this move
+            continue;
+        }
 
-        int eval = -negamax_ab(pos, depth - 1, -beta, -alpha);
+        int eval = -negamax_ab(current_position, depth - 1, -beta, -alpha);
         // do i need to undo the move? shouldnt need to if i copy positions instead
         // of editing our one position
 
@@ -712,10 +875,11 @@ int Position::evaluate(Position pos) {
     // I think chess perspective of - for black is performed in another function, so dont need to consider anything besides own side - opp side
     if(pos.get_turn() == Turn::WHITE) {
         // could make a get_opp_turn()?
-        return count_material(Turn::WHITE) - count_material(Turn::BLACK);
+
+        return pos.count_material(Turn::WHITE) - pos.count_material(Turn::BLACK);
     }
     else {
-        return count_material(Turn::BLACK) - count_material(Turn::WHITE);
+        return pos.count_material(Turn::BLACK) - pos.count_material(Turn::WHITE);
     } 
 }
 
@@ -729,8 +893,14 @@ u8 Position::count_material(Turn turn) {
         board = get_black_pieces();
     }
     Piece piece;
+    int square = 0;
     while(true) {
-        piece = get_piece_type_from_square(Utils::find_piece_index(board));
+        // find ls1b square
+        square = Utils::find_piece_index(board);
+        if(square == 64) { // no more pieces
+            break;
+        }
+        piece = get_piece_type_from_square(square);
         switch(piece) {
             case(Piece::PAWN):
                 material += Piece_Values::PAWN_VALUE;
@@ -750,6 +920,59 @@ u8 Position::count_material(Turn turn) {
             default: // Kings and Invalid have no value
                 break;
         }
+        board = Utils::clear_bit(board, square);
+    }
+    if(get_piece_type_from_square(35) == Piece::INVALID) { 
+        std::cout << "\n lets go \n";
     }
     return material;
+}
+
+// Inspired by: https://www.chessprogramming.org/Perft#Perft_function
+// u64 Position::perft(int depth)
+// {
+//   MOVE move_list[256];
+//   int n_moves, i;
+//   u64 nodes = 0;
+
+//   if (depth == 0) 
+//     return 1ULL;
+
+//   n_moves = GenerateMoves(move_list);
+//   for (i = 0; i < n_moves; i++) {
+//     MakeMove(move_list[i]);
+//     if (!IsIncheck())
+//       nodes += Perft(depth - 1);
+//     UndoMove(move_list[i]);
+//   }
+//   return nodes;
+// }
+
+u64 Position::perft(int depth, Position current_position)
+{
+    if (depth == 0) {
+        return 1ULL;
+    }
+    u64 sum = 0;
+    u64 nodes = 0;
+    std::vector<Move> moves = current_position.generate_all_moves(); // generates moves of the position that called it
+    int best_eval;
+    for(Move move : moves) {
+        // Reset position
+        Position new_position = current_position; // reset position after every exploration
+        
+        // make move
+        new_position.copy_make(move, new_position); // apply move to current pos
+        
+        if(!new_position.legality_check(new_position, move)) { // if move isnt legal, don't count
+            continue;
+        }
+        nodes = new_position.perft(depth - 1, new_position);
+        sum += nodes;
+        
+
+        //std::cout << "Src Square: " << Utils::index_to_board_notation(move.get_src_square())  << " Dest Square: " << Utils::index_to_board_notation(move.get_dest_square()) << " Nodes: " << nodes << std::endl;
+        std::cout << Utils::index_to_board_notation(move.get_src_square()) << Utils::index_to_board_notation(move.get_dest_square()) << ": " << nodes << std::endl ;
+    }
+    return sum;
 }

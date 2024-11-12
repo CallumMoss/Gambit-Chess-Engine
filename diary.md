@@ -1,3 +1,8 @@
+09/11/2024 - 10/11/2024
+Major Revisions: Updated things to work with Moves instead of u64s. Made a search and eval function with copy make move
+
+07/11/2024 - 08/11/2024
+N/A
 
 06/11/2024
 Research into implementation of alpha beta and negamax

@@ -26,9 +26,12 @@ int Utils::count_number_of_1bs(u64 board) {
 }
 
 // Use this to determine whether there is a piece of same colour on corresponding square (can check if & 1 << square_of_ls1b)
-// Finds the position of the ls1b
+// Finds the square index of the ls1b
 // Credit to https://www.chessprogramming.org/BitScan#DeBruijnMultiplation and Reference: Hacker's Delight by Henry S. Warren, Jr. and ChatGPT
 u8 Utils::find_piece_index(u64 bitboard) {
+    if(bitboard == 0ULL) {
+        return 64; // Not applicable
+    }
     static const int index64[64] = {
          0,  1, 48,  2, 57, 49, 28,  3,
         61, 58, 50, 42, 38, 29, 17,  4,
@@ -75,4 +78,10 @@ void Utils::PrintBB(u64 board, int board_center, bool mirrored) {
 
 u64 Utils::clear_bit(u64 board, int index) {
     return board &= ~(1ULL << index);
+}
+
+std::string Utils::index_to_board_notation(u8 square) {
+    char rank = '1' + (square / 8);  // Calculate rank ('1' to '8')
+    char file = 'a' + (square % 8);  // Calculate file ('a' to 'h')
+    return std::string() + file + rank;  // Construct string using file and rank
 }

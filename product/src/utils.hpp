@@ -147,11 +147,11 @@ struct Move {
     }
 
     u8 get_src_square() {
-        return (move >> 4) & 0x3F;
+        return (move >> 10) & 0x3F;
     }
 
     u8 get_dest_square() {
-        return (move >> 10) & 0x3F;
+        return (move >> 4) & 0x3F;
     }
 
 };
@@ -167,6 +167,7 @@ namespace Utils {
     int count_number_of_1bs(u64 board);
     u8 find_piece_index(u64 bitboard);
     u64 clear_bit(u64 board, int index);
+    std::string index_to_board_notation(u8 square);
 
     static constexpr u8 NULL_EN_PASSANT = 64;
 

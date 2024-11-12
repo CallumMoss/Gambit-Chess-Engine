@@ -26,18 +26,21 @@ class Position { // Game state class
         u64 get_rook_moves(u8 square);
         u64 get_queen_moves(u8 square);
         std::vector<Move> generate_all_moves();
+        u64 generate_piece_attacks(Piece type, u8 square);
         std::vector<Move> generate_piece_moves(Piece type, u8 square);
         std::vector<u64> extract_piece_moves(u64 attacks);
         std::vector<Move> bb_to_move_list(Piece type, u8 square, u64 attacks);
         Move encode_move(Piece type, u8 src_square, u8 dest_square);
+        void copy_make(Move move, Position& pos);
+        bool legality_check(Position& pos, Move& move);
+        u64 perft(int depth, Position current_position);
 
+        // Search and Eval
         Move find_best_move(const Position& current_position, u8 depth);
         int evaluate(Position pos);
         u8 count_material(Turn turn);
         int negamax(Position pos, u8 depth);
         int negamax_ab(Position pos, u8 depth, int alpha, int beta);
-        void copy_make(Move move, Position& pos);
-        bool legality_check();
 
         Piece get_piece_type_from_square(u8 square);
         const std::array<u64, 6>& get_pieces();
@@ -84,6 +87,11 @@ class Position { // Game state class
         bool get_bscr();
         bool get_blcr();
 
+        void remove_wscr();
+        void remove_wlcr();
+        void remove_bscr();
+        void remove_blcr();
+
         void set_turn(Turn);
         void set_pieces_and_colours(const Piece& moved_piece_type, const Piece& captured_piece_type, const Piece& promoted_piece_type, const Turn& turn, const u8& src_square, const u8& dest_square, bool is_en_passant);
 
@@ -91,7 +99,7 @@ class Position { // Game state class
         // Piece-centric bitboards for storing the position of the pieces by types and colour
         std::array<u64, 6> pieces;
         std::array<u64, 2> colours;
-		u8 en_passant_target = Utils::NULL_EN_PASSANT; // 64 if not applicable. This is the square of the pawn that just moved twice. Not the dest square of en passant.
+		u8 en_passant_target;
         u8 half_move_clock; // number of half moves, to test for 50 move rule
 		u8 full_move_counter; // how many moves have been played
         u8 castling_rights; // XXXX-BL-BS-WL-WS, last 4 bits, 0 if cannot castle
