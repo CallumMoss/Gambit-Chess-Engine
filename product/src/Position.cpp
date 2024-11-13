@@ -765,14 +765,18 @@ void Position::set_pieces_and_colours(const Piece& moved_piece_type, const Piece
             u64 captured_piece = pieces[captured_piece_type];
             if(playerB_colour == Colour::WHITE) {
                 captured_piece = Utils::clear_bit(captured_piece, en_passant_target + 8); // we have captured whites piece with en passant
+                    pieces[captured_piece_type] = captured_piece;
+                u64 playerB_pieces = colours[playerB_colour];
+                playerB_pieces = Utils::clear_bit(playerB_pieces, en_passant_target + 8);
+                colours[playerB_colour] = playerB_pieces;
             }
             else {
                 captured_piece = Utils::clear_bit(captured_piece, en_passant_target - 8);
-            }
-            pieces[captured_piece_type] = captured_piece;
-            u64 playerB_pieces = colours[playerB_colour];
-            playerB_pieces = Utils::clear_bit(playerB_pieces, en_passant_target);
-            colours[playerB_colour] = playerB_pieces;
+                pieces[captured_piece_type] = captured_piece;
+                u64 playerB_pieces = colours[playerB_colour];
+                playerB_pieces = Utils::clear_bit(playerB_pieces, en_passant_target - 8);
+                colours[playerB_colour] = playerB_pieces;
+            } // ref //
             return;
         }
 
@@ -943,18 +947,17 @@ u64 Position::split_perft(int current_depth, const int& desired_depth) // desire
         // Create a copy of the current starting position at each depth
         Position new_position = *this;
         new_position.make_move(move); // apply move to current pos
-        
+
         if(!new_position.legality_check(move)) { // if move isnt legal, don't count
             continue;
         }
+
         nodes = new_position.split_perft(current_depth - 1, desired_depth);
         sum += nodes;
         
         if(current_depth == desired_depth) { // if finished recursion
             std::cout << Utils::index_to_board_notation(move.get_src_square()) << Utils::index_to_board_notation(move.get_dest_square()) << ": " << nodes << std::endl;
         }
-        //std::cout << "Src Square: " << Utils::index_to_board_notation(move.get_src_square())  << " Dest Square: " << Utils::index_to_board_notation(move.get_dest_square()) << " Nodes: " << nodes << std::endl;
-
     }
     return sum;
 }

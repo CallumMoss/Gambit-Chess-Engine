@@ -593,6 +593,9 @@
 
 
 TEST(PERFT, pos1_1) { // where ply is a half move, in this case whites opening move
+
+	//if generates the right number of moves after applying a FEN, it probably means the position doesnt get updated correctly
+
 	Position pos = Position();
 	Magics::init();
 	int depth = 6;
