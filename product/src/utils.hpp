@@ -163,7 +163,7 @@ namespace Utils {
     u64 shift_right(u64 board);
     bool piece_is_at_square(uint64_t board, int square);
     u64 get_ls1b(u64 board); // gets the least significant bit that is 1 (furthest right in bitstring)
-    void PrintBB(u64 board, int board_center, bool mirrored);
+    void PrintBB(u64 board, int board_center = 64); // defaults to 64 if no argument provided (no center)
     int count_number_of_1bs(u64 board);
     u8 find_piece_index(u64 bitboard);
     u64 clear_bit(u64 board, int index);

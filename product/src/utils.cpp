@@ -48,7 +48,8 @@ u8 Utils::find_piece_index(u64 bitboard) {
 }
 
 // Prints the board in bit representation, puts an X where the piece by specifying board center
-void Utils::PrintBB(u64 board, int board_center, bool mirrored) {
+void Utils::PrintBB(u64 board, int board_center) {
+        bool mirrored = true;
         std::string output{}, current_line{};
         for(int row{0}; row < 8; ++row)
         {

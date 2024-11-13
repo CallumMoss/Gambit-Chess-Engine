@@ -5,6 +5,7 @@
 #include <iostream>
 #include <array>
 #include <cstdint>
+#include <cassert>
 
 Position::Position(const std::string& fen):
     pieces(),
@@ -171,53 +172,57 @@ void Position::print_board(std::array<char, 64> board) {
 
 u64 Position::get_pawn_attacks(u8 square) {
     u64 attacks = 0ULL;
-    if(get_turn() == Turn::WHITE) {
+    u64 board = get_board();
+    if (get_turn() == Turn::WHITE) {
         attacks = Utils::WHITE_PAWN_ATTACKS[square];
         attacks &= ~get_white_pieces();
-        if(square + 8 < 64 && Utils::piece_is_at_square(get_board(), square + 8)) { // if something directly infront and is on the board, cant move forward at all
-            // if something is infront then clear forward movement
-            attacks &= ~(1ULL << square + 8);
+        if (square + 8 < 64 && Utils::piece_is_at_square(board, square + 8)) { // if something directly in front and is on the board, can't move forward
+            attacks &= ~(1ULL << (square + 8));
         }
-        if(square >= 8 && square <= 15 && Utils::piece_is_at_square(get_board(), square + 16)) { // if can move twice but something is 2 spaces in front, we cant move twice
-            attacks &= ~(1ULL << square + 16);
+        if (square >= 8 && square <= 15 && 
+            (Utils::piece_is_at_square(board, square + 16) || Utils::piece_is_at_square(board, square + 8))) {
+            attacks &= ~(1ULL << (square + 16));
         }
-        if((square + 7 < 64) && !(Utils::piece_is_at_square(get_black_pieces(), square + 7))) { // if an enemy piece is not diagonal, remove diagonal attacks
-            attacks &= ~(1ULL << square + 7);
+        if ((square + 7 < 64) && ((square + 7 + 1) % 8 != 0) && !(Utils::piece_is_at_square(get_black_pieces(), square + 7)) && 
+            ((square % 8) != 0)) { // left diagonal capture check, ensuring within board boundaries
+            attacks &= ~(1ULL << (square + 7));
         }
-        if((square + 9 < 64) && !(Utils::piece_is_at_square(get_black_pieces(), square + 9))) { 
-            attacks &= ~(1ULL << square + 9);
+        if ((square + 9 < 64) && ((square + 9) % 8 != 0) && !(Utils::piece_is_at_square(get_black_pieces(), square + 9)) && 
+            ((square % 8) != 7)) { // right diagonal capture check, ensuring within board boundaries
+            attacks &= ~(1ULL << (square + 9));
         }
-        if(en_passant_target != 64) { // if there is an en passant, add it to relevant pawn attacks
-        if((square == en_passant_target - 7) || (square == en_passant_target - 9)) {
-            attacks |= 1ULL << en_passant_target;
+        if (en_passant_target != 64) { // En passant capture logic
+            if (((square + 7 == en_passant_target) && (((square + 7 + 1) % 8 != 0))) || ((square + 9 == en_passant_target) && (((square + 9) % 8 != 0)))) {
+                attacks |= 1ULL << en_passant_target;
+            }
         }
-    }
-    }
-    else {
+    } else {
         attacks = Utils::BLACK_PAWN_ATTACKS[square];
         attacks &= ~get_black_pieces();
-        if(square - 8 >= 0 && Utils::piece_is_at_square(get_board(), square - 8)) { // if something directly infront and is on the board, cant move forward at all
-            // if something is infront then clear forward movement
-            attacks &= ~(1ULL << square - 8);
+        if (square - 8 >= 0 && Utils::piece_is_at_square(board, square - 8)) {
+            attacks &= ~(1ULL << (square - 8));
         }
-        if(square >= 48 && square <= 55 && Utils::piece_is_at_square(get_board(), square - 16)) { // if can move twice but something is 2 spaces in front, we cant move twice
-            attacks &= ~(1ULL << square - 16);
+        if (square >= 48 && square <= 55 && 
+            (Utils::piece_is_at_square(board, square - 16) || Utils::piece_is_at_square(board, square - 8))) {
+            attacks &= ~(1ULL << (square - 16));
         }
-        if((square - 7 >= 0) && !(Utils::piece_is_at_square(get_white_pieces(), square - 7))) { // if an enemy piece is not diagonal, remove diagonal attacks
-            attacks &= ~(1ULL << square - 7);
+        if ((square - 7 >= 0) && ((square - 7) % 8 != 0) && !(Utils::piece_is_at_square(get_white_pieces(), square - 7)) && 
+            ((square % 8) != 7)) { // right diagonal capture check for black pawns
+            attacks &= ~(1ULL << (square - 7));
         }
-        if((square - 9 >= 0) && !(Utils::piece_is_at_square(get_white_pieces(), square - 9))) { // if an enemy piece is not diagonal, remove diagonal attacks
-            attacks &= ~(1ULL << square - 9);
+        if ((square - 9 >= 0) && ((square - 9 + 1) % 8 != 0) && !(Utils::piece_is_at_square(get_white_pieces(), square - 9)) && 
+            ((square % 8) != 0)) { // left diagonal capture check for black pawns
+            attacks &= ~(1ULL << (square - 9));
         }
-        if(en_passant_target != 64) { // if there is an en passant, add it to relevant pawn attacks
-            if((square == en_passant_target + 7) || (square == en_passant_target + 9)) {
+        if (en_passant_target != 64) {
+            if (((square - 7 == en_passant_target) && ((square - 7) % 8 != 0)) || ((square - 9 == en_passant_target) && ((square - 9 + 1) % 8 != 0))) {
                 attacks |= 1ULL << en_passant_target;
+            }
         }
     }
-    }
-
     return attacks;
 }
+
 
 u64 Position::get_knight_moves(u8 square) {
     return Utils::KNIGHT_ATTACKS[square];
@@ -230,22 +235,30 @@ u64 Position::get_king_moves(u8 square) {
     if(turn == Turn::WHITE) {
         if(square == 4) { // if on starting square
             u64 board = get_board();
-            if((Utils::piece_is_at_square(5, board) == Piece::INVALID) && (Utils::piece_is_at_square(6, board) == Piece::INVALID)) { // if clear space between
-                moves |= 1ULL << 6; // add short castling
+            if((get_white_rooks() & 1ULL << 7)) {
+                if(!(Utils::piece_is_at_square(board, 5) || Utils::piece_is_at_square(board, 6))) {
+                    moves |= 1ULL << 6; // add short castling
+                }
             }
-            else if((Utils::piece_is_at_square(3, board) == Piece::INVALID) && (Utils::piece_is_at_square(2, board) == Piece::INVALID) && (Utils::piece_is_at_square(1, board) == Piece::INVALID)) {
-                moves |= 1ULL << 2; // long
+            if(get_white_rooks() & (1ULL)) {
+                if(!(Utils::piece_is_at_square(board, 1) || Utils::piece_is_at_square(board, 2) || Utils::piece_is_at_square(board, 3))) {
+                    moves |= 1ULL << 2; // long
+                }
             }
         }
     }
     else {
         if(square == 60) {
             u64 board = get_board();
-            if((Utils::piece_is_at_square(61, board) == Piece::INVALID) && (Utils::piece_is_at_square(62, board) == Piece::INVALID)) { // if clear space between
-                moves |= 1ULL << 62; // add short castling
+            if(get_black_rooks() & (1ULL << 63)) {
+                if(!(Utils::piece_is_at_square(board, 61) || Utils::piece_is_at_square(board, 62))) { // if clear space between
+                    moves |= 1ULL << 62; // add short castling
+                }
             }
-            else if((Utils::piece_is_at_square(59, board) == Piece::INVALID) && (Utils::piece_is_at_square(58, board) == Piece::INVALID) && (Utils::piece_is_at_square(57, board) == Piece::INVALID)) {
-                moves |= 1ULL << 58; // long
+            if(get_black_rooks() & (1ULL << 56)) {
+                if(!(Utils::piece_is_at_square(board, 59) || Utils::piece_is_at_square(board, 58) || Utils::piece_is_at_square(board, 57))) {
+                    moves |= 1ULL << 58; // long
+                }
             }
         }
     }
@@ -285,10 +298,10 @@ Piece Position::get_piece_type_from_square(u8 square) {
 std::vector<Move> Position::generate_all_moves() // uses the board state to generate all moves for a given colour 
 {
     std::vector<Move> moves;
-   u64 pieces = get_pieces_from_current_turn();
+    u64 pieces = get_pieces_from_current_turn();
     std::vector<Move> square_moves;
     std::vector<Move> empty_vector; // no moves for this square as the player whos turn it is does not have a piece on it
-    for(u8 square = 0; square < 64; square++) {
+    for(u8 square = 0; square < 64; square++) { // can change this so it only iterates through pieces mask but can do some other time
         if((1ULL << square) & pieces) { // if the person whos turn it is has a piece on this square, gen its moves
             Piece piece_type = get_piece_type_from_square(square);
             square_moves = generate_piece_moves(piece_type, square);
@@ -360,8 +373,6 @@ u64 Position::generate_piece_attacks(Piece type, u8 square) { // returns u64 wit
     // Ensuring it isnt attacking its own piece
 
     return attacks & ~get_pieces_from_current_turn();
-
-    return attacks;
 }
 
 std::vector<Move> Position::generate_piece_moves(Piece type, u8 square) { // will be used when searching for both sides, so will use Turn.
@@ -383,7 +394,7 @@ std::vector<Move> Position::generate_piece_moves(Piece type, u8 square) { // wil
             attacks = get_queen_moves(square);
             break;
         case Piece::KING:
-            attacks = Utils::KING_ATTACKS[square];
+            attacks = get_king_moves(square);
             break;
         case Piece::INVALID:
             attacks = 0;
@@ -394,8 +405,6 @@ std::vector<Move> Position::generate_piece_moves(Piece type, u8 square) { // wil
     attacks &= ~get_pieces_from_current_turn();
 
     return bb_to_move_list(type, square, attacks);
-
-    //return extract_piece_moves(attacks);
 }
 
 std::vector<Move> Position::bb_to_move_list(Piece type, u8 src_square, u64 attacks) {
@@ -426,21 +435,23 @@ Move Position::encode_move(Piece type, u8 src_square, u8 dest_square) {
         if((src_square == dest_square + 16) || (src_square == dest_square - 16)) { // if is pawn and has moved twice
             flag = Move_Flag::PAWN_TWO_FORWARD_FLAG; // this move gives the option of en_passant for next move
         }
-
-        if(dest_square == en_passant_target) {
+        else if(dest_square == en_passant_target) {
             flag = Move_Flag::EN_PASSANT_FLAG;
         } // then en passant has occured
+        else {
+            flag = Move_Flag::PAWN_FLAG;
+        }
     }
     else if(type == Piece::KING) {
         if((src_square == dest_square + 2) || (src_square == dest_square - 2)) { // castling has occured
             flag = Move_Flag::CASTLING_FLAG;
         }
+        else {
+            flag = Move_Flag::KING_FLAG;
+        }
     }
     else {
         switch(type) {
-            case(Piece::PAWN):
-                flag = Move_Flag::PAWN_FLAG;
-                break;
             case(Piece::KNIGHT):
                 flag = Move_Flag::KNIGHT_FLAG;
                 break;
@@ -453,9 +464,6 @@ Move Position::encode_move(Piece type, u8 src_square, u8 dest_square) {
             case(Piece::QUEEN):
                 flag = Move_Flag::QUEEN_FLAG;
                 break;
-            case(Piece::KING):
-                flag = Move_Flag::KING_FLAG;
-                break;
             default: // if invalid piece type
                 flag = Move_Flag::NULL_FLAG;
                 break;
@@ -465,22 +473,21 @@ Move Position::encode_move(Piece type, u8 src_square, u8 dest_square) {
 }
 
 // Checks whether after applying a pseudo move, if the position is legal.
-bool Position::legality_check(Position& pos, Move& move)
+bool Position::legality_check(Move& move)
 {
-
     // Finding King Square and opponents pieces:
     u64 king_square_u64;
     u64 our_pieces;
     u64 opponent_pieces;
-    if(pos.get_turn() == Turn::WHITE) {
-        our_pieces = pos.get_white_pieces();
-        opponent_pieces = pos.get_black_pieces();
-        king_square_u64 = pos.get_white_king();
+    if(turn == Turn::BLACK) { // is flipped because we flip turn after make move
+        our_pieces = get_white_pieces();
+        opponent_pieces = get_black_pieces();
+        king_square_u64 = get_white_king();
     }
     else {
-        our_pieces = pos.get_black_pieces();
-        opponent_pieces = pos.get_white_pieces();
-        king_square_u64 = pos.get_black_king();
+        our_pieces = get_black_pieces();
+        opponent_pieces = get_white_pieces();
+        king_square_u64 = get_black_king();
     }
 
     if(king_square_u64 == 0ULL) { // if king has been taken. Should not happen but will be helpful for strange FENs
@@ -493,7 +500,8 @@ bool Position::legality_check(Position& pos, Move& move)
     // Finding squares where if a piece is on, would see the king.
     // OR queen attacks from the square with knight attacks
     // generate attacks for opponents pieces on these squares
-    u64 king_target_mask = Utils::QUEEN_ATTACKS[king_square_index] || Utils::KNIGHT_ATTACKS[king_square_index]; // squares where if opponents piece is on could attack king
+    u64 king_target_mask = Utils::QUEEN_ATTACKS[king_square_index];
+    king_target_mask |= Utils::KNIGHT_ATTACKS[king_square_index]; // squares where if opponents piece is on could attack king
     u64 opponent_relevant_pieces = king_target_mask & opponent_pieces; // squares with an opponents piece on
 
     // Check if opponents relevant pieces can actually attack the king
@@ -508,7 +516,7 @@ bool Position::legality_check(Position& pos, Move& move)
         index = Utils::find_piece_index(opponent_relevant_pieces);
         type = get_piece_type_from_square(index);
         attacks = generate_piece_attacks(type, index);
-        if(attacks & king_target_mask) { // if there is a piece hitting the king
+        if(attacks & king_square_u64) { // if there is a piece hitting the king
             return false;
         }
         opponent_relevant_pieces = Utils::clear_bit(opponent_relevant_pieces, index);
@@ -517,16 +525,17 @@ bool Position::legality_check(Position& pos, Move& move)
 
     if(move.get_flag() == Move_Flag::CASTLING_FLAG) { // Already checks when generating whether it has the rights to do so
         // Already checks if king is in check, so now check if rook is in check
-        u64 rook_square_u64 = pos.get_rooks() & our_pieces;
+        u64 rook_square_u64 = get_rooks() & our_pieces;
         u8 rook_square_index = Utils::find_piece_index(rook_square_u64);
-        u64 rook_target_mask = Utils::QUEEN_ATTACKS[rook_square_index] || Utils::KNIGHT_ATTACKS[rook_square_index]; // squares where if opponents piece is on could attack rook
+        u64 rook_target_mask = Utils::QUEEN_ATTACKS[rook_square_index];
+        rook_target_mask |= Utils::KNIGHT_ATTACKS[rook_square_index]; // squares where if opponents piece is on could attack rook
         opponent_relevant_pieces = rook_target_mask & opponent_pieces; // squares with an opponents piece on
 
         while(opponent_relevant_pieces) {
             index = Utils::find_piece_index(opponent_relevant_pieces);
             type = get_piece_type_from_square(index);
             attacks = generate_piece_attacks(type, index);
-            if(attacks & rook_target_mask) { // if there is a piece hitting the king
+            if(attacks & rook_square_u64) { // if there is a piece hitting the king
                 return false;
             }
             opponent_relevant_pieces = Utils::clear_bit(opponent_relevant_pieces, index);
@@ -536,9 +545,8 @@ bool Position::legality_check(Position& pos, Move& move)
     return true;
 }
 
-// Takes a reference to a position where we apply a move to it.
-// Find best move will check if its legal. If it isn't, it will undo the move by making it equal to the original pos
-void Position::copy_make(Move move, Position& pos) // simpler than make and unmake but slightly slower.
+// Applies changes to a copy of the Position object that calls it. Returns said copy.
+void Position::make_move(Move& move) // simpler than make and unmake but slightly slower.
 {
     // std::array<u64, 6> pieces;
     // std::array<u64, 2> colours;
@@ -561,50 +569,44 @@ void Position::copy_make(Move move, Position& pos) // simpler than make and unma
     // Adapting for special flags
     switch(flag) {
         case ROOK_FLAG: // removing castling rights
-            if(pos.castling_rights = 0) { // if already cant castle, ignore removing castling
+            if(castling_rights = 0) { // if already cant castle, ignore removing castling
                 break;
             }
             if(src_square == 0) { // no need to check colour as this implies if a rook got here that they cant castle
-                pos.remove_wlcr();
+                remove_wlcr();
             }
             else if(src_square == 7) {
-                pos.remove_wscr();
+                remove_wscr();
             }
             else if(src_square == 56) {
-                pos.remove_blcr();
+                remove_blcr();
             }
             else if(src_square == 63) {
-                pos.remove_bscr();
+                remove_bscr();
             }
             break;
         case KING_FLAG:
-            if(pos.turn == Turn::WHITE) {
-                pos.remove_wlcr();
-                pos.remove_wscr();
+            if(turn == Turn::WHITE) {
+                remove_wlcr();
+                remove_wscr();
             }
             else {
-                pos.remove_blcr();
-                pos.remove_bscr();
+                remove_blcr();
+                remove_bscr();
             }
             break;
 
         case PAWN_TWO_FORWARD_FLAG:
-            if(pos.turn == Turn::WHITE) {
-                pos.en_passant_target = dest_square - 8;
+            if(turn == Turn::WHITE) {
+                en_passant_target = dest_square - 8;
             }
             else {
-                pos.en_passant_target = dest_square + 8;
+                en_passant_target = dest_square + 8;
             }
 
             break;
         case EN_PASSANT_FLAG:
-            Utils::PrintBB(pos.get_board(), 0, true);
             set_pieces_and_colours(Piece::PAWN, Piece::PAWN, Piece::INVALID, turn, src_square, dest_square, true);
-            std::cout << "\n\nEN PASSANT\n\n";
-            Utils::PrintBB(pos.get_board(), 0, true);
-            Utils::PrintBB(pos.get_pawns(), 0, true);
-            Utils::PrintBB(pos.get_black_pieces(), 0, true);
-            Utils::PrintBB(pos.get_white_pieces(), 0, true);
              // if this flag, then the dest square and target square are different.
             break;
 
@@ -620,6 +622,8 @@ void Position::copy_make(Move move, Position& pos) // simpler than make and unma
         case QUEEN_PROMOTION_FLAG:
             promoted_piece_type = Piece::QUEEN;
             break;
+
+            //ref//
         case CASTLING_FLAG:
             // remove corresponding castling rights and play rook portion. After this it will move king as if normal move.
             if(turn == Turn::WHITE) {
@@ -651,7 +655,7 @@ void Position::copy_make(Move move, Position& pos) // simpler than make and unma
     }
 
     if ((en_passant_target != Utils::NULL_EN_PASSANT) && (flag != PAWN_TWO_FORWARD_FLAG)) {en_passant_target = Utils::NULL_EN_PASSANT;} // reset en passant if double push hasnt been played
-
+    turn = get_opp_turn();
 }
 
 // Uses reference for data type larger than u64
@@ -748,10 +752,9 @@ void Position::set_pieces_and_colours(const Piece& moved_piece_type, const Piece
     if(promoted_piece_type != Piece::INVALID) { // if there is a promotion
         pieces[promoted_piece_type] |= 1 << dest_square; // add new piece to the board
     }
-    else { // if no promotion, add pawn to new square
+    else { // if no promotion, add piece to new square
         pieces[moved_piece_type] |= 1ULL << dest_square;
     }
-
     if(captured_piece_type != Piece::INVALID) { // if has been a capture, update playerB's board accordingly
         if(moved_piece_type != captured_piece_type) { // if same type, then capture has already occured for pieces board
             u64 captured_piece = pieces[captured_piece_type];
@@ -768,7 +771,7 @@ void Position::set_pieces_and_colours(const Piece& moved_piece_type, const Piece
             }
             pieces[captured_piece_type] = captured_piece;
             u64 playerB_pieces = colours[playerB_colour];
-            playerB_pieces = Utils::clear_bit(captured_piece, en_passant_target);
+            playerB_pieces = Utils::clear_bit(playerB_pieces, en_passant_target);
             colours[playerB_colour] = playerB_pieces;
             return;
         }
@@ -783,7 +786,7 @@ void Position::set_pieces_and_colours(const Piece& moved_piece_type, const Piece
 
 // Finds the best move for the current position using negamax
 // Initial call for negamax for each move up to a line depth provided
-Move Position::find_best_move(const Position& current_position, u8 depth) {
+Move Position::find_best_move(u8 depth) {
     // Currently do not keep track of eval after end
     // If wish to do this for programming analysis, can
     // just use prints
@@ -795,11 +798,11 @@ Move Position::find_best_move(const Position& current_position, u8 depth) {
     std::vector<Move> moves = generate_all_moves();
      for(Move move : moves) {
         // Reset position
-        Position new_position = current_position; // reset position after every exploration
+        Position new_position = *this; // reset position after every exploration
         // make move
-        new_position.copy_make(move, new_position); // apply move to current pos
+        new_position.make_move(move); // apply move to current pos
 
-        if(!new_position.legality_check(new_position, move)) { // if move isnt legal, skip eval for this move
+        if(!new_position.legality_check(move)) { // if move isnt legal, skip eval for this move
             continue;
         }
 
@@ -814,7 +817,7 @@ Move Position::find_best_move(const Position& current_position, u8 depth) {
         // calls -negamax as to flip the eval back to our perspective
 
         // AB Negamax:
-        eval = -negamax_ab(new_position, depth - 1, INT_MIN, INT_MAX);
+        eval = -new_position.negamax_ab(depth - 1, INT_MIN, INT_MAX);
         if(eval > best_eval) {
             best_eval = eval;
             best_move = move;
@@ -829,27 +832,28 @@ Move Position::find_best_move(const Position& current_position, u8 depth) {
 // Pruning is less helpful for gambit as it aims to find risky moves, therefore pruning could prove bad
 // Added pruning simply but may take it off for the above reason
 // negamax and negamax_ab returns the same best move, therefore chose to implement this version.
-int Position::negamax_ab(Position current_position, u8 depth, int alpha, int beta) {
+int Position::negamax_ab(u8 depth, int alpha, int beta) {
+    Position new_position = *this;
+    
     if (depth == 0) { // or if checkmate?
         // returns eval of the position at a given depth
         //std::cout << evaluate(current_position);
-        return evaluate(current_position);
+        return evaluate(new_position);
     }
 
-    std::vector<Move> moves = current_position.generate_all_moves();
     int best_eval;
-    for(Move move : moves) {
+    for(Move move : generate_all_moves()) {
         // Reset position
-        Position new_position = current_position; // reset position after every exploration
+        new_position = *this; // reset position after every exploration
         
         // make move
-        new_position.copy_make(move, new_position); // apply move to current pos
+        new_position.make_move(move); // apply move to current pos
         
-        if(!new_position.legality_check(new_position, move)) { // if move isnt legal, skip eval for this move
+        if(!new_position.legality_check(move)) { // if move isnt legal, skip eval for this move
             continue;
         }
 
-        int eval = -negamax_ab(current_position, depth - 1, -beta, -alpha);
+        int eval = -new_position.negamax_ab(depth - 1, -beta, -alpha);
         // do i need to undo the move? shouldnt need to if i copy positions instead
         // of editing our one position
 
@@ -922,57 +926,35 @@ u8 Position::count_material(Turn turn) {
         }
         board = Utils::clear_bit(board, square);
     }
-    if(get_piece_type_from_square(35) == Piece::INVALID) { 
-        std::cout << "\n lets go \n";
-    }
     return material;
 }
 
-// Inspired by: https://www.chessprogramming.org/Perft#Perft_function
-// u64 Position::perft(int depth)
-// {
-//   MOVE move_list[256];
-//   int n_moves, i;
-//   u64 nodes = 0;
-
-//   if (depth == 0) 
-//     return 1ULL;
-
-//   n_moves = GenerateMoves(move_list);
-//   for (i = 0; i < n_moves; i++) {
-//     MakeMove(move_list[i]);
-//     if (!IsIncheck())
-//       nodes += Perft(depth - 1);
-//     UndoMove(move_list[i]);
-//   }
-//   return nodes;
-// }
-
-u64 Position::perft(int depth, Position current_position)
+u64 Position::split_perft(int current_depth, const int& desired_depth) // desired depth being the initial depth input
 {
-    if (depth == 0) {
+    if (current_depth == 0) {
         return 1ULL;
     }
+    
     u64 sum = 0;
     u64 nodes = 0;
-    std::vector<Move> moves = current_position.generate_all_moves(); // generates moves of the position that called it
-    int best_eval;
-    for(Move move : moves) {
+    std::vector<Move> moves = generate_all_moves();
+    for(Move& move : moves) {
         // Reset position
-        Position new_position = current_position; // reset position after every exploration
+        // Create a copy of the current starting position at each depth
+        Position new_position = *this;
+        new_position.make_move(move); // apply move to current pos
         
-        // make move
-        new_position.copy_make(move, new_position); // apply move to current pos
-        
-        if(!new_position.legality_check(new_position, move)) { // if move isnt legal, don't count
+        if(!new_position.legality_check(move)) { // if move isnt legal, don't count
             continue;
         }
-        nodes = new_position.perft(depth - 1, new_position);
+        nodes = new_position.split_perft(current_depth - 1, desired_depth);
         sum += nodes;
         
-
+        if(current_depth == desired_depth) { // if finished recursion
+            std::cout << Utils::index_to_board_notation(move.get_src_square()) << Utils::index_to_board_notation(move.get_dest_square()) << ": " << nodes << std::endl;
+        }
         //std::cout << "Src Square: " << Utils::index_to_board_notation(move.get_src_square())  << " Dest Square: " << Utils::index_to_board_notation(move.get_dest_square()) << " Nodes: " << nodes << std::endl;
-        std::cout << Utils::index_to_board_notation(move.get_src_square()) << Utils::index_to_board_notation(move.get_dest_square()) << ": " << nodes << std::endl ;
+
     }
     return sum;
 }

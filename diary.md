@@ -1,3 +1,6 @@
+11/11/2024 - 12/11/2024
+Lots of work. Fixing various move gen issues and testing with perft.
+
 09/11/2024 - 10/11/2024
 Major Revisions: Updated things to work with Moves instead of u64s. Made a search and eval function with copy make move
 

@@ -352,14 +352,14 @@
 // 	Position pos = Position();
 // 	pos.set_turn(Turn::WHITE);
 // 	int square = 0;
-// 	u64 blocker_squares = pos.get_relevant_blocker_squares(square);
-// 	Utils::PrintBB(blocker_squares, square, true);
-// 	Final_Magic magic = pos.find_magic(square);
+// 	u64 blocker_squares = Magics::get_relevant_blocker_squares(Piece::ROOK, square);
+// 	Utils::PrintBB(blocker_squares, square);
+// 	Final_Magic magic = Magics::find_magic(Piece::ROOK, square);
 // 	std::cout << "Done";
 // 	std::cout << "\nMagic Number: " << magic.magic.magic_number << "\n";
-// 	for(size_t i = 0; i < magic.table.size(); i++) {
-// 		std::cout << magic.table[i] << "\n ########################################### \n";
-// 	}
+// 	// for(size_t i = 0; i < magic.table.size(); i++) {
+// 	// 	std::cout << magic.table[i] << "\n ########################################### \n";
+// 	// }
 // }
 
 // Tests finding of magics
@@ -378,14 +378,19 @@
 // }
 
 // ARCHIVED:
-// // Tests finding of magics
+// Tests finding of magics
 // TEST(GEN_MOVES_VALIDATION, getting_magics) {
 // 	// I used this function to get the magics:
 // 	Position pos = Position();
-// 	Magics::init(pos);
+// 	Magics::init();
 // 	for(Final_Magic magic : rook_magics_table) {
 // 		std::cout << magic.magic.magic_number << std::endl;
 // 	}
+// 	std::cout << "\n ################### \n";
+// 	for(Final_Magic magic : bishop_magics_table) {
+// 		std::cout << magic.magic.magic_number << std::endl;
+// 	}
+	
 // }
 
 // TEST(GEN_MOVES_VALIDATION, using_generated_magics) {
@@ -563,42 +568,63 @@
 // 	Utils::PrintBB(pos.get_white_pieces(), src_square, true);
 // }
 
-TEST(PERFT, pos1) {
-	Position pos = Position();
-	Magics::init();
-	std::cout << pos.perft(1, pos) << std::endl;
-}
-
-// TEST(PERFT, pos1_black) {
-// 	Position pos = Position("rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1"); // starting pos
-// 	Magics::init();
-// 	std::cout << pos.perft(1, pos) << std::endl;
+// TEST(SQUARE_CONVERSION, x1) {
+// 	for(int i = 0; i < 64; i++) {
+// 		std::cout << Utils::index_to_board_notation(i) << std::endl;
+// 	}
 // }
 
-// TEST(FIND_BEST_MOVE, pos1) {
+// TEST(PERFT, pos1_ply1) { // where ply is a half move, in this case whites opening move
 // 	Position pos = Position();
 // 	Magics::init();
-// 	Move move = pos.find_best_move(pos, 1); // Depth 1 is the eval of root's first move, depth 2 is the eval of the position after roots first move and opponents response
-// 	u8 src_square = move.get_src_square();
-// 	// apply best move
-// 	pos.copy_make(move, pos);
-// 	Utils::PrintBB(pos.get_board(), src_square, true);
-// 	Utils::PrintBB(pos.get_pawns(), src_square, true);
-// 	Utils::PrintBB(pos.get_white_pawns(), src_square, true);
-// 	Utils::PrintBB(pos.get_white_pieces(), src_square, true);
+// 	int depth = 4;
+// 	std::cout << "Position 1: (Depth 1)" << std::endl << pos.split_perft(depth, depth) << std::endl;
 // }
 
-// TEST(FIND_BEST_MOVE, pos2) {
-// 	Position pos = Position("1k6/8/8/3Pp3/8/8/8/1N2K3 w - e6 0 2");
+
+
+// To debug using perft and web perft:
+// Find up to a depth where you are accurate
+// then for the first failed depth, compare the difference of your results
+// Go down the line of moves with incorrect nodes till you get to the original moves that were wrong at depth 1
+// Solve the problem
+
+//Rook a2 -> a1 missing
+
+
+TEST(PERFT, pos1_1) { // where ply is a half move, in this case whites opening move
+	Position pos = Position();
+	Magics::init();
+	int depth = 6;
+	std::cout << "Position 1: (Depth 1)" << std::endl << pos.split_perft(depth, depth) << std::endl;
+}
+
+// TEST(PERFT, pos1_2) { // where ply is a half move, in this case whites opening move
+// 	Position pos = Position("rnbqkbnr/pppppppp/8/8/8/N7/PPPPPPPP/R1BQKBNR b KQkq - 1 1");
 // 	Magics::init();
-// 	Move move = pos.find_best_move(pos, 1);
-// 	u8 src_square = move.get_src_square();
-// 	// apply best move
-// 	pos.copy_make(move, pos);
-// 	Utils::PrintBB(pos.get_board(), src_square, true);
-// 	Utils::PrintBB(pos.get_pawns(), src_square, true);
-// 	Utils::PrintBB(pos.get_white_pawns(), src_square, true);
-// 	Utils::PrintBB(pos.get_white_pieces(), src_square, true);
+// 	int depth = 4;
+// 	std::cout << "Position 1: (Depth 1)" << std::endl << pos.split_perft(depth, depth) << std::endl;
+// }
+
+// TEST(PERFT, pos1_3) { // where ply is a half move, in this case whites opening move
+// 	Position pos = Position("rnbqkbnr/1ppppppp/8/p7/8/N7/PPPPPPPP/R1BQKBNR w KQkq a6 0 2");
+// 	Magics::init();
+// 	int depth = 3;
+// 	std::cout << "Position 1: (Depth 1)" << std::endl << pos.split_perft(depth, depth) << std::endl;
+// }
+
+// TEST(PERFT, pos1_4) { // where ply is a half move, in this case whites opening move
+// 	Position pos = Position("rnbqkbnr/1ppppppp/8/p7/7P/N7/PPPPPPP1/R1BQKBNR b KQkq h3 0 2");
+// 	Magics::init();
+// 	int depth = 2;
+// 	std::cout << "Position 1: (Depth 1)" << std::endl << pos.split_perft(depth, depth) << std::endl;
+// }
+
+// TEST(PERFT, pos1_5) { // where ply is a half move, in this case whites opening move
+// 	Position pos = Position("rnbqkbnr/2pppppp/p7/Pp6/8/8/1PPPPPPP/RNBQKBNR w KQkq b6 0 3");
+// 	Magics::init();
+// 	int depth = 1;
+// 	std::cout << "Position 1: (Depth 1)" << std::endl << pos.split_perft(depth, depth) << std::endl;
 // }
 
 int main(int argc, char **argv) {

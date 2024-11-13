@@ -31,16 +31,15 @@ class Position { // Game state class
         std::vector<u64> extract_piece_moves(u64 attacks);
         std::vector<Move> bb_to_move_list(Piece type, u8 square, u64 attacks);
         Move encode_move(Piece type, u8 src_square, u8 dest_square);
-        void copy_make(Move move, Position& pos);
-        bool legality_check(Position& pos, Move& move);
-        u64 perft(int depth, Position current_position);
+        void make_move(Move& move);
+        bool legality_check(Move& move);
+        u64 split_perft(int current_depth, const int& desired_depth);
 
         // Search and Eval
-        Move find_best_move(const Position& current_position, u8 depth);
+        Move find_best_move(u8 depth);
         int evaluate(Position pos);
         u8 count_material(Turn turn);
-        int negamax(Position pos, u8 depth);
-        int negamax_ab(Position pos, u8 depth, int alpha, int beta);
+        int negamax_ab(u8 depth, int alpha, int beta);
 
         Piece get_piece_type_from_square(u8 square);
         const std::array<u64, 6>& get_pieces();
