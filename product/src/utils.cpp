@@ -81,8 +81,28 @@ u64 Utils::clear_bit(u64 board, int index) {
     return board &= ~(1ULL << index);
 }
 
-std::string Utils::index_to_board_notation(u8 square) {
-    char rank = '1' + (square / 8);  // Calculate rank ('1' to '8')
-    char file = 'a' + (square % 8);  // Calculate file ('a' to 'h')
-    return std::string() + file + rank;  // Construct string using file and rank
+std::string Utils::index_to_board_notation(u8 square, Move_Flag flag, bool is_src) {
+    std::string ret_string = "";
+    ret_string += 'a' + (square % 8);  // Calculate file ('a' to 'h')
+    ret_string += '1' + (square / 8);  // Calculate rank ('1' to '8')
+    if(is_src) {
+        return ret_string;
+    }
+    switch(flag) {
+        case KNIGHT_PROMOTION_FLAG:
+            ret_string += 'n';
+            break;
+        case BISHOP_PROMOTION_FLAG:
+            ret_string += 'b';
+            break;
+        case ROOK_PROMOTION_FLAG:
+            ret_string += 'r';
+            break;
+        case QUEEN_PROMOTION_FLAG:
+            ret_string += 'q';
+            break;
+        default:
+            break;
+    }
+    return ret_string;  // Construct string using file and rank
 }

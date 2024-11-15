@@ -235,14 +235,18 @@ u64 Position::get_king_moves(u8 square) {
     if(turn == Turn::WHITE) {
         if(square == 4) { // if on starting square
             u64 board = get_board();
-            if((get_white_rooks() & 1ULL << 7)) {
-                if(!(Utils::piece_is_at_square(board, 5) || Utils::piece_is_at_square(board, 6))) {
-                    moves |= 1ULL << 6; // add short castling
+            if(get_wscr()) {
+                if(get_white_rooks() & (1ULL << 7)) {
+                    if(!(Utils::piece_is_at_square(board, 5) || Utils::piece_is_at_square(board, 6))) {
+                        moves |= 1ULL << 6; // add short castling
+                    }
                 }
             }
-            if(get_white_rooks() & (1ULL)) {
-                if(!(Utils::piece_is_at_square(board, 1) || Utils::piece_is_at_square(board, 2) || Utils::piece_is_at_square(board, 3))) {
-                    moves |= 1ULL << 2; // long
+            if(get_wlcr()) {
+                if(get_white_rooks() & (1ULL)) {
+                    if(!(Utils::piece_is_at_square(board, 1) || Utils::piece_is_at_square(board, 2) || Utils::piece_is_at_square(board, 3))) {
+                        moves |= 1ULL << 2; // long
+                    }
                 }
             }
         }
@@ -250,16 +254,21 @@ u64 Position::get_king_moves(u8 square) {
     else {
         if(square == 60) {
             u64 board = get_board();
-            if(get_black_rooks() & (1ULL << 63)) {
-                if(!(Utils::piece_is_at_square(board, 61) || Utils::piece_is_at_square(board, 62))) { // if clear space between
-                    moves |= 1ULL << 62; // add short castling
+            if(get_bscr()) { // if allowed to castle
+                if(get_black_rooks() & (1ULL << 63)) {
+                    if(!(Utils::piece_is_at_square(board, 61) || Utils::piece_is_at_square(board, 62))) { // if clear space between
+                        moves |= 1ULL << 62; // add short castling
+                    }
                 }
             }
-            if(get_black_rooks() & (1ULL << 56)) {
-                if(!(Utils::piece_is_at_square(board, 59) || Utils::piece_is_at_square(board, 58) || Utils::piece_is_at_square(board, 57))) {
-                    moves |= 1ULL << 58; // long
+            if(get_blcr()) {
+                if(get_black_rooks() & (1ULL << 56)) {
+                    if(!(Utils::piece_is_at_square(board, 59) || Utils::piece_is_at_square(board, 58) || Utils::piece_is_at_square(board, 57))) {
+                        moves |= 1ULL << 58; // long
+                    }
                 }
             }
+
         }
     }
 
@@ -503,7 +512,7 @@ bool Position::legality_check(Move& move)
     u64 king_target_mask = Utils::QUEEN_ATTACKS[king_square_index];
     king_target_mask |= Utils::KNIGHT_ATTACKS[king_square_index]; // squares where if opponents piece is on could attack king
     u64 opponent_relevant_pieces = king_target_mask & opponent_pieces; // squares with an opponents piece on
-
+    
     // Check if opponents relevant pieces can actually attack the king
     // Is there a faster way than generating them?
     // Generate attacks for pieces on these squares
@@ -524,18 +533,58 @@ bool Position::legality_check(Move& move)
 
 
     if(move.get_flag() == Move_Flag::CASTLING_FLAG) { // Already checks when generating whether it has the rights to do so
-        // Already checks if king is in check, so now check if rook is in check
-        u64 rook_square_u64 = get_rooks() & our_pieces;
-        u8 rook_square_index = Utils::find_piece_index(rook_square_u64);
-        u64 rook_target_mask = Utils::QUEEN_ATTACKS[rook_square_index];
-        rook_target_mask |= Utils::KNIGHT_ATTACKS[rook_square_index]; // squares where if opponents piece is on could attack rook
-        opponent_relevant_pieces = rook_target_mask & opponent_pieces; // squares with an opponents piece on
+        // Already checks if king moved into check
+        // Now need to check whether the squares the king traverses are in check, or whether the king was in check
+        u8 relevant_square_1;
+        u8 relevant_square_2;
+        u64 relevant_squares = 0ULL;
+        if(move.get_dest_square() == 2) {
+            relevant_square_1 = 2;
+            relevant_square_2 = 3;
+        }
+        else if(move.get_dest_square() == 6) {
+            relevant_square_1 = 5;
+            relevant_square_2 = 6;
+        }
+        else if(move.get_dest_square() == 58) {
+            relevant_square_1 = 58;
+            relevant_square_2 = 59;
+        }
+        else if(move.get_dest_square() == 62) {
+            relevant_square_1 = 61;
+            relevant_square_2 = 62;
+        }
+        else {
+            std::cout << "\nExpected castling but king did not move to the expected square\n";
+            assert(0);
+        }
+
+        u8 previous_king_square = move.get_src_square();
+        u64 target_mask = Utils::QUEEN_ATTACKS[relevant_square_1];
+        target_mask |= Utils::QUEEN_ATTACKS[relevant_square_2];
+        target_mask |= Utils::QUEEN_ATTACKS[previous_king_square];
+        target_mask |= Utils::KNIGHT_ATTACKS[relevant_square_1]; // squares where if opponents piece is on could attack the square a king has to move through
+        target_mask |= Utils::KNIGHT_ATTACKS[relevant_square_2];
+        target_mask |= Utils::KNIGHT_ATTACKS[previous_king_square];
+        opponent_relevant_pieces = target_mask & opponent_pieces; // squares with an opponents piece on
 
         while(opponent_relevant_pieces) {
             index = Utils::find_piece_index(opponent_relevant_pieces);
             type = get_piece_type_from_square(index);
             attacks = generate_piece_attacks(type, index);
-            if(attacks & rook_square_u64) { // if there is a piece hitting the king
+            if(type == Piece::PAWN) {
+                if(turn == Turn::BLACK) {
+                    if((index - 7 == move.get_src_square()) || (index - 9 == move.get_src_square())) { // if pawn could see king before move
+                        attacks |= (1ULL << move.get_src_square());
+                    }
+                }
+                else {
+                    if((index + 7 == move.get_src_square()) || (index + 9 == move.get_src_square())) {
+                        attacks |= (1ULL << move.get_src_square());
+                    }
+                }
+            }
+            if((attacks & (1ULL << relevant_square_1)) || (attacks & (1ULL << relevant_square_2)) || (attacks & (1ULL << previous_king_square))) {
                 return false;
             }
             opponent_relevant_pieces = Utils::clear_bit(opponent_relevant_pieces, index);
@@ -569,10 +618,10 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
     // Adapting for special flags
     switch(flag) {
         case ROOK_FLAG: // removing castling rights
-            if(castling_rights = 0) { // if already cant castle, ignore removing castling
+            if(castling_rights == 0) { // if already cant castle, ignore removing castling
                 break;
             }
-            if(src_square == 0) { // no need to check colour as this implies if a rook got here that they cant castle
+            if(src_square == 0) { // no need to check colour as this implies if either rook got here that they cant castle
                 remove_wlcr();
             }
             else if(src_square == 7) {
@@ -628,23 +677,23 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
             // remove corresponding castling rights and play rook portion. After this it will move king as if normal move.
             if(turn == Turn::WHITE) {
                 if(dest_square == 6) { // has short castled
-                    castling_rights &= ~(1ULL);
                     set_pieces_and_colours(Piece::ROOK, Piece::INVALID, Piece::INVALID, turn, 7, 5, false);
                 }
                 else { // has long castled
-                    castling_rights &= ~(1ULL << 1);
                     set_pieces_and_colours(Piece::ROOK, Piece::INVALID, Piece::INVALID, turn, 0, 3, false);
                 }
+                remove_wscr();
+                remove_wlcr();
             }
-            else {
+            else { // if black
                 if(dest_square == 62) { // has short castled
-                    castling_rights &= ~(1ULL << 2);
                     set_pieces_and_colours(Piece::ROOK, Piece::INVALID, Piece::INVALID, turn, 63, 61, false);
                 }
                 else { // has long castled
-                    castling_rights &= ~(1ULL << 3);
                     set_pieces_and_colours(Piece::ROOK, Piece::INVALID, Piece::INVALID, turn, 56, 59, false);
                 }
+                remove_bscr();
+                remove_blcr();
             }
             break;
     }
@@ -715,10 +764,10 @@ bool Position::get_wlcr() { return castling_rights & (1 << Castling_Rights::WHIT
 bool Position::get_bscr() { return castling_rights & (1 << Castling_Rights::BLACK_SHORT); }
 bool Position::get_blcr() { return castling_rights & (1 << Castling_Rights::BLACK_LONG); }
 
-void Position::remove_wscr() { castling_rights = castling_rights & ~ 1 << Castling_Rights::WHITE_SHORT; }
-void Position::remove_wlcr() { castling_rights = castling_rights & ~ 1 << Castling_Rights::WHITE_LONG; }
-void Position::remove_bscr() { castling_rights = castling_rights & ~ 1 << Castling_Rights::BLACK_SHORT; }
-void Position::remove_blcr() { castling_rights = castling_rights & ~ 1 << Castling_Rights::BLACK_LONG; }
+void Position::remove_wscr() { castling_rights = castling_rights & ~(1 << Castling_Rights::WHITE_SHORT); }
+void Position::remove_wlcr() { castling_rights = castling_rights & ~(1 << Castling_Rights::WHITE_LONG); }
+void Position::remove_bscr() { castling_rights = castling_rights & ~(1 << Castling_Rights::BLACK_SHORT); }
+void Position::remove_blcr() { castling_rights = castling_rights & ~(1 << Castling_Rights::BLACK_LONG); }
 
 void Position::set_turn(Turn turn) {this->turn = turn;}
 
@@ -750,7 +799,7 @@ void Position::set_pieces_and_colours(const Piece& moved_piece_type, const Piece
     // Updating representation for piece on destination square by adding it to the destination square
     // Handling promotions
     if(promoted_piece_type != Piece::INVALID) { // if there is a promotion
-        pieces[promoted_piece_type] |= 1 << dest_square; // add new piece to the board
+        pieces[promoted_piece_type] |= 1ULL << dest_square; // add new piece to the board
     }
     else { // if no promotion, add piece to new square
         pieces[moved_piece_type] |= 1ULL << dest_square;
@@ -933,7 +982,7 @@ u8 Position::count_material(Turn turn) {
     return material;
 }
 
-u64 Position::split_perft(int current_depth, const int& desired_depth) // desired depth being the initial depth input
+u64 Position::split_perft(int current_depth, const int& desired_depth, const bool& output_split) // desired depth being the initial depth input
 {
     if (current_depth == 0) {
         return 1ULL;
@@ -952,11 +1001,13 @@ u64 Position::split_perft(int current_depth, const int& desired_depth) // desire
             continue;
         }
 
-        nodes = new_position.split_perft(current_depth - 1, desired_depth);
+        nodes = new_position.split_perft(current_depth - 1, desired_depth, output_split);
         sum += nodes;
-        
-        if(current_depth == desired_depth) { // if finished recursion
-            std::cout << Utils::index_to_board_notation(move.get_src_square()) << Utils::index_to_board_notation(move.get_dest_square()) << ": " << nodes << std::endl;
+
+        if(output_split) {
+            if(current_depth == desired_depth) { // if finished recursion
+                std::cout << Utils::index_to_board_notation(move.get_src_square(), move.get_flag(), true) << Utils::index_to_board_notation(move.get_dest_square(), move.get_flag(), false) << ": " << nodes << std::endl;
+            }
         }
     }
     return sum;

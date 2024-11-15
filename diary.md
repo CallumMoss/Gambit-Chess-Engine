@@ -1,3 +1,6 @@
+13/11/2024
+Refactored until passes perft 6 for starting position.
+
 11/11/2024 - 12/11/2024
 Lots of work. Fixing various move gen issues and testing with perft.
 

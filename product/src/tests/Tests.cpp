@@ -3,6 +3,7 @@
 #include "../utils.hpp"
 #include "../Magics.hpp"
 #include <iostream>
+#include "Perft.cpp"
 
 // // Testing getters and FEN parser.
 // TEST(FEN_And_Pos_Rep, initial_position) {
@@ -589,46 +590,53 @@
 // Go down the line of moves with incorrect nodes till you get to the original moves that were wrong at depth 1
 // Solve the problem
 
-//Rook a2 -> a1 missing
+// TEST(PERFT, pos1) { // starting position
+// 	Position pos = Position();
+// 	Magics::init();
+// 	int depth = 6; // where depth is measured in half moves / plys
+// 	std::cout << "Position 1: (Depth " << depth << ")" << std::endl << pos.split_perft(depth, depth) << std::endl;
+// }
 
+// TEST(PERFT, pos2) { // conventionally named kiwipete
+// 	Position pos = Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+// 	Magics::init();
+// 	int depth = 5; // where depth is measured in half moves / plys
+// 	std::cout << "Position 2: (Depth " << depth << ")" << std::endl << pos.split_perft(depth, depth) << std::endl;
+// }
 
-TEST(PERFT, pos1_1) { // where ply is a half move, in this case whites opening move
+// TEST(PERFT, pos3) {
+// 	Position pos = Position("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1");
+// 	Magics::init();
+// 	int depth = 7; // where depth is measured in half moves / plys
+// 	std::cout << "Position 3: (Depth " << depth << ")" << std::endl << pos.split_perft(depth, depth) << std::endl;
+// }
 
-	//if generates the right number of moves after applying a FEN, it probably means the position doesnt get updated correctly
+// TEST(PERFT, pos4) {
+// 	Position pos = Position("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
+// 	Magics::init();
+// 	int depth = 5; // where depth is measured in half moves / plys
+// 	std::cout << "Position 4: (Depth " << depth << ")" << std::endl << pos.split_perft(depth, depth) << std::endl;
+// }
 
-	Position pos = Position();
+// TEST(PERFT, pos5) {
+// 	Position pos = Position("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8");
+// 	Magics::init();
+// 	int depth = 5; // where depth is measured in half moves / plys
+// 	std::cout << "Position 5: (Depth " << depth << ")" << std::endl << pos.split_perft(depth, depth) << std::endl;
+// }
+
+// TEST(PERFT, pos6) {
+// 	Position pos = Position("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10");
+// 	Magics::init();
+// 	int depth = 5; // where depth is measured in half moves / plys
+// 	std::cout << "Position 6: (Depth " << depth << ")" << std::endl << pos.split_perft(depth, depth) << std::endl;
+// }
+
+TEST(PERFT, perft_suite) {
 	Magics::init();
-	int depth = 6;
-	std::cout << "Position 1: (Depth 1)" << std::endl << pos.split_perft(depth, depth) << std::endl;
+	ASSERT_TRUE(run_perft_suite(false));
 }
 
-// TEST(PERFT, pos1_2) { // where ply is a half move, in this case whites opening move
-// 	Position pos = Position("rnbqkbnr/pppppppp/8/8/8/N7/PPPPPPPP/R1BQKBNR b KQkq - 1 1");
-// 	Magics::init();
-// 	int depth = 4;
-// 	std::cout << "Position 1: (Depth 1)" << std::endl << pos.split_perft(depth, depth) << std::endl;
-// }
-
-// TEST(PERFT, pos1_3) { // where ply is a half move, in this case whites opening move
-// 	Position pos = Position("rnbqkbnr/1ppppppp/8/p7/8/N7/PPPPPPPP/R1BQKBNR w KQkq a6 0 2");
-// 	Magics::init();
-// 	int depth = 3;
-// 	std::cout << "Position 1: (Depth 1)" << std::endl << pos.split_perft(depth, depth) << std::endl;
-// }
-
-// TEST(PERFT, pos1_4) { // where ply is a half move, in this case whites opening move
-// 	Position pos = Position("rnbqkbnr/1ppppppp/8/p7/7P/N7/PPPPPPP1/R1BQKBNR b KQkq h3 0 2");
-// 	Magics::init();
-// 	int depth = 2;
-// 	std::cout << "Position 1: (Depth 1)" << std::endl << pos.split_perft(depth, depth) << std::endl;
-// }
-
-// TEST(PERFT, pos1_5) { // where ply is a half move, in this case whites opening move
-// 	Position pos = Position("rnbqkbnr/2pppppp/p7/Pp6/8/8/1PPPPPPP/RNBQKBNR w KQkq b6 0 3");
-// 	Magics::init();
-// 	int depth = 1;
-// 	std::cout << "Position 1: (Depth 1)" << std::endl << pos.split_perft(depth, depth) << std::endl;
-// }
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

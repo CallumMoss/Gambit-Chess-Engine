@@ -33,7 +33,7 @@ class Position { // Game state class
         Move encode_move(Piece type, u8 src_square, u8 dest_square);
         void make_move(Move& move);
         bool legality_check(Move& move);
-        u64 split_perft(int current_depth, const int& desired_depth);
+        u64 split_perft(int current_depth, const int& desired_depth, const bool& output_split);
 
         // Search and Eval
         Move find_best_move(u8 depth);
