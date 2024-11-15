@@ -9,8 +9,11 @@
 #include "../Position.hpp"
 #include "../Types.hpp"
 
+
+// Perft suite used: http://www.rocechess.ch/perft.html
+
 // Used AI assistance for this function as the problem seemed relatively trivial
-std::vector<std::string> Split(const std::string& str, const std::string& delimiter) {
+static std::vector<std::string> Split(const std::string& str, const std::string& delimiter) {
     std::vector<std::string> tokens;
     size_t start = 0;
     size_t end = str.find(delimiter);
@@ -26,7 +29,7 @@ std::vector<std::string> Split(const std::string& str, const std::string& delimi
 }
 
 // Heavily inspired by the following implementation, but adapted for my own project: https://github.com/TiltedDFA/TDFA/tree/c26a01e29ba87c41af50700c2c8321e3e2667c8f
-u64 test_perft(u8 depth, u64 expected_nodes, uint16_t test_number, const std::string& fen, const bool& output_perft) {
+static u64 test_perft(u8 depth, u64 expected_nodes, uint16_t test_number, const std::string& fen, const bool& output_perft) {
     Position pos(fen);
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -49,8 +52,8 @@ u64 test_perft(u8 depth, u64 expected_nodes, uint16_t test_number, const std::st
     return nps;
 }
 
-bool run_perft_suite(const bool& output_perft) {
-    std::fstream perft_file("../src/tests/perftsuite.epd", std::ios::in);
+static bool run_perft_suite(const bool& output_perft) {
+    std::fstream perft_file("../product/src/tests/perftsuite.epd", std::ios::in);
 
     if(!perft_file.is_open()){return false;}
 

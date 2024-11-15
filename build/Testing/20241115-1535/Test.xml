@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="(empty)"
+	BuildStamp="20241115-1535-Experimental"
+	Name="(empty)"
+	Generator="ctest-3.29.0-rc4"
+	CompilerName=""
+	CompilerVersion=""
+	OSName="Windows"
+	Hostname="LAPTOP-OOBN6C4G"
+	OSRelease=" Personal"
+	OSVersion=" (Build 19045)"
+	OSPlatform="AMD64"
+	Is64Bits="1"
+	VendorString="AuthenticAMD"
+	VendorID="Advanced Micro Devices"
+	FamilyID="15"
+	ModelID="8"
+	ProcessorCacheSize="64"
+	NumberOfLogicalCPU="16"
+	NumberOfPhysicalCPU="8"
+	TotalVirtualMemory="23689"
+	TotalPhysicalMemory="15753"
+	LogicalProcessorsPerPhysical="2"
+	ProcessorClockFrequency="1796"
+	>
+	<Testing>
+		<StartDateTime>Nov 15 15:35 GMT Standard Time</StartDateTime>
+		<StartTestTime>1731684914</StartTestTime>
+		<TestList/>
+		<EndDateTime>Nov 15 15:35 GMT Standard Time</EndDateTime>
+		<EndTestTime>1731684914</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>
