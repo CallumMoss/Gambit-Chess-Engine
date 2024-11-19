@@ -1006,7 +1006,7 @@ u64 Position::split_perft(int current_depth, const int& desired_depth, const boo
 
         if(output_split) {
             if(current_depth == desired_depth) { // if finished recursion
-                std::cout << Utils::index_to_board_notation(move.get_src_square(), move.get_flag(), true) << Utils::index_to_board_notation(move.get_dest_square(), move.get_flag(), false) << ": " << nodes << std::endl;
+                std::cout << Utils::move_to_board_notation(move) << ": " << nodes << std::endl;
             }
         }
     }

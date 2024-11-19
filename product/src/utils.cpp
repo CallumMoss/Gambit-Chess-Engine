@@ -81,28 +81,28 @@ u64 Utils::clear_bit(u64 board, int index) {
     return board &= ~(1ULL << index);
 }
 
-std::string Utils::index_to_board_notation(u8 square, Move_Flag flag, bool is_src) {
-    std::string ret_string = "";
-    ret_string += 'a' + (square % 8);  // Calculate file ('a' to 'h')
-    ret_string += '1' + (square / 8);  // Calculate rank ('1' to '8')
-    if(is_src) {
-        return ret_string;
-    }
-    switch(flag) {
+std::string Utils::move_to_board_notation(Move move) {
+    std::string board_notation = "";
+    board_notation += 'a' + (move.get_src_square() % 8);  // Calculate file ('a' to 'h')
+    board_notation += '1' + (move.get_src_square() / 8);  // Calculate rank ('1' to '8')
+
+    board_notation += 'a' + (move.get_dest_square() % 8);  // Calculate file ('a' to 'h')
+    board_notation += '1' + (move.get_dest_square() / 8);  // Calculate rank ('1' to '8')
+    switch(move.get_flag()) {
         case KNIGHT_PROMOTION_FLAG:
-            ret_string += 'n';
+            board_notation += 'n';
             break;
         case BISHOP_PROMOTION_FLAG:
-            ret_string += 'b';
+            board_notation += 'b';
             break;
         case ROOK_PROMOTION_FLAG:
-            ret_string += 'r';
+            board_notation += 'r';
             break;
         case QUEEN_PROMOTION_FLAG:
-            ret_string += 'q';
+            board_notation += 'q';
             break;
         default:
             break;
     }
-    return ret_string;  // Construct string using file and rank
+    return board_notation;  // Construct string using file and rank
 }

@@ -167,7 +167,7 @@ namespace Utils {
     int count_number_of_1bs(u64 board);
     u8 find_piece_index(u64 bitboard);
     u64 clear_bit(u64 board, int index);
-    std::string index_to_board_notation(u8 square, Move_Flag flag, bool is_src);
+    std::string move_to_board_notation(Move move);
 
     static constexpr u8 NULL_EN_PASSANT = 64;
 
