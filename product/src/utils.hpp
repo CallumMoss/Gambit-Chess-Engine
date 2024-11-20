@@ -5,7 +5,10 @@
 #include <array>
 #include <string>
 #include <iostream>
+
 #include "Types.hpp"
+
+class Position; // Forward declaration to avoid circular dependencies.
 
 enum Piece
 {
@@ -167,7 +170,9 @@ namespace Utils {
     int count_number_of_1bs(u64 board);
     u8 find_piece_index(u64 bitboard);
     u64 clear_bit(u64 board, int index);
+    Move encode_move(Piece type, u8 src_square, u8 dest_square, u8 en_passant_target);
     std::string move_to_board_notation(Move move);
+    Move board_notation_to_move(std::string board_notation, Position& pos);
 
     static constexpr u8 NULL_EN_PASSANT = 64;
 

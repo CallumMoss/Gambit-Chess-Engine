@@ -77,6 +77,13 @@ build CMakeFiles/Tests.dir/src/Search.cpp.obj: CXX_COMPILER__Tests_unscanned_Rel
   OBJECT_DIR = CMakeFiles\Tests.dir
   OBJECT_FILE_DIR = CMakeFiles\Tests.dir\src
 
+build CMakeFiles/Tests.dir/src/UCI.cpp.obj: CXX_COMPILER__Tests_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/UCI.cpp || cmake_object_order_depends_target_Tests
+  DEP_FILE = CMakeFiles\Tests.dir\src\UCI.cpp.obj.d
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
+  INCLUDES = -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
+  OBJECT_DIR = CMakeFiles\Tests.dir
+  OBJECT_FILE_DIR = CMakeFiles\Tests.dir\src
+
 build CMakeFiles/Tests.dir/src/tests/Perft.cpp.obj: CXX_COMPILER__Tests_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/tests/Perft.cpp || cmake_object_order_depends_target_Tests
   DEP_FILE = CMakeFiles\Tests.dir\src\tests\Perft.cpp.obj.d
   FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
@@ -106,7 +113,7 @@ build CMakeFiles/Tests.dir/src/utils.cpp.obj: CXX_COMPILER__Tests_unscanned_Rele
 #############################################
 # Link the executable Tests.exe
 
-build Tests.exe Tests[1]_tests.cmake | ${cmake_ninja_workdir}Tests[1]_tests.cmake: CXX_EXECUTABLE_LINKER__Tests_Release CMakeFiles/Tests.dir/src/Evaluation.cpp.obj CMakeFiles/Tests.dir/src/Magics.cpp.obj CMakeFiles/Tests.dir/src/Position.cpp.obj CMakeFiles/Tests.dir/src/Search.cpp.obj CMakeFiles/Tests.dir/src/tests/Perft.cpp.obj CMakeFiles/Tests.dir/src/tests/Tests.cpp.obj CMakeFiles/Tests.dir/src/utils.cpp.obj | lib/libgtest_main.a lib/libgtest.a || lib/libgtest.a lib/libgtest_main.a
+build Tests.exe Tests[1]_tests.cmake | ${cmake_ninja_workdir}Tests[1]_tests.cmake: CXX_EXECUTABLE_LINKER__Tests_Release CMakeFiles/Tests.dir/src/Evaluation.cpp.obj CMakeFiles/Tests.dir/src/Magics.cpp.obj CMakeFiles/Tests.dir/src/Position.cpp.obj CMakeFiles/Tests.dir/src/Search.cpp.obj CMakeFiles/Tests.dir/src/UCI.cpp.obj CMakeFiles/Tests.dir/src/tests/Perft.cpp.obj CMakeFiles/Tests.dir/src/tests/Tests.cpp.obj CMakeFiles/Tests.dir/src/utils.cpp.obj | lib/libgtest_main.a lib/libgtest.a || lib/libgtest.a lib/libgtest_main.a
   FLAGS = -O3  -march=native  -mtune=native
   LINK_LIBRARIES = lib/libgtest_main.a  lib/libgtest.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Tests.dir
@@ -156,6 +163,12 @@ build CMakeFiles/Gambit.dir/src/Search.cpp.obj: CXX_COMPILER__Gambit_unscanned_R
   OBJECT_DIR = CMakeFiles\Gambit.dir
   OBJECT_FILE_DIR = CMakeFiles\Gambit.dir\src
 
+build CMakeFiles/Gambit.dir/src/UCI.cpp.obj: CXX_COMPILER__Gambit_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/UCI.cpp || cmake_object_order_depends_target_Gambit
+  DEP_FILE = CMakeFiles\Gambit.dir\src\UCI.cpp.obj.d
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
+  OBJECT_DIR = CMakeFiles\Gambit.dir
+  OBJECT_FILE_DIR = CMakeFiles\Gambit.dir\src
+
 build CMakeFiles/Gambit.dir/src/tests/Perft.cpp.obj: CXX_COMPILER__Gambit_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/tests/Perft.cpp || cmake_object_order_depends_target_Gambit
   DEP_FILE = CMakeFiles\Gambit.dir\src\tests\Perft.cpp.obj.d
   FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
@@ -176,7 +189,7 @@ build CMakeFiles/Gambit.dir/src/utils.cpp.obj: CXX_COMPILER__Gambit_unscanned_Re
 #############################################
 # Link the executable Gambit.exe
 
-build Gambit.exe: CXX_EXECUTABLE_LINKER__Gambit_Release CMakeFiles/Gambit.dir/src/Evaluation.cpp.obj CMakeFiles/Gambit.dir/src/Magics.cpp.obj CMakeFiles/Gambit.dir/src/Main.cpp.obj CMakeFiles/Gambit.dir/src/Position.cpp.obj CMakeFiles/Gambit.dir/src/Search.cpp.obj CMakeFiles/Gambit.dir/src/tests/Perft.cpp.obj CMakeFiles/Gambit.dir/src/utils.cpp.obj
+build Gambit.exe: CXX_EXECUTABLE_LINKER__Gambit_Release CMakeFiles/Gambit.dir/src/Evaluation.cpp.obj CMakeFiles/Gambit.dir/src/Magics.cpp.obj CMakeFiles/Gambit.dir/src/Main.cpp.obj CMakeFiles/Gambit.dir/src/Position.cpp.obj CMakeFiles/Gambit.dir/src/Search.cpp.obj CMakeFiles/Gambit.dir/src/UCI.cpp.obj CMakeFiles/Gambit.dir/src/tests/Perft.cpp.obj CMakeFiles/Gambit.dir/src/utils.cpp.obj
   FLAGS = -O3  -march=native  -mtune=native
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Gambit.dir

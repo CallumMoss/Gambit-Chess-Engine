@@ -1,11 +1,13 @@
 #include "Position.hpp"
 #include "Magics.hpp"
+
 #include <vector>
 #include <sstream>
 #include <iostream>
 #include <array>
 #include <cstdint>
 #include <cassert>
+
 
 Position::Position(const std::string& fen):
     pieces(),
@@ -432,53 +434,9 @@ std::vector<Move> Position::bb_to_move_list(Piece type, u8 src_square, u64 attac
                 continue;
             }
         }
-        move_list.push_back(encode_move(type, src_square, dest_square));
+        move_list.push_back(Utils::encode_move(type, src_square, dest_square, en_passant_target));
     }
     return move_list;
-}
-
-Move Position::encode_move(Piece type, u8 src_square, u8 dest_square) {
-    Move_Flag flag = Move_Flag::NULL_FLAG;
-
-    if (type == Piece::PAWN) {
-        if((src_square == dest_square + 16) || (src_square == dest_square - 16)) { // if is pawn and has moved twice
-            flag = Move_Flag::PAWN_TWO_FORWARD_FLAG; // this move gives the option of en_passant for next move
-        }
-        else if(dest_square == en_passant_target) {
-            flag = Move_Flag::EN_PASSANT_FLAG;
-        } // then en passant has occured
-        else {
-            flag = Move_Flag::PAWN_FLAG;
-        }
-    }
-    else if(type == Piece::KING) {
-        if((src_square == dest_square + 2) || (src_square == dest_square - 2)) { // castling has occured
-            flag = Move_Flag::CASTLING_FLAG;
-        }
-        else {
-            flag = Move_Flag::KING_FLAG;
-        }
-    }
-    else {
-        switch(type) {
-            case(Piece::KNIGHT):
-                flag = Move_Flag::KNIGHT_FLAG;
-                break;
-            case(Piece::BISHOP):
-                flag = Move_Flag::BISHOP_FLAG;
-                break;
-            case(Piece::ROOK):
-                flag = Move_Flag::ROOK_FLAG;
-                break;
-            case(Piece::QUEEN):
-                flag = Move_Flag::QUEEN_FLAG;
-                break;
-            default: // if invalid piece type
-                flag = Move_Flag::NULL_FLAG;
-                break;
-        }
-    }
-    return Move(src_square, dest_square, flag);
 }
 
 // Checks whether after applying a pseudo move, if the position is legal.
@@ -839,7 +797,7 @@ void Position::set_pieces_and_colours(const Piece& moved_piece_type, const Piece
 
 // Finds the best move for the current position using negamax
 // Initial call for negamax for each move up to a line depth provided
-Move Position::find_best_move(u8 depth) {
+Move Position::find_best_move(Timer& timer) {
     // Currently do not keep track of eval after end
     // If wish to do this for programming analysis, can
     // just use prints
@@ -847,35 +805,36 @@ Move Position::find_best_move(u8 depth) {
     int best_eval = INT_MIN;
     Move best_move = Move(0, 0, Move_Flag::NULL_FLAG);
     int eval;
-    // Need to convert this to return moves instead of bitboards
-    std::vector<Move> moves = generate_all_moves();
-     for(Move move : moves) {
-        // Reset position
-        Position new_position = *this; // reset position after every exploration
-        // make move
-        new_position.make_move(move); // apply move to current pos
+    for(u8 depth = 1; timer.is_out_of_time(); depth++) { // increments depth of search until runs out of time
+        std::vector<Move> moves = generate_all_moves();
+        for(Move move : moves) {
+            // Reset position
+            Position new_position = *this; // reset position after every exploration
+            // make move
+            new_position.make_move(move); // apply move to current pos
 
-        if(!new_position.legality_check(move)) { // if move isnt legal, skip eval for this move
-            continue;
+            if(!new_position.legality_check(move)) { // if move isnt legal, skip eval for this move
+                continue;
+            }
+
+            // depth - 1 because we have already looked at this depth
+            // eg: depth 1 = our move
+            // eg: depth 2 = opponents response
+            // uses depth of half moves
+
+            // Should figure out how to make use of turns
+            // in this case, it should be called with the turn that isnt ours
+            // for simplicity we assume we are white for now
+            // calls -negamax as to flip the eval back to our perspective
+
+            // AB Negamax:
+            eval = -new_position.negamax_ab(depth - 1, INT_MIN, INT_MAX);
+            if(eval > best_eval) {
+                best_eval = eval;
+                best_move = move;
+            }
         }
-
-        // depth - 1 because we have already looked at this depth
-        // eg: depth 1 = our move
-        // eg: depth 2 = opponents response
-        // uses depth of half moves
-
-        // Should figure out how to make use of turns
-        // in this case, it should be called with the turn that isnt ours
-        // for simplicity we assume we are white for now
-        // calls -negamax as to flip the eval back to our perspective
-
-        // AB Negamax:
-        eval = -new_position.negamax_ab(depth - 1, INT_MIN, INT_MAX);
-        if(eval > best_eval) {
-            best_eval = eval;
-            best_move = move;
-        }
-     }
+    }
      return best_move;
 }
 

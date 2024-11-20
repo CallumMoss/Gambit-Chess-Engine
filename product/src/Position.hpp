@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "utils.hpp"
+#include "Timer.hpp"
 
 enum class Turn: u8 {
     WHITE,
@@ -30,13 +31,12 @@ class Position { // Game state class
         std::vector<Move> generate_piece_moves(Piece type, u8 square);
         std::vector<u64> extract_piece_moves(u64 attacks);
         std::vector<Move> bb_to_move_list(Piece type, u8 square, u64 attacks);
-        Move encode_move(Piece type, u8 src_square, u8 dest_square);
         void make_move(Move& move);
         bool legality_check(Move& move);
         u64 split_perft(int current_depth, const int& desired_depth, const bool& output_split);
 
         // Search and Eval
-        Move find_best_move(u8 depth);
+        Move find_best_move(Timer& timer);
         int evaluate(Position pos);
         u8 count_material(Turn turn);
         int negamax_ab(u8 depth, int alpha, int beta);

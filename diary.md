@@ -1,3 +1,12 @@
+19/11/2024 - 20/11/2024
+Working on UCI
+
+16/11/2024 - 18/11/2024
+Birthday Celebrations
+
+14/11/2024 - 15/11/2024
+Working on UCI
+
 13/11/2024
 Refactored until passes perft 6 for starting position.
 

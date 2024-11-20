@@ -1,4 +1,5 @@
 #include "Utils.hpp"
+#include "Position.hpp"
 
 // Shifts should only be used for indiviual piece bbs, not entire board bbs. Aka a singular pawn attack.
 u64 Utils::shift_up(u64 board) { // Moving the board up a rank (can be used for seeing possible pawn moves for example)
@@ -105,4 +106,74 @@ std::string Utils::move_to_board_notation(Move move) {
             break;
     }
     return board_notation;  // Construct string using file and rank
+}
+
+Move Utils::encode_move(Piece type, u8 src_square, u8 dest_square, u8 en_passant_target) {
+    Move_Flag flag = Move_Flag::NULL_FLAG;
+
+    if (type == Piece::PAWN) {
+        if((src_square == dest_square + 16) || (src_square == dest_square - 16)) { // if is pawn and has moved twice
+            flag = Move_Flag::PAWN_TWO_FORWARD_FLAG; // this move gives the option of en_passant for next move
+        }
+        else if(dest_square == en_passant_target) {
+            flag = Move_Flag::EN_PASSANT_FLAG;
+        } // then en passant has occured
+        else {
+            flag = Move_Flag::PAWN_FLAG;
+        }
+    }
+    else if(type == Piece::KING) {
+        if((src_square == dest_square + 2) || (src_square == dest_square - 2)) { // castling has occured
+            flag = Move_Flag::CASTLING_FLAG;
+        }
+        else {
+            flag = Move_Flag::KING_FLAG;
+        }
+    }
+    else {
+        switch(type) {
+            case(Piece::KNIGHT):
+                flag = Move_Flag::KNIGHT_FLAG;
+                break;
+            case(Piece::BISHOP):
+                flag = Move_Flag::BISHOP_FLAG;
+                break;
+            case(Piece::ROOK):
+                flag = Move_Flag::ROOK_FLAG;
+                break;
+            case(Piece::QUEEN):
+                flag = Move_Flag::QUEEN_FLAG;
+                break;
+            default: // if invalid piece type
+                flag = Move_Flag::NULL_FLAG;
+                break;
+        }
+    }
+    return Move(src_square, dest_square, flag);
+}
+
+Move Utils::board_notation_to_move(std::string board_notation, Position& pos) {
+    u8 src_square = (board_notation[0] - 'a') + (board_notation[1] - '1') * 8;
+    u8 dest_square = (board_notation[2] - 'a') + (board_notation[3] - '1') * 8;
+    Move_Flag flag;
+    if(board_notation.length() == 5) {
+        switch(board_notation[4]) {
+            case 'q':
+                flag = Move_Flag::QUEEN_PROMOTION_FLAG;
+                break;
+            case 'r':
+                flag = Move_Flag::ROOK_PROMOTION_FLAG;
+                break;
+            case 'b':
+                flag = Move_Flag::BISHOP_PROMOTION_FLAG;
+                break;
+            case 'n':
+                flag = Move_Flag::KNIGHT_PROMOTION_FLAG;
+                break;
+        }
+        return Move(src_square, dest_square, flag);
+    }
+    else {
+        return encode_move(pos.get_piece_type_from_square(src_square), src_square, dest_square, pos.get_en_passant_target());
+    }
 }

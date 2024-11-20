@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
+#include <iostream>
+
 #include "../Position.hpp"
 #include "../utils.hpp"
 #include "../Magics.hpp"
-#include <iostream>
 #include "Perft.cpp"
 
 // // Testing getters and FEN parser.

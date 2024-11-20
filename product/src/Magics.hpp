@@ -7,8 +7,10 @@
 #include <iostream>
 #include <vector>
 #include <list>
+
 #include "utils.hpp"
 #include "Position.hpp"
+
 
 struct MagicEntry {
     u64 mask;

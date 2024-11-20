@@ -25,6 +25,12 @@
 },
 {
   "directory": "C:/Users/callu/Desktop/Gambit/build",
+  "command": "g++ -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest -O3  -march=native  -mtune=native -std=gnu++20 -o CMakeFiles\\Tests.dir\\src\\UCI.cpp.obj -c C:\\Users\\callu\\Desktop\\Gambit\\product\\src\\UCI.cpp",
+  "file": "C:\\Users\\callu\\Desktop\\Gambit\\product\\src\\UCI.cpp",
+  "output": "CMakeFiles\\Tests.dir\\src\\UCI.cpp.obj"
+},
+{
+  "directory": "C:/Users/callu/Desktop/Gambit/build",
   "command": "g++ -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest -O3  -march=native  -mtune=native -std=gnu++20 -o CMakeFiles\\Tests.dir\\src\\tests\\Perft.cpp.obj -c C:\\Users\\callu\\Desktop\\Gambit\\product\\src\\tests\\Perft.cpp",
   "file": "C:\\Users\\callu\\Desktop\\Gambit\\product\\src\\tests\\Perft.cpp",
   "output": "CMakeFiles\\Tests.dir\\src\\tests\\Perft.cpp.obj"
@@ -70,6 +76,12 @@
   "command": "g++ -O3  -march=native  -mtune=native -std=gnu++20 -o CMakeFiles\\Gambit.dir\\src\\Search.cpp.obj -c C:\\Users\\callu\\Desktop\\Gambit\\product\\src\\Search.cpp",
   "file": "C:\\Users\\callu\\Desktop\\Gambit\\product\\src\\Search.cpp",
   "output": "CMakeFiles\\Gambit.dir\\src\\Search.cpp.obj"
+},
+{
+  "directory": "C:/Users/callu/Desktop/Gambit/build",
+  "command": "g++ -O3  -march=native  -mtune=native -std=gnu++20 -o CMakeFiles\\Gambit.dir\\src\\UCI.cpp.obj -c C:\\Users\\callu\\Desktop\\Gambit\\product\\src\\UCI.cpp",
+  "file": "C:\\Users\\callu\\Desktop\\Gambit\\product\\src\\UCI.cpp",
+  "output": "CMakeFiles\\Gambit.dir\\src\\UCI.cpp.obj"
 },
 {
   "directory": "C:/Users/callu/Desktop/Gambit/build",

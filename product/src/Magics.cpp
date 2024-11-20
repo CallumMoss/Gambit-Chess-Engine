@@ -1,10 +1,12 @@
 #include "Magics.hpp"
+
 #include <random>
 #include <vector>
 #include <sstream>
 #include <iostream>
 #include <array>
 #include <cstdint>
+
 
 // ARCHIVED:
 // Final_Magic bishop_magics_table[64] = {};
