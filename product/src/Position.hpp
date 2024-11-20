@@ -36,6 +36,7 @@ class Position { // Game state class
         u64 split_perft(int current_depth, const int& desired_depth, const bool& output_split);
 
         // Search and Eval
+        Move find_random_move();
         Move find_best_move(Timer& timer);
         int evaluate(Position pos);
         u8 count_material(Turn turn);

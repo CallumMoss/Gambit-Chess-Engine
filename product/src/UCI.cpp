@@ -76,6 +76,7 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
     }
 
     timer.start_timer();
+    //std::cout << "bestmove " << Utils::move_to_board_notation(pos.find_random_move()) << std::endl;
     std::cout << "bestmove " << Utils::move_to_board_notation(pos.find_best_move(timer)) << std::endl;
 }
 

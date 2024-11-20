@@ -21,11 +21,10 @@ int main() {
         std::string command = args[0];
         // parameters = rest of args
         if(command == "uci") {
-            output += "id name Gambit ", version, "\n"; // insert version here
-            output += "id author Callum Moss\n";
+            std::cout << "id name Gambit " << version << std::endl; // insert version here
+            std::cout << "id author Callum Moss" << std::endl;
             // can print option commands
-            output+= "uciok\n"; // engine has set all parameters and is ready
-            std::cout << output;
+            std::cout << "uciok" << std::endl; // engine has set all parameters and is ready
         }
         else if(command == "isready") {
             std::cout << "readyok\n";

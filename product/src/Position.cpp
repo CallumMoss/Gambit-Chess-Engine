@@ -7,6 +7,7 @@
 #include <array>
 #include <cstdint>
 #include <cassert>
+#include <random>
 
 
 Position::Position(const std::string& fen):
@@ -793,7 +794,24 @@ void Position::set_pieces_and_colours(const Piece& moved_piece_type, const Piece
     }
 }
 
-///////////////////
+Move Position::find_random_move() {
+    std::vector<Move> moves = generate_all_moves();
+     std::random_device rd;
+    // Initialize a Mersenne Twister pseudo-random number generator
+    std::mt19937_64 gen(rd());
+    // Define the range of random numbers (inclusive)
+    std::uniform_int_distribution<uint64_t> dis(0, moves.size());
+    while(true) {
+        Position new_position = *this; // reset position after every exploration
+        // make move
+        Move move = moves[dis(gen)];
+        new_position.make_move(move); // apply move to current pos
+
+        if(new_position.legality_check(move)) { // if move isnt legal, skip eval for this move
+                return move;
+            }
+    }
+}
 
 // Finds the best move for the current position using negamax
 // Initial call for negamax for each move up to a line depth provided
@@ -805,7 +823,7 @@ Move Position::find_best_move(Timer& timer) {
     int best_eval = INT_MIN;
     Move best_move = Move(0, 0, Move_Flag::NULL_FLAG);
     int eval;
-    for(u8 depth = 1; timer.is_out_of_time(); depth++) { // increments depth of search until runs out of time
+    for(u8 depth = 1; !timer.is_out_of_time(); depth++) { // increments depth of search until runs out of time
         std::vector<Move> moves = generate_all_moves();
         for(Move move : moves) {
             // Reset position
