@@ -826,6 +826,9 @@ Move Position::find_best_move(Timer& timer) {
     for(u8 depth = 1; !timer.is_out_of_time(); depth++) { // increments depth of search until runs out of time
         std::vector<Move> moves = generate_all_moves();
         for(Move move : moves) {
+            if(timer.is_out_of_time()) {
+                break;
+            }
             // Reset position
             Position new_position = *this; // reset position after every exploration
             // make move
@@ -846,7 +849,7 @@ Move Position::find_best_move(Timer& timer) {
             // calls -negamax as to flip the eval back to our perspective
 
             // AB Negamax:
-            eval = -new_position.negamax_ab(depth - 1, INT_MIN, INT_MAX);
+            eval = -new_position.negamax_ab(depth - 1, INT_MIN, INT_MAX, timer);
             if(eval > best_eval) {
                 best_eval = eval;
                 best_move = move;
@@ -862,10 +865,10 @@ Move Position::find_best_move(Timer& timer) {
 // Pruning is less helpful for gambit as it aims to find risky moves, therefore pruning could prove bad
 // Added pruning simply but may take it off for the above reason
 // negamax and negamax_ab returns the same best move, therefore chose to implement this version.
-int Position::negamax_ab(u8 depth, int alpha, int beta) {
+int Position::negamax_ab(u8 depth, int alpha, int beta, Timer& timer) {
     Position new_position = *this;
     
-    if (depth == 0) { // or if checkmate?
+    if (depth == 0 || timer.is_out_of_time()) { // or if checkmate?
         // returns eval of the position at a given depth
         //std::cout << evaluate(current_position);
         return evaluate(new_position);
@@ -883,7 +886,7 @@ int Position::negamax_ab(u8 depth, int alpha, int beta) {
             continue;
         }
 
-        int eval = -new_position.negamax_ab(depth - 1, -beta, -alpha);
+        int eval = -new_position.negamax_ab(depth - 1, -beta, -alpha, timer);
         // do i need to undo the move? shouldnt need to if i copy positions instead
         // of editing our one position
 

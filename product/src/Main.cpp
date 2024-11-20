@@ -7,7 +7,7 @@
 
 
 int main() {
-    float version = 1.0;
+    std::string version = "v1.0.0";
 
     Magics::init();
     std::string input = "";

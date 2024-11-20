@@ -40,7 +40,7 @@ class Position { // Game state class
         Move find_best_move(Timer& timer);
         int evaluate(Position pos);
         u8 count_material(Turn turn);
-        int negamax_ab(u8 depth, int alpha, int beta);
+        int negamax_ab(u8 depth, int alpha, int beta, Timer& timer);
 
         Piece get_piece_type_from_square(u8 square);
         const std::array<u64, 6>& get_pieces();
