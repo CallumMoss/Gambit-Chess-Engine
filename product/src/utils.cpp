@@ -177,3 +177,7 @@ Move Utils::board_notation_to_move(std::string board_notation, Position& pos) {
         return encode_move(pos.get_piece_type_from_square(src_square), src_square, dest_square, pos.get_en_passant_target());
     }
 }
+
+// int find_mvv_lva_ratio() {
+//     return value(victim) * 10 - value(attacker)
+// }

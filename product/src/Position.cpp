@@ -7,6 +7,7 @@
 #include <array>
 #include <cstdint>
 #include <cassert>
+#include <bit>
 #include <random>
 
 
@@ -514,8 +515,8 @@ bool Position::legality_check(Move& move)
             relevant_square_2 = 62;
         }
         else {
-            std::cout << "\nExpected castling but king did not move to the expected square\n";
-            assert(0);
+            std::cerr << "\nExpected castling but king did not move to the expected square";
+            std::exit(-1);
         }
 
         u8 previous_king_square = move.get_src_square();
@@ -800,34 +801,33 @@ Move Position::find_random_move() {
     // Initialize a Mersenne Twister pseudo-random number generator
     std::mt19937_64 gen(rd());
     // Define the range of random numbers (inclusive)
-    std::uniform_int_distribution<uint64_t> dis(0, moves.size());
+    std::uniform_int_distribution<size_t> dis(0, moves.size() - 1);
     while(true) {
         Position new_position = *this; // reset position after every exploration
         // make move
         Move move = moves[dis(gen)];
         new_position.make_move(move); // apply move to current pos
 
-        if(new_position.legality_check(move)) { // if move isnt legal, skip eval for this move
-                return move;
-            }
+        if(new_position.legality_check(move)) { // if move is legal, return move
+            std::cout << "info score cp " << static_cast<int>(new_position.evaluate()) << " depth 1\n";
+            return move;
+        }
     }
 }
 
 // Finds the best move for the current position using negamax
 // Initial call for negamax for each move up to a line depth provided
 Move Position::find_best_move(Timer& timer) {
-    // Currently do not keep track of eval after end
-    // If wish to do this for programming analysis, can
-    // just use prints
-
-    int best_eval = INT_MIN;
+    int best_score = -INT_MAX;
     Move best_move = Move(0, 0, Move_Flag::NULL_FLAG);
-    int eval;
-    for(u8 depth = 1; !timer.is_out_of_time(); depth++) { // increments depth of search until runs out of time
+    int score = 0;// increments depth of search until runs out of time
+    PV principal_variation; // used to keep track of the best line
+    int depth = 1;
+    while(true) {
         std::vector<Move> moves = generate_all_moves();
         for(Move move : moves) {
             if(timer.is_out_of_time()) {
-                break;
+                return best_move;
             }
             // Reset position
             Position new_position = *this; // reset position after every exploration
@@ -837,45 +837,44 @@ Move Position::find_best_move(Timer& timer) {
             if(!new_position.legality_check(move)) { // if move isnt legal, skip eval for this move
                 continue;
             }
+            PV line;
 
-            // depth - 1 because we have already looked at this depth
-            // eg: depth 1 = our move
-            // eg: depth 2 = opponents response
-            // uses depth of half moves
+            //**  Negamax: **//
+            score = -new_position.negamax(depth - 1, &line, timer);
+            
+            //** AB Negamax: **//
+            //score = -new_position.negamax_ab(depth - 1, -INT_MAX, INT_MAX, &line, timer);
 
-            // Should figure out how to make use of turns
-            // in this case, it should be called with the turn that isnt ours
-            // for simplicity we assume we are white for now
-            // calls -negamax as to flip the eval back to our perspective
-
-            // AB Negamax:
-            eval = -new_position.negamax_ab(depth - 1, INT_MIN, INT_MAX, timer);
-            if(eval > best_eval) {
-                best_eval = eval;
+            if(score > best_score) {
+                best_score = score;
                 best_move = move;
+                //Update the principal variation
+                principal_variation.moves.clear();
+                principal_variation.moves.push_back(move);
+                principal_variation.moves.insert(
+                principal_variation.moves.end(), line.moves.begin(), line.moves.end());
+                principal_variation.num_of_moves = static_cast<int>(principal_variation.moves.size());
             }
         }
+        std::cout << "info score cp " << best_score << " depth " << depth << " pv ";
+        for (Move& pv_move : principal_variation.moves) {
+            std::cout << Utils::move_to_board_notation(pv_move) << " ";  // Print the principal variation
+        }
+        std::cout << std::endl;
+        depth++;
     }
-     return best_move;
 }
 
-// Inspired from the chess programming wiki (standard convention)
-// Search algorithm which produces the same output as minimax but is simpler to implement
-
-// Pruning is less helpful for gambit as it aims to find risky moves, therefore pruning could prove bad
-// Added pruning simply but may take it off for the above reason
-// negamax and negamax_ab returns the same best move, therefore chose to implement this version.
-int Position::negamax_ab(u8 depth, int alpha, int beta, Timer& timer) {
+int Position::negamax(u8 depth, PV* pline, Timer& timer) {
     Position new_position = *this;
-    
-    if (depth == 0 || timer.is_out_of_time()) { // or if checkmate?
-        // returns eval of the position at a given depth
-        //std::cout << evaluate(current_position);
-        return evaluate(new_position);
+    if(depth == 0 || timer.is_out_of_time()) {
+        pline->num_of_moves = 0;
+        return new_position.evaluate();
     }
-
-    int best_eval;
-    for(Move move : generate_all_moves()) {
+    PV line;
+    int best_score = -INT_MAX;
+    std::vector<Move> moves = generate_all_moves();
+    for(Move move : moves) {
         // Reset position
         new_position = *this; // reset position after every exploration
         
@@ -886,42 +885,80 @@ int Position::negamax_ab(u8 depth, int alpha, int beta, Timer& timer) {
             continue;
         }
 
-        int eval = -new_position.negamax_ab(depth - 1, -beta, -alpha, timer);
-        // do i need to undo the move? shouldnt need to if i copy positions instead
-        // of editing our one position
+        int score = -new_position.negamax(depth - 1, &line, timer);
 
-        if(eval > best_eval) {
-            best_eval = eval;
-        }
-        if(eval > alpha) {
-            alpha = eval;
-
-            if(beta >= eval) {
-                break;
-            }
+        if(score > best_score) {
+            best_score = score;
+            pline->moves.clear();                 // Clear the previous PV
+            pline->moves.push_back(move);         // Add the current move
+            pline->moves.insert(pline->moves.end(), line.moves.begin(), line.moves.end());  // Append deeper PV
+            pline->num_of_moves = static_cast<int>(pline->moves.size());  // Update PV size
         }
     }
+    return best_score;
+}
+// Inspired from the chess programming wiki (standard convention)
+// Search algorithm which produces the same output as minimax but is simpler to implement
+// Pruning is less helpful for gambit as it aims to find risky moves, therefore pruning could prove bad
+// Added pruning simply but may take it off for the above reason
+// negamax_ab returns the same best move, therefore chose to implement this version.
+int Position::negamax_ab(u8 depth, int alpha, int beta, PV* pline, Timer& timer) {
+    Position new_position = *this;
+    
+    if (depth == 0 || timer.is_out_of_time()) { // or if checkmate?
+        // returns eval of the position at a given depth
+        //std::cout << evaluate(current_position);
+        pline->num_of_moves = 0;
+        return new_position.evaluate();
+    }
 
-    return best_eval;
+    PV line;
 
+    int best_score = -INT_MAX;
+    std::vector<Move> moves = generate_all_moves();
+    for(Move move : moves) {
+        // Reset position
+        new_position = *this; // reset position after every exploration
+        
+        // make move
+        new_position.make_move(move); // apply move to current pos
+        
+        if(!new_position.legality_check(move)) { // if move isnt legal, skip eval for this move
+            continue;
+        }
+
+        int score = -new_position.negamax_ab(depth - 1, -beta, -alpha, &line, timer);
+
+        if(score > best_score) {
+            best_score = score;
+            if(score > alpha) {
+                alpha = score;
+                pline->moves.clear();                 // Clear the previous PV
+                pline->moves.push_back(move);         // Add the current move
+                pline->moves.insert(pline->moves.end(), line.moves.begin(), line.moves.end());  // Append deeper PV
+                pline->num_of_moves = static_cast<int>(pline->moves.size());  // Update PV size
+            }
+        }
+        if(score >= beta) {
+            return best_score;
+        }
+    }
+    return best_score;
 }
 
 //////////
 
-int Position::evaluate(Position pos) {
-    // I think chess perspective of - for black is performed in another function, so dont need to consider anything besides own side - opp side
-    if(pos.get_turn() == Turn::WHITE) {
-        // could make a get_opp_turn()?
-
-        return pos.count_material(Turn::WHITE) - pos.count_material(Turn::BLACK);
+int Position::evaluate() {
+    if(get_turn() == Turn::WHITE) {
+        return count_material(Turn::WHITE) - count_material(Turn::BLACK);
     }
     else {
-        return pos.count_material(Turn::BLACK) - pos.count_material(Turn::WHITE);
+        return count_material(Turn::BLACK) - count_material(Turn::WHITE);
     } 
 }
 
-u8 Position::count_material(Turn turn) {
-    u8 material = 0;
+int Position::count_material(Turn turn) {
+    int material = 0;
     u64 board;
     if(turn == Turn::WHITE) {
         board = get_white_pieces();

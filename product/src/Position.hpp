@@ -12,6 +12,12 @@ enum class Turn: u8 {
     WHITE,
     BLACK
 };
+
+struct PV {
+    int num_of_moves;
+    std::vector<Move> moves;
+};
+
 class Position { // Game state class
     public:
         Position(const std::string& fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -38,9 +44,10 @@ class Position { // Game state class
         // Search and Eval
         Move find_random_move();
         Move find_best_move(Timer& timer);
-        int evaluate(Position pos);
-        u8 count_material(Turn turn);
-        int negamax_ab(u8 depth, int alpha, int beta, Timer& timer);
+        int evaluate();
+        int count_material(Turn turn);
+        int negamax(u8 depth, PV* pline, Timer& timer);
+        int negamax_ab(u8 depth, int alpha, int beta, PV* pline, Timer& timer);
 
         Piece get_piece_type_from_square(u8 square);
         const std::array<u64, 6>& get_pieces();

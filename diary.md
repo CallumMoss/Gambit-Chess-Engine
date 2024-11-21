@@ -1,3 +1,6 @@
+21/11/2024:
+Ran SPRTs for negamax_fixed_depth_2 vs random_mover and negamax_iterative_deepening vs negamax_fixed_depth_2. Found issues so implemented quintescence search
+
 19/11/2024 - 20/11/2024
 Working on UCI, v1 complete
 

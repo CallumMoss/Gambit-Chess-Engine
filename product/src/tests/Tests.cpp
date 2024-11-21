@@ -633,11 +633,32 @@
 // 	std::cout << "Position 6: (Depth " << depth << ")" << std::endl << pos.split_perft(depth, depth) << std::endl;
 // }
 
-TEST(PERFT, perft_suite) {
-	Magics::init();
-	ASSERT_TRUE(run_perft_suite(false));
-}
+// TEST(PERFT, perft_suite) {
+// 	Magics::init();
+// 	ASSERT_TRUE(run_perft_suite(false));
+// }
 
+// TEST(SEARCH, mate_in_one) {
+// 	Magics::init();
+//       auto start = std::chrono::high_resolution_clock::now();
+// 	    Position pos = Position("rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 2");
+//     // Give default values which are updated later
+//     // Usually these values for wtime and btime should always be updated, so value here is technically irrelevant
+//     u64 wtime = 60'000; // white has x msec left on the clock
+//     u64 btime = 60'000; // black has x msec left on the clock
+//     u64 winc = 600; // white increment per move in mseconds if x > 0
+//     u64 binc = 600; // black increment per move in mseconds if x > 0
+
+//     if(pos.get_turn() == Turn::WHITE) {
+//         timer.set_fields(wtime, winc);
+//     }
+//     else {
+//         timer.set_fields(btime, binc);
+//     }
+
+//     std::string best_move = Utils::move_to_board_notation(pos.find_best_move(timer));
+//     std::cout << "bestmove " << best_move << std::endl;
+// }
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

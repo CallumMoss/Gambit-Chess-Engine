@@ -76,8 +76,13 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
     }
 
     timer.start_timer();
-    //std::cout << "bestmove " << Utils::move_to_board_notation(pos.find_random_move()) << std::endl;
-    std::cout << "bestmove " << Utils::move_to_board_notation(pos.find_best_move(timer)) << std::endl;
+    //** Random Mover: **//
+    // std::string best_move = Utils::move_to_board_notation(pos.find_random_move());
+    // std::cout << "bestmove " << best_move << std::endl;
+    
+    //** Negamax: **//
+    std::string best_move = Utils::move_to_board_notation(pos.find_best_move(timer));
+    std::cout << "bestmove " << best_move << std::endl;
 }
 
 void UCI::position(std::vector<std::string>& args, Position& pos) {
@@ -94,6 +99,10 @@ void UCI::position(std::vector<std::string>& args, Position& pos) {
     }
     else if (args[1] == "startpos") {
         pos = Position();
+    }
+    else {
+        std::cerr << "Invalid UCI position input";
+        std::exit(-1);
     }
 
     int index = -1;
