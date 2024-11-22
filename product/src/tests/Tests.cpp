@@ -638,27 +638,53 @@
 // 	ASSERT_TRUE(run_perft_suite(false));
 // }
 
-// TEST(SEARCH, mate_in_one) {
-// 	Magics::init();
-//       auto start = std::chrono::high_resolution_clock::now();
-// 	    Position pos = Position("rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 2");
-//     // Give default values which are updated later
-//     // Usually these values for wtime and btime should always be updated, so value here is technically irrelevant
-//     u64 wtime = 60'000; // white has x msec left on the clock
-//     u64 btime = 60'000; // black has x msec left on the clock
-//     u64 winc = 600; // white increment per move in mseconds if x > 0
-//     u64 binc = 600; // black increment per move in mseconds if x > 0
+TEST(SEARCH, mvv_lva) {
+  Piece victim = Piece::PAWN;
+  Piece attacker = Piece::QUEEN;
+	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 45
+}
 
-//     if(pos.get_turn() == Turn::WHITE) {
-//         timer.set_fields(wtime, winc);
-//     }
-//     else {
-//         timer.set_fields(btime, binc);
-//     }
+TEST(SEARCH, mvv_lva2) {
+  Piece victim = Piece::QUEEN;
+  Piece attacker = Piece::PAWN;
+	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 9
+}
 
-//     std::string best_move = Utils::move_to_board_notation(pos.find_best_move(timer));
-//     std::cout << "bestmove " << best_move << std::endl;
-// }
+TEST(SEARCH, mvv_lva3) {
+  Piece victim = Piece::KING;
+  Piece attacker = Piece::PAWN;
+	ASSERT_EXIT(
+    { std::cerr << Utils::find_mvv_lva(victim, attacker) << std::endl; },
+    ::testing::ExitedWithCode(-1),                                        
+    "Unexpected piece type of victim: 5"                   
+  );
+}
+
+TEST(SEARCH, mvv_lva4) { // lowest
+  Piece victim = Piece::QUEEN;
+  Piece attacker = Piece::KING;
+	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 4
+}
+
+TEST(SEARCH, mvv_lva5) { // highest
+  Piece victim = Piece::PAWN;
+  Piece attacker = Piece::PAWN;
+	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 49
+}
+
+TEST(SEARCH, mvv_lva_sorting) { // testing whether sorted returns the correct number of moves
+  Position pos = Position("5k2/7p/6p1/8/8/8/8/3K3R w - - 0 1");
+  Magics::init();
+  std::vector<Move> moves = pos.generate_all_moves();
+  std::vector<Move> sorted_moves = Utils::sort_by_mvv_lva(moves, pos);
+  Piece victim = Piece::PAWN;
+  Piece attacker = Piece::ROOK;
+  assert(Utils::find_mvv_lva(victim, attacker) == 46);
+  assert(moves.size() == sorted_moves.size());
+  //std::cout << Utils::move_to_board_notation(sorted_moves[static_cast<int>(sorted_moves.size()) - 1]) << std::endl;
+  assert(static_cast<int>(sorted_moves[0].get_src_square()) == 7 && static_cast<int>(sorted_moves[0].get_dest_square()) == 55);
+}
+
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

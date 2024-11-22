@@ -41,14 +41,7 @@ class Position { // Game state class
         bool legality_check(Move& move);
         u64 split_perft(int current_depth, const int& desired_depth, const bool& output_split);
 
-        // Search and Eval
-        Move find_random_move();
-        Move find_best_move(Timer& timer);
-        int evaluate();
-        int count_material(Turn turn);
-        int negamax(u8 depth, PV* pline, Timer& timer);
-        int negamax_ab(u8 depth, int alpha, int beta, PV* pline, Timer& timer);
-
+        // Getters and Setters:
         Piece get_piece_type_from_square(u8 square);
         const std::array<u64, 6>& get_pieces();
         const std::array<u64, 2>& get_colours();

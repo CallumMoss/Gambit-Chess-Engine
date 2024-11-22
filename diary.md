@@ -1,3 +1,6 @@
+22/11/2024:
+Reorganised to relevant files
+
 21/11/2024:
 Ran SPRTs for negamax_fixed_depth_2 vs random_mover and negamax_iterative_deepening vs negamax_fixed_depth_2. Found issues so implemented quintescence search
 

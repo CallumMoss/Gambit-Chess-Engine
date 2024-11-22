@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "_deps/googletest-build",
+		"source" : "C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src"
+	}
+}

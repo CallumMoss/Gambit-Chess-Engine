@@ -172,6 +172,10 @@ namespace Utils {
     std::string move_to_board_notation(Move move);
     Move board_notation_to_move(std::string board_notation, Position& pos);
 
+    int find_mvv_lva(Piece& victim_type, Piece& attacker_type);
+    int value_of_piece_from_type_and_capture_role(Piece& type, bool is_victim);
+    std::vector<Move> sort_by_mvv_lva(std::vector<Move>& moves, Position& pos);
+
     static constexpr u8 NULL_EN_PASSANT = 64;
 
     constexpr u64 WHITE_PAWN_ATTACKS[64] {
@@ -295,5 +299,6 @@ namespace Utils {
         35469167227379968ULL, 34909537435795968ULL, 34355426829272064ULL, 33245015174547456ULL, 31024181169623040ULL, 26581965518020608ULL, 17557346482143744ULL, 35677642917708800ULL,
         9080106810209288448ULL, 8936841583563768320ULL, 8794989268293649408ULL, 8510723884684150784ULL, 7942190379423502336ULL, 6804983172613283840ULL, 4494680699428814848ULL, 9133476586933486080ULL
     };
+
 }
 #endif // #ifndef UTILS_HPP

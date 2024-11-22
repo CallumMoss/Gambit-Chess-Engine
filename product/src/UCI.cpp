@@ -1,4 +1,5 @@
 #include "UCI.hpp"
+#include "Search.hpp"
 
 std::vector<std::string> UCI::split_args(std::string input)
 {
@@ -81,7 +82,11 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
     // std::cout << "bestmove " << best_move << std::endl;
     
     //** Negamax: **//
-    std::string best_move = Utils::move_to_board_notation(pos.find_best_move(timer));
+    // std::string best_move = Utils::move_to_board_notation(pos.find_best_move(timer, false));
+    // std::cout << "bestmove " << best_move << std::endl;
+
+    //** Negamax with MVV-LVA: **//
+    std::string best_move = Utils::move_to_board_notation(Search::find_best_move(pos, timer, true));
     std::cout << "bestmove " << best_move << std::endl;
 }
 
