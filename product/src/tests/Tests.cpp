@@ -4,6 +4,7 @@
 #include "../Position.hpp"
 #include "../utils.hpp"
 #include "../Magics.hpp"
+#include "../Search.hpp"
 #include "Perft.cpp"
 
 // // Testing getters and FEN parser.
@@ -684,6 +685,14 @@ TEST(PERFT, perft_suite) {
 //   //std::cout << Utils::move_to_board_notation(sorted_moves[static_cast<int>(sorted_moves.size()) - 1]) << std::endl;
 //   assert(static_cast<int>(sorted_moves[0].get_src_square()) == 7 && static_cast<int>(sorted_moves[0].get_dest_square()) == 55);
 // }
+
+TEST(FIXED_DEPTH_NEGAMAX, mate_in_1) {
+  Position pos = Position("4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/4R1P1/B1Q2RK1 b - - 4 32");
+  Search search = Search();
+  int depth = 2;
+  search.negamax2(depth, 0, pos);
+  std::cout << Utils::move_to_board_notation(search.get_root_best_move()) << std::endl;
+}
 
 
 int main(int argc, char **argv) {

@@ -1,3 +1,5 @@
+#include "Types.hpp" // Needed in every file with an assert for assert checker macro
+
 #include "Utils.hpp"
 #include "Position.hpp"
 #include <algorithm> 
@@ -243,6 +245,7 @@ std::vector<Move> Utils::sort_by_mvv_lva(std::vector<Move>& moves, Position& pos
     for(Mvv_lva_log& log : move_logs) {
         sorted_moves.push_back(log.move);
     }
+    
     return sorted_moves;
 }
 

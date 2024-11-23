@@ -1,3 +1,5 @@
+#include "Types.hpp" // Needed in every file with an assert for assert checker macro
+
 #include "Position.hpp"
 #include "Magics.hpp"
 
@@ -655,6 +657,8 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
                 remove_bscr();
                 remove_blcr();
             }
+            break;
+        default:
             break;
     }
     // Update pieces and colours.

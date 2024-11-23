@@ -1,7 +1,11 @@
+#include "Types.hpp" // Needed in every file with an assert for assert checker macro
+
 #include "Search.hpp"
 #include "Evaluation.hpp"
 
 #include <random>
+
+Search::Search(){}
 
 Search::Search(Search_Type search_type, Search_Algorithm search_algorithm) {
     this->search_type = search_type;

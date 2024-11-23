@@ -1,3 +1,4 @@
+#include "Types.hpp" // Needed in every file with an assert for assert checker macro
 #include "Evaluation.hpp"
 #include "Position.hpp"
 

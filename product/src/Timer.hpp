@@ -1,7 +1,7 @@
 #ifndef TIMER_HPP
 #define TIMER_HPP
 
-#include "Types.hpp"
+#include "Types.hpp" // Needed in every file with an assert for assert checker macro
 #include <chrono>
 
 class Timer {

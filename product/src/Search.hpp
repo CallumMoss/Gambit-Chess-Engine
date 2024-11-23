@@ -17,6 +17,7 @@ enum Search_Algorithm {
 
 class Search {
     public:
+        Search();
         Search(Search_Type search_type, Search_Algorithm search_algorithm);
 
         Move find_random_move(Position& pos);

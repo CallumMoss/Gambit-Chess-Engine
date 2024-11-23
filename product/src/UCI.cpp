@@ -1,3 +1,4 @@
+#include "Types.hpp" // Needed in every file with an assert for assert checker macro
 #include "UCI.hpp"
 #include "Search.hpp"
 
@@ -76,7 +77,7 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
 
     timer.start_timer();
 
-    Search search = Search(Search_Type::FIXED_DEPTH, Search_Algorithm::NEGAMAX);
+    Search search = Search();
 
    //** Random Mover: **//
     // std::string best_move = Utils::move_to_board_notation(search.find_random_move(pos));
