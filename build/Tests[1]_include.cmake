@@ -1,5 +1,0 @@
-if(EXISTS "C:/Users/callu/Desktop/Gambit/build/Tests[1]_tests.cmake")
-  include("C:/Users/callu/Desktop/Gambit/build/Tests[1]_tests.cmake")
-else()
-  add_test(Tests_NOT_BUILT Tests_NOT_BUILT)
-endif()

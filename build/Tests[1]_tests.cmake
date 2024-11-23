@@ -1,5 +1,0 @@
-add_test([=[PERFT.perft_suite]=]  C:/Users/callu/Desktop/Gambit/build/Tests.exe [==[--gtest_filter=PERFT.perft_suite]==] --gtest_also_run_disabled_tests)
-set_tests_properties([=[PERFT.perft_suite]=]  PROPERTIES WORKING_DIRECTORY C:/Users/callu/Desktop/Gambit/build SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
-add_test([=[FIXED_DEPTH_NEGAMAX.mate_in_1]=]  C:/Users/callu/Desktop/Gambit/build/Tests.exe [==[--gtest_filter=FIXED_DEPTH_NEGAMAX.mate_in_1]==] --gtest_also_run_disabled_tests)
-set_tests_properties([=[FIXED_DEPTH_NEGAMAX.mate_in_1]=]  PROPERTIES WORKING_DIRECTORY C:/Users/callu/Desktop/Gambit/build SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
-set(  Tests_TESTS PERFT.perft_suite FIXED_DEPTH_NEGAMAX.mate_in_1)
