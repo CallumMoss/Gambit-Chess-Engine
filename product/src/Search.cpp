@@ -53,6 +53,9 @@ int Search::negamax2(int depth, int ply, const Position& pos) {
             }
         }
     }
+    if(!has_found_a_legal_root_move) { // if there are no legal moves at a depth past 1, then 
+        best_score = Utils::MATE_SCORE;
+    }
     return best_score;
 }
 

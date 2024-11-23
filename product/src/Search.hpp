@@ -30,9 +30,11 @@ class Search {
 
         // Getters and Setters
         Move get_root_best_move() { return root_best_move; }
+        bool get_has_found_a_legal_root_move() { return has_found_a_legal_root_move; }
 
     private:
-        Move root_best_move = Move(1, 1, Move_Flag::NULL_FLAG);
+        Move root_best_move = Move(0, 0, Move_Flag::NULL_FLAG);
+        bool has_found_a_legal_root_move = false;
         Search_Type search_type;
         Search_Algorithm search_algorithm;
 };

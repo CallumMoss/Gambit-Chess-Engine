@@ -155,6 +155,13 @@ struct Move {
         return (move >> 4) & 0x3F;
     }
 
+    bool equals(Move& moveb) {
+        if(get_src_square() != moveb.get_src_square()) { return false; }
+        if(get_dest_square() != moveb.get_dest_square()) { return false; }
+        if(get_flag() != moveb.get_flag()) { return false; }
+        return true;
+    }
+
 };
 
 namespace Utils {
@@ -177,7 +184,7 @@ namespace Utils {
     std::vector<Move> sort_by_mvv_lva(std::vector<Move>& moves, Position& pos);
 
     static constexpr u8 NULL_EN_PASSANT = 64;
-
+    static constexpr int MATE_SCORE = -INT_MAX + 1;
     constexpr u64 WHITE_PAWN_ATTACKS[64] {
         0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, // although a white pawn from here could move, there should never be one here
         0x1030000ULL, 0x2070000ULL, 0x40e0000ULL, 0x81c0000ULL, 0x10380000ULL, 0x20700000ULL, 1088421888ULL, 0x80c00000ULL,

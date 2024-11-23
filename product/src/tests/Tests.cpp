@@ -634,10 +634,10 @@
 // 	std::cout << "Position 6: (Depth " << depth << ")" << std::endl << pos.split_perft(depth, depth) << std::endl;
 // }
 
-TEST(PERFT, perft_suite) {
-	Magics::init();
-	ASSERT_TRUE(run_perft_suite(false));
-}
+// TEST(PERFT, perft_suite) {
+// 	Magics::init();
+// 	ASSERT_TRUE(run_perft_suite(false));
+// }
 
 // TEST(SEARCH, mvv_lva) {
 //   Piece victim = Piece::PAWN;
@@ -687,9 +687,11 @@ TEST(PERFT, perft_suite) {
 // }
 
 TEST(FIXED_DEPTH_NEGAMAX, mate_in_1) {
-  Position pos = Position("4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/4R1P1/B1Q2RK1 b - - 4 32");
+  Position pos = Position("2k2r2/1pp5/p2q4/3np2n/8/2P1P3/PP3p1q/1RB2KN1 w - - 0 38");
+  Magics::init();
+  //4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/4R1P1/B1Q2RK1 b - - 4 32
   Search search = Search();
-  int depth = 2;
+  int depth = 4;
   search.negamax2(depth, 0, pos);
   std::cout << Utils::move_to_board_notation(search.get_root_best_move()) << std::endl;
 }

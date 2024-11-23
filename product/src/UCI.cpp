@@ -33,14 +33,9 @@ std::vector<std::string> UCI::split_args(std::string input)
     |        uci |           Outputs the engine name, authors, and all available options |
     |    isready | *           Responds with readyok when no longer searching a position |
     | ucinewgame | *  Resets the TT and any Hueristics to ensure determinism in searches |
-    |  setoption | *     Sets a given option and reports that the option was set if done |
     |   position | *  Sets the board position via an optional FEN and optional move list |
     |         go | *       Searches the current position with the provided time controls |
-    |  ponderhit |          Flags the search to indicate that the ponder move was played |
-    |       stop |            Signals the search threads to finish and report a bestmove |
     |       quit |             Exits the engine and any searches by killing the UCI loop |
-    |      perft |            Custom command to compute PERFT(N) of the current position |
-    |      print |         Custom command to print an ASCII view of the current position |
     |------------|-----------------------------------------------------------------------|
     */
 
@@ -84,7 +79,7 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
     // std::cout << "bestmove " << best_move << std::endl;
     
     //** Negamax Fixed Depth (No Timer) **//
-    int depth = 2;
+    int depth = 4;
     search.negamax2(depth, 0, pos); // find best move
     std::string best_move = Utils::move_to_board_notation(search.get_root_best_move());
     std::cout << "bestmove " << best_move << std::endl;
