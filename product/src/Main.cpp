@@ -7,7 +7,7 @@
 
 
 int main() {
-    std::string version = "v1.0.1";
+    std::string version = "v1.1.0";
 
     Magics::init();
     std::string input = "";

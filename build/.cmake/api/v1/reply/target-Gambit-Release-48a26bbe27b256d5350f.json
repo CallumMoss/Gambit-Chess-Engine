@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Tests.exe"
+			"path" : "Gambit.exe"
 		},
 		{
-			"path" : "Tests.pdb"
+			"path" : "Gambit.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -14,12 +14,11 @@
 		"commands" : 
 		[
 			"add_executable",
-			"target_link_libraries"
+			"install"
 		],
 		"files" : 
 		[
-			"CMakeLists.txt",
-			"C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/CMakeLists.txt"
+			"CMakeLists.txt"
 		],
 		"nodes" : 
 		[
@@ -29,23 +28,14 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 37,
+				"line" : 57,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 41,
+				"line" : 60,
 				"parent" : 0
-			},
-			{
-				"file" : 1
-			},
-			{
-				"command" : 1,
-				"file" : 1,
-				"line" : 153,
-				"parent" : 3
 			}
 		]
 	},
@@ -55,20 +45,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20"
-				}
-			],
-			"includes" : 
-			[
-				{
-					"backtrace" : 2,
-					"isSystem" : true,
-					"path" : "C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include"
-				},
-				{
-					"backtrace" : 2,
-					"isSystem" : true,
-					"path" : "C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest"
+					"fragment" : "-O3  -march=native  -mtune=native -std=gnu++20"
 				}
 			],
 			"language" : "CXX",
@@ -76,7 +53,7 @@
 			{
 				"backtraces" : 
 				[
-					2
+					1
 				],
 				"standard" : "20"
 			},
@@ -93,39 +70,32 @@
 			]
 		}
 	],
-	"dependencies" : 
-	[
+	"id" : "Gambit::@6890427a1f51a3e7e1df",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 2,
+				"path" : "bin"
+			}
+		],
+		"prefix" : 
 		{
-			"backtrace" : 2,
-			"id" : "gtest::@1ea2dfc0605fe3ab2a3f"
-		},
-		{
-			"backtrace" : 2,
-			"id" : "gtest_main::@1ea2dfc0605fe3ab2a3f"
+			"path" : "C:/Program Files (x86)/Gambit"
 		}
-	],
-	"id" : "Tests::@6890427a1f51a3e7e1df",
+	},
 	"link" : 
 	{
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "-O0 -Wall -Wextra -Wpedantic -ggdb",
+				"fragment" : "-O3  -march=native  -mtune=native",
 				"role" : "flags"
 			},
 			{
 				"fragment" : "",
 				"role" : "flags"
-			},
-			{
-				"backtrace" : 2,
-				"fragment" : "lib\\libgtest_main.a",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 4,
-				"fragment" : "lib\\libgtest.a",
-				"role" : "libraries"
 			},
 			{
 				"fragment" : "-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32",
@@ -134,8 +104,8 @@
 		],
 		"language" : "CXX"
 	},
-	"name" : "Tests",
-	"nameOnDisk" : "Tests.exe",
+	"name" : "Gambit",
+	"nameOnDisk" : "Gambit.exe",
 	"paths" : 
 	{
 		"build" : ".",
@@ -175,6 +145,12 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
+			"path" : "src/Main.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
 			"path" : "src/Position.cpp",
 			"sourceGroupIndex" : 0
 		},
@@ -194,12 +170,6 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "src/tests/Perft.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "src/tests/Tests.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{

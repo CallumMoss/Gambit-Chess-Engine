@@ -3,7 +3,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "lib/libgtest.a"
+			"path" : "lib/libgmock.a"
 		}
 	],
 	"backtrace" : 3,
@@ -16,13 +16,14 @@
 			"cxx_library",
 			"install",
 			"install_project",
+			"target_link_libraries",
 			"include_directories",
 			"target_compile_features"
 		],
 		"files" : 
 		[
 			"C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/cmake/internal_utils.cmake",
-			"C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/CMakeLists.txt"
+			"C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock/CMakeLists.txt"
 		],
 		"nodes" : 
 		[
@@ -32,7 +33,7 @@
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 123,
+				"line" : 96,
 				"parent" : 0
 			},
 			{
@@ -50,7 +51,7 @@
 			{
 				"command" : 4,
 				"file" : 1,
-				"line" : 158,
+				"line" : 115,
 				"parent" : 0
 			},
 			{
@@ -62,11 +63,17 @@
 			{
 				"command" : 5,
 				"file" : 1,
-				"line" : 113,
+				"line" : 97,
 				"parent" : 0
 			},
 			{
 				"command" : 6,
+				"file" : 1,
+				"line" : 74,
+				"parent" : 0
+			},
+			{
+				"command" : 7,
 				"file" : 0,
 				"line" : 198,
 				"parent" : 2
@@ -79,7 +86,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-O0 -Wall -Wextra -Wpedantic -ggdb -std=c++20"
+					"fragment" : "-O3  -march=native  -mtune=native -std=c++20"
 				},
 				{
 					"fragment" : "-Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers"
@@ -88,11 +95,21 @@
 			"includes" : 
 			[
 				{
-					"backtrace" : 6,
+					"backtrace" : 7,
+					"path" : "C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock/include"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock"
+				},
+				{
+					"backtrace" : 7,
+					"isSystem" : true,
 					"path" : "C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include"
 				},
 				{
-					"backtrace" : 6,
+					"backtrace" : 7,
+					"isSystem" : true,
 					"path" : "C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest"
 				}
 			],
@@ -101,7 +118,7 @@
 			{
 				"backtraces" : 
 				[
-					7
+					8
 				],
 				"standard" : "20"
 			},
@@ -111,7 +128,14 @@
 			]
 		}
 	],
-	"id" : "gtest::@1ea2dfc0605fe3ab2a3f",
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 6,
+			"id" : "gtest::@1ea2dfc0605fe3ab2a3f"
+		}
+	],
+	"id" : "gmock::@0f7bb11d64f3678238c7",
 	"install" : 
 	{
 		"destinations" : 
@@ -126,12 +150,12 @@
 			"path" : "C:/Program Files (x86)/Gambit"
 		}
 	},
-	"name" : "gtest",
-	"nameOnDisk" : "libgtest.a",
+	"name" : "gmock",
+	"nameOnDisk" : "libgmock.a",
 	"paths" : 
 	{
-		"build" : "_deps/googletest-build/googletest",
-		"source" : "C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest"
+		"build" : "_deps/googletest-build/googlemock",
+		"source" : "C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock"
 	},
 	"sourceGroups" : 
 	[
@@ -148,7 +172,7 @@
 		{
 			"backtrace" : 3,
 			"compileGroupIndex" : 0,
-			"path" : "C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/src/gtest-all.cc",
+			"path" : "C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock/src/gmock-all.cc",
 			"sourceGroupIndex" : 0
 		}
 	],

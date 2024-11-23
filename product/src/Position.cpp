@@ -174,7 +174,7 @@ void Position::print_board(std::array<char, 64> board) {
     std::cout << "   A   B   C   D   E   F   G   H  " << std::endl << std::endl;
 }
 
-u64 Position::get_pawn_attacks(u8 square) {
+u64 Position::get_pawn_attacks(u8 square) const {
     u64 attacks = 0ULL;
     u64 board = get_board();
     if (get_turn() == Turn::WHITE) {
@@ -228,11 +228,11 @@ u64 Position::get_pawn_attacks(u8 square) {
 }
 
 
-u64 Position::get_knight_moves(u8 square) {
+u64 Position::get_knight_moves(u8 square) const {
     return Utils::KNIGHT_ATTACKS[square];
 }
 
-u64 Position::get_king_moves(u8 square) {
+u64 Position::get_king_moves(u8 square) const {
     u64 moves = Utils::KING_ATTACKS[square];
 
     // Castling: (rooks move is handled thanks to flags later) | Can check if legal later (like castling flags and checks)
@@ -280,7 +280,7 @@ u64 Position::get_king_moves(u8 square) {
 }
 
 // Gets the piece type of a piece on a given square
-Piece Position::get_piece_type_from_square(u8 square) {
+Piece Position::get_piece_type_from_square(u8 square) const {
     u64 piece_pos = 1ULL << square;
     if(get_pawns() & piece_pos) {return Piece::PAWN;}
     else if (get_knights() & piece_pos) {return Piece::KNIGHT;}
@@ -293,7 +293,7 @@ Piece Position::get_piece_type_from_square(u8 square) {
 
 
 // Should probably be private
- std::vector<u64> Position::extract_piece_moves(u64 attacks) {
+ std::vector<u64> Position::extract_piece_moves(u64 attacks) const {
     bb_vector attacks_vector;  // Use a vector for dynamic storage
     while (attacks) {
         // Get the least significant 1 bit (LS1B)
@@ -308,7 +308,7 @@ Piece Position::get_piece_type_from_square(u8 square) {
     return attacks_vector;
 }
 
-std::vector<Move> Position::generate_all_moves() // uses the board state to generate all moves for a given colour 
+std::vector<Move> Position::generate_all_moves() const // uses the board state to generate all moves for a given colour 
 {
     std::vector<Move> moves;
     u64 pieces = get_pieces_from_current_turn();
@@ -327,7 +327,7 @@ std::vector<Move> Position::generate_all_moves() // uses the board state to gene
     return moves;
 }
 
-u64 Position::get_rook_moves(u8 square) {
+u64 Position::get_rook_moves(u8 square) const {
     // Returns the attack mask of a rook on a given square
     bb_vector attacks_on_square = rook_magics_table[square];
     MagicEntry magic;
@@ -339,7 +339,7 @@ u64 Position::get_rook_moves(u8 square) {
     return attacks & ~get_pieces_from_current_turn();
 }
 
-u64 Position::get_bishop_moves(u8 square) {
+u64 Position::get_bishop_moves(u8 square) const {
     // Returns the long table of moves for a rook on that square. To choose which ones apply, you should return 
     bb_vector attacks_on_square = bishop_magics_table[square];
     MagicEntry magic;
@@ -351,14 +351,14 @@ u64 Position::get_bishop_moves(u8 square) {
     return attacks & ~get_pieces_from_current_turn();
 }
 
-u64 Position::get_queen_moves(u8 square) {
+u64 Position::get_queen_moves(u8 square) const {
     // Returns the attack mask of a queen on a given square
     // Does this by glueing a rook and bishop on the same square together
     u64 attacks = get_rook_moves(square) | get_bishop_moves(square);
     return attacks & ~get_pieces_from_current_turn();
 }
 
-u64 Position::generate_piece_attacks(Piece type, u8 square) { // returns u64 without move conversion
+u64 Position::generate_piece_attacks(Piece type, u8 square) const { // returns u64 without move conversion
     u64 attacks = 0ULL;
     switch(type) {
         case Piece::PAWN:
@@ -388,7 +388,7 @@ u64 Position::generate_piece_attacks(Piece type, u8 square) { // returns u64 wit
     return attacks & ~get_pieces_from_current_turn();
 }
 
-std::vector<Move> Position::generate_piece_moves(Piece type, u8 square) { // will be used when searching for both sides, so will use Turn.
+std::vector<Move> Position::generate_piece_moves(Piece type, u8 square) const { // will be used when searching for both sides, so will use Turn.
     u64 attacks = 0ULL;
     switch(type) {
         case Piece::PAWN:
@@ -420,7 +420,7 @@ std::vector<Move> Position::generate_piece_moves(Piece type, u8 square) { // wil
     return bb_to_move_list(type, square, attacks);
 }
 
-std::vector<Move> Position::bb_to_move_list(Piece type, u8 src_square, u64 attacks) {
+std::vector<Move> Position::bb_to_move_list(Piece type, u8 src_square, u64 attacks) const {
     std::vector<Move> move_list;
     u8 dest_square;
     std::vector<u64> bb_list = extract_piece_moves(attacks);
@@ -442,7 +442,7 @@ std::vector<Move> Position::bb_to_move_list(Piece type, u8 src_square, u64 attac
 }
 
 // Checks whether after applying a pseudo move, if the position is legal.
-bool Position::legality_check(Move& move)
+bool Position::legality_check(Move& move) const
 {
     // Finding King Square and opponents pieces:
     u64 king_square_u64;
@@ -668,47 +668,47 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
 }
 
 // Uses reference for data type larger than u64
-const std::array<u64, 6>& Position::get_pieces() { return pieces; }
-const std::array<u64, 2>& Position::get_colours() { return colours; }
-u64 Position::get_en_passant_target() { return en_passant_target; }
-u8 Position::get_half_move_clock() { return half_move_clock; }
-u8 Position::get_full_move_counter() { return full_move_counter; }
-u8 Position::get_castling_rights() { return castling_rights; }
-Turn Position::get_turn() { return turn; }
-Turn Position::get_opp_turn() {
+std::array<u64, 6> Position::get_pieces() const { return pieces; }
+std::array<u64, 2> Position::get_colours() const { return colours; }
+u64 Position::get_en_passant_target() const { return en_passant_target; }
+u8 Position::get_half_move_clock() const { return half_move_clock; }
+u8 Position::get_full_move_counter() const { return full_move_counter; }
+u8 Position::get_castling_rights() const { return castling_rights; }
+Turn Position::get_turn() const { return turn; }
+Turn Position::get_opp_turn() const {
     if(turn == Turn::WHITE) {
         return Turn::BLACK;
     }
     return Turn::WHITE;
 }
 
-u64 Position::get_pawns() { return pieces[Piece::PAWN]; }
-u64 Position::get_white_pawns() { return pieces[Piece::PAWN] & colours[Colour::WHITE]; }
-u64 Position::get_black_pawns() { return pieces[Piece::PAWN] & colours[Colour::BLACK]; }
+u64 Position::get_pawns() const { return pieces[Piece::PAWN]; }
+u64 Position::get_white_pawns() const { return pieces[Piece::PAWN] & colours[Colour::WHITE]; }
+u64 Position::get_black_pawns() const { return pieces[Piece::PAWN] & colours[Colour::BLACK]; }
 
-u64 Position::get_knights() { return pieces[Piece::KNIGHT]; }
-u64 Position::get_white_knights() { return pieces[Piece::KNIGHT] & colours[Colour::WHITE]; }
-u64 Position::get_black_knights() { return pieces[Piece::KNIGHT] & colours[Colour::BLACK]; }
+u64 Position::get_knights() const { return pieces[Piece::KNIGHT]; }
+u64 Position::get_white_knights() const { return pieces[Piece::KNIGHT] & colours[Colour::WHITE]; }
+u64 Position::get_black_knights() const { return pieces[Piece::KNIGHT] & colours[Colour::BLACK]; }
 
-u64 Position::get_bishops() { return pieces[Piece::BISHOP];}
-u64 Position::get_white_bishops() { return pieces[Piece::BISHOP] & colours[Colour::WHITE]; }
-u64 Position::get_black_bishops() { return pieces[Piece::BISHOP] & colours[Colour::BLACK]; }
+u64 Position::get_bishops() const { return pieces[Piece::BISHOP];}
+u64 Position::get_white_bishops() const { return pieces[Piece::BISHOP] & colours[Colour::WHITE]; }
+u64 Position::get_black_bishops() const { return pieces[Piece::BISHOP] & colours[Colour::BLACK]; }
 
-u64 Position::get_rooks() { return pieces[Piece::ROOK]; }
-u64 Position::get_white_rooks() { return pieces[Piece::ROOK] & colours[Colour::WHITE]; }
-u64 Position::get_black_rooks() { return pieces[Piece::ROOK] & colours[Colour::BLACK]; }
+u64 Position::get_rooks() const { return pieces[Piece::ROOK]; }
+u64 Position::get_white_rooks() const { return pieces[Piece::ROOK] & colours[Colour::WHITE]; }
+u64 Position::get_black_rooks() const { return pieces[Piece::ROOK] & colours[Colour::BLACK]; }
 
-u64 Position::get_queens() { return pieces[Piece::QUEEN];}
-u64 Position::get_white_queen() { return pieces[Piece::QUEEN] & colours[Colour::WHITE]; }
-u64 Position::get_black_queen() { return pieces[Piece::QUEEN] & colours[Colour::BLACK]; }
+u64 Position::get_queens() const { return pieces[Piece::QUEEN];}
+u64 Position::get_white_queen() const { return pieces[Piece::QUEEN] & colours[Colour::WHITE]; }
+u64 Position::get_black_queen() const { return pieces[Piece::QUEEN] & colours[Colour::BLACK]; }
 
-u64 Position::get_kings() { return pieces[Piece::KING]; }
-u64 Position::get_white_king() { return pieces[Piece::KING] & colours[Colour::WHITE]; }
-u64 Position::get_black_king() { return pieces[Piece::KING] & colours[Colour::BLACK]; }
+u64 Position::get_kings() const { return pieces[Piece::KING]; }
+u64 Position::get_white_king() const { return pieces[Piece::KING] & colours[Colour::WHITE]; }
+u64 Position::get_black_king() const { return pieces[Piece::KING] & colours[Colour::BLACK]; }
 
-u64 Position::get_white_pieces() { return colours[Colour::WHITE]; } 
-u64 Position::get_black_pieces() { return colours[Colour::BLACK]; } 
-u64 Position::get_pieces_from_current_turn() {
+u64 Position::get_white_pieces() const { return colours[Colour::WHITE]; } 
+u64 Position::get_black_pieces() const { return colours[Colour::BLACK]; } 
+u64 Position::get_pieces_from_current_turn() const {
     if(turn == Turn::WHITE) {
         return get_white_pieces();
     }
@@ -717,12 +717,12 @@ u64 Position::get_pieces_from_current_turn() {
     }
 }
 
-u64 Position::get_board() { return colours[Colour::WHITE] | colours[Colour::BLACK]; }
+u64 Position::get_board() const { return colours[Colour::WHITE] | colours[Colour::BLACK]; }
 
-bool Position::get_wscr() { return castling_rights & (1 << Castling_Rights::WHITE_SHORT); }
-bool Position::get_wlcr() { return castling_rights & (1 << Castling_Rights::WHITE_LONG); }
-bool Position::get_bscr() { return castling_rights & (1 << Castling_Rights::BLACK_SHORT); }
-bool Position::get_blcr() { return castling_rights & (1 << Castling_Rights::BLACK_LONG); }
+bool Position::get_wscr() const { return castling_rights & (1 << Castling_Rights::WHITE_SHORT); }
+bool Position::get_wlcr() const { return castling_rights & (1 << Castling_Rights::WHITE_LONG); }
+bool Position::get_bscr() const { return castling_rights & (1 << Castling_Rights::BLACK_SHORT); }
+bool Position::get_blcr() const { return castling_rights & (1 << Castling_Rights::BLACK_LONG); }
 
 void Position::remove_wscr() { castling_rights = castling_rights & ~(1 << Castling_Rights::WHITE_SHORT); }
 void Position::remove_wlcr() { castling_rights = castling_rights & ~(1 << Castling_Rights::WHITE_LONG); }

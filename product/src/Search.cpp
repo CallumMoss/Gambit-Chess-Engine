@@ -3,6 +3,11 @@
 
 #include <random>
 
+Search::Search(Search_Type search_type, Search_Algorithm search_algorithm) {
+    this->search_type = search_type;
+    this->search_algorithm = search_algorithm;
+}
+
 Move Search::find_random_move(Position& pos) {
     std::vector<Move> moves = pos.generate_all_moves();
      std::random_device rd;
@@ -23,33 +28,29 @@ Move Search::find_random_move(Position& pos) {
     }
 }
 
-// /**
-//  * @brief Initiates calls to negamax with fixed depth
-//  * 
-//  * @param timer 
-//  * @param desired_depth 
-//  * @param use_mvv_lva 
-//  * @return Move 
-//  */
-// Move Search::find_best_move_fixed_depth(Timer& timer, int& desired_depth, bool& use_mvv_lva, bool& find_pv) {
-
-// }
-
-// /**
-//  * @brief Initiates calls to negamax with fixed depth
-//  * 
-//  * @param timer 
-//  * @param desired_depth 
-//  * @param use_mvv_lva 
-//  * @return Move 
-//  */
-// Move Search::find_best_move_iterative_deepening(Timer& timer, bool& use_mvv_lva, bool& find_pv) {
-//     int depth = 1;
-//     while(true) {
-
-//         depth++;
-//     }
-// }
+int Search::negamax2(int depth, int ply, const Position& pos) {
+    if(depth == 0) {
+        return Evaluation::evaluate(pos);
+    }
+    int best_score = -INT_MAX;
+    std::vector<Move> moves = pos.generate_all_moves();
+    for(Move move : moves) {
+        // reset position
+        Position new_position = pos;
+        new_position.make_move(move);
+        if(!new_position.legality_check(move)) {
+            continue;
+        }
+        int score = -negamax2(depth - 1, ply + 1, new_position);
+        if(score > best_score) {
+            best_score = score;
+            if(ply == 0) { // if we have got the score for the best move at root (the one we will give to UCI to play)
+                root_best_move = move;
+            }
+        }
+    }
+    return best_score;
+}
 
 // Finds the best move for the current position using negamax
 // Initial call for negamax for each move up to a line depth provided

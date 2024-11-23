@@ -45,8 +45,6 @@ std::vector<std::string> UCI::split_args(std::string input)
 
 // Inspired by https://github.com/AndyGrant/Ethereal/blob/master/src/uci.c#L133
 void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     // Give default values which are updated later
     // Usually these values for wtime and btime should always be updated, so value here is technically irrelevant
     u64 wtime = 60'000; // white has x msec left on the clock
@@ -77,17 +75,22 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
     }
 
     timer.start_timer();
-    //** Random Mover: **//
-    // std::string best_move = Utils::move_to_board_notation(pos.find_random_move());
+
+    Search search = Search(Search_Type::FIXED_DEPTH, Search_Algorithm::NEGAMAX);
+
+   //** Random Mover: **//
+    // std::string best_move = Utils::move_to_board_notation(search.find_random_move(pos));
     // std::cout << "bestmove " << best_move << std::endl;
     
-    //** Negamax: **//
-    // std::string best_move = Utils::move_to_board_notation(pos.find_best_move(timer, false));
-    // std::cout << "bestmove " << best_move << std::endl;
+    //** Negamax Fixed Depth (No Timer) **//
+    int depth = 2;
+    search.negamax2(depth, 0, pos); // find best move
+    std::string best_move = Utils::move_to_board_notation(search.get_root_best_move());
+    std::cout << "bestmove " << best_move << std::endl;
 
     //** Negamax with MVV-LVA: **//
-    std::string best_move = Utils::move_to_board_notation(Search::find_best_move(pos, timer, true));
-    std::cout << "bestmove " << best_move << std::endl;
+    // std::string best_move = Utils::move_to_board_notation(search.find_best_move(pos, timer, true));
+    // std::cout << "bestmove " << best_move << std::endl;
 }
 
 void UCI::position(std::vector<std::string>& args, Position& pos) {
@@ -112,14 +115,14 @@ void UCI::position(std::vector<std::string>& args, Position& pos) {
 
     int index = -1;
 
-    for(int i = 0; i < args.size(); i++) {
+    for(int i = 0; i < static_cast<int>(args.size()); i++) {
         if(args[i] == "moves") {
             index = i;
             break;
         }
     }
     if(index != -1) { // if there is a moves argument
-        for(index++; index < args.size(); index++) {
+        for(index++; index < static_cast<int>(args.size()); index++) {
             Move move = Utils::board_notation_to_move(args[index], pos);
             pos.make_move(move);
         }

@@ -1,13 +1,13 @@
 #include "Evaluation.hpp"
 #include "Position.hpp"
 
-int Evaluation::evaluate(Position& pos) {
+int Evaluation::evaluate(const Position& pos) {
     int eval = count_material(pos, Colour::WHITE) - count_material(pos, Colour::BLACK);
     if(pos.get_turn() == Turn::WHITE) { return eval; }
     else { return -eval; } 
 }
 
-int Evaluation::count_material(Position& pos, Colour colour) {
+int Evaluation::count_material(const Position& pos, Colour colour) {
     int material = 0;
     u64 board;
     if(colour == Colour::WHITE) {

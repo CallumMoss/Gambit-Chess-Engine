@@ -12,7 +12,7 @@
 
 # =============================================================================
 # Project: Gambit
-# Configurations: Debug
+# Configurations: Release
 # =============================================================================
 
 #############################################
@@ -24,7 +24,7 @@ ninja_required_version = 1.5
 #############################################
 # Set configuration variable for custom commands.
 
-CONFIGURATION = Debug
+CONFIGURATION = Release
 # =============================================================================
 # Include auxiliary files.
 
@@ -49,58 +49,58 @@ cmake_ninja_workdir = C$:/Users/callu/Desktop/Gambit/build/
 
 build cmake_object_order_depends_target_Tests: phony || cmake_object_order_depends_target_gtest cmake_object_order_depends_target_gtest_main
 
-build CMakeFiles/Tests.dir/src/Evaluation.cpp.obj: CXX_COMPILER__Tests_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/Evaluation.cpp || cmake_object_order_depends_target_Tests
+build CMakeFiles/Tests.dir/src/Evaluation.cpp.obj: CXX_COMPILER__Tests_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/Evaluation.cpp || cmake_object_order_depends_target_Tests
   DEP_FILE = CMakeFiles\Tests.dir\src\Evaluation.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   INCLUDES = -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = CMakeFiles\Tests.dir
   OBJECT_FILE_DIR = CMakeFiles\Tests.dir\src
 
-build CMakeFiles/Tests.dir/src/Magics.cpp.obj: CXX_COMPILER__Tests_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/Magics.cpp || cmake_object_order_depends_target_Tests
+build CMakeFiles/Tests.dir/src/Magics.cpp.obj: CXX_COMPILER__Tests_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/Magics.cpp || cmake_object_order_depends_target_Tests
   DEP_FILE = CMakeFiles\Tests.dir\src\Magics.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   INCLUDES = -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = CMakeFiles\Tests.dir
   OBJECT_FILE_DIR = CMakeFiles\Tests.dir\src
 
-build CMakeFiles/Tests.dir/src/Position.cpp.obj: CXX_COMPILER__Tests_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/Position.cpp || cmake_object_order_depends_target_Tests
+build CMakeFiles/Tests.dir/src/Position.cpp.obj: CXX_COMPILER__Tests_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/Position.cpp || cmake_object_order_depends_target_Tests
   DEP_FILE = CMakeFiles\Tests.dir\src\Position.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   INCLUDES = -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = CMakeFiles\Tests.dir
   OBJECT_FILE_DIR = CMakeFiles\Tests.dir\src
 
-build CMakeFiles/Tests.dir/src/Search.cpp.obj: CXX_COMPILER__Tests_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/Search.cpp || cmake_object_order_depends_target_Tests
+build CMakeFiles/Tests.dir/src/Search.cpp.obj: CXX_COMPILER__Tests_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/Search.cpp || cmake_object_order_depends_target_Tests
   DEP_FILE = CMakeFiles\Tests.dir\src\Search.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   INCLUDES = -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = CMakeFiles\Tests.dir
   OBJECT_FILE_DIR = CMakeFiles\Tests.dir\src
 
-build CMakeFiles/Tests.dir/src/UCI.cpp.obj: CXX_COMPILER__Tests_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/UCI.cpp || cmake_object_order_depends_target_Tests
+build CMakeFiles/Tests.dir/src/UCI.cpp.obj: CXX_COMPILER__Tests_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/UCI.cpp || cmake_object_order_depends_target_Tests
   DEP_FILE = CMakeFiles\Tests.dir\src\UCI.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   INCLUDES = -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = CMakeFiles\Tests.dir
   OBJECT_FILE_DIR = CMakeFiles\Tests.dir\src
 
-build CMakeFiles/Tests.dir/src/tests/Perft.cpp.obj: CXX_COMPILER__Tests_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/tests/Perft.cpp || cmake_object_order_depends_target_Tests
+build CMakeFiles/Tests.dir/src/tests/Perft.cpp.obj: CXX_COMPILER__Tests_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/tests/Perft.cpp || cmake_object_order_depends_target_Tests
   DEP_FILE = CMakeFiles\Tests.dir\src\tests\Perft.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   INCLUDES = -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = CMakeFiles\Tests.dir
   OBJECT_FILE_DIR = CMakeFiles\Tests.dir\src\tests
 
-build CMakeFiles/Tests.dir/src/tests/Tests.cpp.obj: CXX_COMPILER__Tests_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/tests/Tests.cpp || cmake_object_order_depends_target_Tests
+build CMakeFiles/Tests.dir/src/tests/Tests.cpp.obj: CXX_COMPILER__Tests_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/tests/Tests.cpp || cmake_object_order_depends_target_Tests
   DEP_FILE = CMakeFiles\Tests.dir\src\tests\Tests.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   INCLUDES = -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = CMakeFiles\Tests.dir
   OBJECT_FILE_DIR = CMakeFiles\Tests.dir\src\tests
 
-build CMakeFiles/Tests.dir/src/utils.cpp.obj: CXX_COMPILER__Tests_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/utils.cpp || cmake_object_order_depends_target_Tests
+build CMakeFiles/Tests.dir/src/utils.cpp.obj: CXX_COMPILER__Tests_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/utils.cpp || cmake_object_order_depends_target_Tests
   DEP_FILE = CMakeFiles\Tests.dir\src\utils.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   INCLUDES = -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = CMakeFiles\Tests.dir
   OBJECT_FILE_DIR = CMakeFiles\Tests.dir\src
@@ -113,8 +113,8 @@ build CMakeFiles/Tests.dir/src/utils.cpp.obj: CXX_COMPILER__Tests_unscanned_Debu
 #############################################
 # Link the executable Tests.exe
 
-build Tests.exe Tests[1]_tests.cmake | ${cmake_ninja_workdir}Tests[1]_tests.cmake: CXX_EXECUTABLE_LINKER__Tests_Debug CMakeFiles/Tests.dir/src/Evaluation.cpp.obj CMakeFiles/Tests.dir/src/Magics.cpp.obj CMakeFiles/Tests.dir/src/Position.cpp.obj CMakeFiles/Tests.dir/src/Search.cpp.obj CMakeFiles/Tests.dir/src/UCI.cpp.obj CMakeFiles/Tests.dir/src/tests/Perft.cpp.obj CMakeFiles/Tests.dir/src/tests/Tests.cpp.obj CMakeFiles/Tests.dir/src/utils.cpp.obj | lib/libgtest_main.a lib/libgtest.a || lib/libgtest.a lib/libgtest_main.a
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb
+build Tests.exe Tests[1]_tests.cmake | ${cmake_ninja_workdir}Tests[1]_tests.cmake: CXX_EXECUTABLE_LINKER__Tests_Release CMakeFiles/Tests.dir/src/Evaluation.cpp.obj CMakeFiles/Tests.dir/src/Magics.cpp.obj CMakeFiles/Tests.dir/src/Position.cpp.obj CMakeFiles/Tests.dir/src/Search.cpp.obj CMakeFiles/Tests.dir/src/UCI.cpp.obj CMakeFiles/Tests.dir/src/tests/Perft.cpp.obj CMakeFiles/Tests.dir/src/tests/Tests.cpp.obj CMakeFiles/Tests.dir/src/utils.cpp.obj | lib/libgtest_main.a lib/libgtest.a || lib/libgtest.a lib/libgtest_main.a
+  FLAGS = -O3  -march=native  -mtune=native
   LINK_LIBRARIES = lib/libgtest_main.a  lib/libgtest.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Tests.dir
   POST_BUILD = C:\Windows\system32\cmd.exe /C "cd /D C:\Users\callu\Desktop\Gambit\build && "C:\Program Files\CMake\bin\cmake.exe" -D TEST_TARGET=Tests -D TEST_EXECUTABLE=C:/Users/callu/Desktop/Gambit/build/Tests.exe -D TEST_EXECUTOR= -D TEST_WORKING_DIR=C:/Users/callu/Desktop/Gambit/build -D TEST_EXTRA_ARGS= -D TEST_PROPERTIES= -D TEST_PREFIX= -D TEST_SUFFIX= -D TEST_FILTER= -D NO_PRETTY_TYPES=FALSE -D NO_PRETTY_VALUES=FALSE -D TEST_LIST=Tests_TESTS -D CTEST_FILE=C:/Users/callu/Desktop/Gambit/build/Tests[1]_tests.cmake -D TEST_DISCOVERY_TIMEOUT=5 -D TEST_XML_OUTPUT_DIR= -P "C:/Program Files/CMake/share/cmake-3.29/Modules/GoogleTestAddTests.cmake""
@@ -133,51 +133,51 @@ build Tests.exe Tests[1]_tests.cmake | ${cmake_ninja_workdir}Tests[1]_tests.cmak
 
 build cmake_object_order_depends_target_Gambit: phony || .
 
-build CMakeFiles/Gambit.dir/src/Evaluation.cpp.obj: CXX_COMPILER__Gambit_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/Evaluation.cpp || cmake_object_order_depends_target_Gambit
+build CMakeFiles/Gambit.dir/src/Evaluation.cpp.obj: CXX_COMPILER__Gambit_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/Evaluation.cpp || cmake_object_order_depends_target_Gambit
   DEP_FILE = CMakeFiles\Gambit.dir\src\Evaluation.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   OBJECT_DIR = CMakeFiles\Gambit.dir
   OBJECT_FILE_DIR = CMakeFiles\Gambit.dir\src
 
-build CMakeFiles/Gambit.dir/src/Magics.cpp.obj: CXX_COMPILER__Gambit_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/Magics.cpp || cmake_object_order_depends_target_Gambit
+build CMakeFiles/Gambit.dir/src/Magics.cpp.obj: CXX_COMPILER__Gambit_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/Magics.cpp || cmake_object_order_depends_target_Gambit
   DEP_FILE = CMakeFiles\Gambit.dir\src\Magics.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   OBJECT_DIR = CMakeFiles\Gambit.dir
   OBJECT_FILE_DIR = CMakeFiles\Gambit.dir\src
 
-build CMakeFiles/Gambit.dir/src/Main.cpp.obj: CXX_COMPILER__Gambit_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/Main.cpp || cmake_object_order_depends_target_Gambit
+build CMakeFiles/Gambit.dir/src/Main.cpp.obj: CXX_COMPILER__Gambit_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/Main.cpp || cmake_object_order_depends_target_Gambit
   DEP_FILE = CMakeFiles\Gambit.dir\src\Main.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   OBJECT_DIR = CMakeFiles\Gambit.dir
   OBJECT_FILE_DIR = CMakeFiles\Gambit.dir\src
 
-build CMakeFiles/Gambit.dir/src/Position.cpp.obj: CXX_COMPILER__Gambit_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/Position.cpp || cmake_object_order_depends_target_Gambit
+build CMakeFiles/Gambit.dir/src/Position.cpp.obj: CXX_COMPILER__Gambit_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/Position.cpp || cmake_object_order_depends_target_Gambit
   DEP_FILE = CMakeFiles\Gambit.dir\src\Position.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   OBJECT_DIR = CMakeFiles\Gambit.dir
   OBJECT_FILE_DIR = CMakeFiles\Gambit.dir\src
 
-build CMakeFiles/Gambit.dir/src/Search.cpp.obj: CXX_COMPILER__Gambit_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/Search.cpp || cmake_object_order_depends_target_Gambit
+build CMakeFiles/Gambit.dir/src/Search.cpp.obj: CXX_COMPILER__Gambit_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/Search.cpp || cmake_object_order_depends_target_Gambit
   DEP_FILE = CMakeFiles\Gambit.dir\src\Search.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   OBJECT_DIR = CMakeFiles\Gambit.dir
   OBJECT_FILE_DIR = CMakeFiles\Gambit.dir\src
 
-build CMakeFiles/Gambit.dir/src/UCI.cpp.obj: CXX_COMPILER__Gambit_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/UCI.cpp || cmake_object_order_depends_target_Gambit
+build CMakeFiles/Gambit.dir/src/UCI.cpp.obj: CXX_COMPILER__Gambit_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/UCI.cpp || cmake_object_order_depends_target_Gambit
   DEP_FILE = CMakeFiles\Gambit.dir\src\UCI.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   OBJECT_DIR = CMakeFiles\Gambit.dir
   OBJECT_FILE_DIR = CMakeFiles\Gambit.dir\src
 
-build CMakeFiles/Gambit.dir/src/tests/Perft.cpp.obj: CXX_COMPILER__Gambit_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/tests/Perft.cpp || cmake_object_order_depends_target_Gambit
+build CMakeFiles/Gambit.dir/src/tests/Perft.cpp.obj: CXX_COMPILER__Gambit_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/tests/Perft.cpp || cmake_object_order_depends_target_Gambit
   DEP_FILE = CMakeFiles\Gambit.dir\src\tests\Perft.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   OBJECT_DIR = CMakeFiles\Gambit.dir
   OBJECT_FILE_DIR = CMakeFiles\Gambit.dir\src\tests
 
-build CMakeFiles/Gambit.dir/src/utils.cpp.obj: CXX_COMPILER__Gambit_unscanned_Debug C$:/Users/callu/Desktop/Gambit/product/src/utils.cpp || cmake_object_order_depends_target_Gambit
+build CMakeFiles/Gambit.dir/src/utils.cpp.obj: CXX_COMPILER__Gambit_unscanned_Release C$:/Users/callu/Desktop/Gambit/product/src/utils.cpp || cmake_object_order_depends_target_Gambit
   DEP_FILE = CMakeFiles\Gambit.dir\src\utils.cpp.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=gnu++20
+  FLAGS = -O3  -march=native  -mtune=native -std=gnu++20
   OBJECT_DIR = CMakeFiles\Gambit.dir
   OBJECT_FILE_DIR = CMakeFiles\Gambit.dir\src
 
@@ -189,8 +189,8 @@ build CMakeFiles/Gambit.dir/src/utils.cpp.obj: CXX_COMPILER__Gambit_unscanned_De
 #############################################
 # Link the executable Gambit.exe
 
-build Gambit.exe: CXX_EXECUTABLE_LINKER__Gambit_Debug CMakeFiles/Gambit.dir/src/Evaluation.cpp.obj CMakeFiles/Gambit.dir/src/Magics.cpp.obj CMakeFiles/Gambit.dir/src/Main.cpp.obj CMakeFiles/Gambit.dir/src/Position.cpp.obj CMakeFiles/Gambit.dir/src/Search.cpp.obj CMakeFiles/Gambit.dir/src/UCI.cpp.obj CMakeFiles/Gambit.dir/src/tests/Perft.cpp.obj CMakeFiles/Gambit.dir/src/utils.cpp.obj
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb
+build Gambit.exe: CXX_EXECUTABLE_LINKER__Gambit_Release CMakeFiles/Gambit.dir/src/Evaluation.cpp.obj CMakeFiles/Gambit.dir/src/Magics.cpp.obj CMakeFiles/Gambit.dir/src/Main.cpp.obj CMakeFiles/Gambit.dir/src/Position.cpp.obj CMakeFiles/Gambit.dir/src/Search.cpp.obj CMakeFiles/Gambit.dir/src/UCI.cpp.obj CMakeFiles/Gambit.dir/src/tests/Perft.cpp.obj CMakeFiles/Gambit.dir/src/utils.cpp.obj
+  FLAGS = -O3  -march=native  -mtune=native
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Gambit.dir
   POST_BUILD = cd .
@@ -374,9 +374,9 @@ build _deps/googletest-build/install/strip: phony _deps/googletest-build/CMakeFi
 
 build cmake_object_order_depends_target_gmock: phony || cmake_object_order_depends_target_gtest
 
-build _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.obj: CXX_COMPILER__gmock_unscanned_Debug C$:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock/src/gmock-all.cc || cmake_object_order_depends_target_gmock
+build _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.obj: CXX_COMPILER__gmock_unscanned_Release C$:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock/src/gmock-all.cc || cmake_object_order_depends_target_gmock
   DEP_FILE = _deps\googletest-build\googlemock\CMakeFiles\gmock.dir\src\gmock-all.cc.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=c++20 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
+  FLAGS = -O3  -march=native  -mtune=native -std=c++20 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
   INCLUDES = -IC:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock/include -IC:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = _deps\googletest-build\googlemock\CMakeFiles\gmock.dir
   OBJECT_FILE_DIR = _deps\googletest-build\googlemock\CMakeFiles\gmock.dir\src
@@ -389,8 +389,8 @@ build _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.ob
 #############################################
 # Link the static library lib\libgmock.a
 
-build lib/libgmock.a: CXX_STATIC_LIBRARY_LINKER__gmock_Debug _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.obj || lib/libgtest.a
-  LANGUAGE_COMPILE_FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb
+build lib/libgmock.a: CXX_STATIC_LIBRARY_LINKER__gmock_Release _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.obj || lib/libgtest.a
+  LANGUAGE_COMPILE_FLAGS = -O3  -march=native  -mtune=native
   OBJECT_DIR = _deps\googletest-build\googlemock\CMakeFiles\gmock.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -406,9 +406,9 @@ build lib/libgmock.a: CXX_STATIC_LIBRARY_LINKER__gmock_Debug _deps/googletest-bu
 
 build cmake_object_order_depends_target_gmock_main: phony || cmake_object_order_depends_target_gmock cmake_object_order_depends_target_gtest
 
-build _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.obj: CXX_COMPILER__gmock_main_unscanned_Debug C$:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock/src/gmock_main.cc || cmake_object_order_depends_target_gmock_main
+build _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.obj: CXX_COMPILER__gmock_main_unscanned_Release C$:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock/src/gmock_main.cc || cmake_object_order_depends_target_gmock_main
   DEP_FILE = _deps\googletest-build\googlemock\CMakeFiles\gmock_main.dir\src\gmock_main.cc.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=c++20 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
+  FLAGS = -O3  -march=native  -mtune=native -std=c++20 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
   INCLUDES = -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googlemock -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = _deps\googletest-build\googlemock\CMakeFiles\gmock_main.dir
   OBJECT_FILE_DIR = _deps\googletest-build\googlemock\CMakeFiles\gmock_main.dir\src
@@ -421,8 +421,8 @@ build _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main
 #############################################
 # Link the static library lib\libgmock_main.a
 
-build lib/libgmock_main.a: CXX_STATIC_LIBRARY_LINKER__gmock_main_Debug _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.obj || lib/libgmock.a lib/libgtest.a
-  LANGUAGE_COMPILE_FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb
+build lib/libgmock_main.a: CXX_STATIC_LIBRARY_LINKER__gmock_main_Release _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.obj || lib/libgmock.a lib/libgtest.a
+  LANGUAGE_COMPILE_FLAGS = -O3  -march=native  -mtune=native
   OBJECT_DIR = _deps\googletest-build\googlemock\CMakeFiles\gmock_main.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -521,9 +521,9 @@ build _deps/googletest-build/googlemock/install/strip: phony _deps/googletest-bu
 
 build cmake_object_order_depends_target_gtest: phony || .
 
-build _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.obj: CXX_COMPILER__gtest_unscanned_Debug C$:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/src/gtest-all.cc || cmake_object_order_depends_target_gtest
+build _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.obj: CXX_COMPILER__gtest_unscanned_Release C$:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/src/gtest-all.cc || cmake_object_order_depends_target_gtest
   DEP_FILE = _deps\googletest-build\googletest\CMakeFiles\gtest.dir\src\gtest-all.cc.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=c++20 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
+  FLAGS = -O3  -march=native  -mtune=native -std=c++20 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
   INCLUDES = -IC:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -IC:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = _deps\googletest-build\googletest\CMakeFiles\gtest.dir
   OBJECT_FILE_DIR = _deps\googletest-build\googletest\CMakeFiles\gtest.dir\src
@@ -536,8 +536,8 @@ build _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.ob
 #############################################
 # Link the static library lib\libgtest.a
 
-build lib/libgtest.a: CXX_STATIC_LIBRARY_LINKER__gtest_Debug _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.obj
-  LANGUAGE_COMPILE_FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb
+build lib/libgtest.a: CXX_STATIC_LIBRARY_LINKER__gtest_Release _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.obj
+  LANGUAGE_COMPILE_FLAGS = -O3  -march=native  -mtune=native
   OBJECT_DIR = _deps\googletest-build\googletest\CMakeFiles\gtest.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -553,9 +553,9 @@ build lib/libgtest.a: CXX_STATIC_LIBRARY_LINKER__gtest_Debug _deps/googletest-bu
 
 build cmake_object_order_depends_target_gtest_main: phony || cmake_object_order_depends_target_gtest
 
-build _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.obj: CXX_COMPILER__gtest_main_unscanned_Debug C$:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/src/gtest_main.cc || cmake_object_order_depends_target_gtest_main
+build _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.obj: CXX_COMPILER__gtest_main_unscanned_Release C$:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/src/gtest_main.cc || cmake_object_order_depends_target_gtest_main
   DEP_FILE = _deps\googletest-build\googletest\CMakeFiles\gtest_main.dir\src\gtest_main.cc.obj.d
-  FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb -std=c++20 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
+  FLAGS = -O3  -march=native  -mtune=native -std=c++20 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=0 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
   INCLUDES = -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest/include -isystem C:/Users/callu/Desktop/Gambit/build/_deps/googletest-src/googletest
   OBJECT_DIR = _deps\googletest-build\googletest\CMakeFiles\gtest_main.dir
   OBJECT_FILE_DIR = _deps\googletest-build\googletest\CMakeFiles\gtest_main.dir\src
@@ -568,8 +568,8 @@ build _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main
 #############################################
 # Link the static library lib\libgtest_main.a
 
-build lib/libgtest_main.a: CXX_STATIC_LIBRARY_LINKER__gtest_main_Debug _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.obj || lib/libgtest.a
-  LANGUAGE_COMPILE_FLAGS = -O0 -Wall -Wextra -Wpedantic -ggdb
+build lib/libgtest_main.a: CXX_STATIC_LIBRARY_LINKER__gtest_main_Release _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.obj || lib/libgtest.a
+  LANGUAGE_COMPILE_FLAGS = -O3  -march=native  -mtune=native
   OBJECT_DIR = _deps\googletest-build\googletest\CMakeFiles\gtest_main.dir
   POST_BUILD = cd .
   PRE_LINK = cd .

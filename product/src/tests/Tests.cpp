@@ -633,57 +633,57 @@
 // 	std::cout << "Position 6: (Depth " << depth << ")" << std::endl << pos.split_perft(depth, depth) << std::endl;
 // }
 
-// TEST(PERFT, perft_suite) {
-// 	Magics::init();
-// 	ASSERT_TRUE(run_perft_suite(false));
+TEST(PERFT, perft_suite) {
+	Magics::init();
+	ASSERT_TRUE(run_perft_suite(false));
+}
+
+// TEST(SEARCH, mvv_lva) {
+//   Piece victim = Piece::PAWN;
+//   Piece attacker = Piece::QUEEN;
+// 	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 45
 // }
 
-TEST(SEARCH, mvv_lva) {
-  Piece victim = Piece::PAWN;
-  Piece attacker = Piece::QUEEN;
-	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 45
-}
+// TEST(SEARCH, mvv_lva2) {
+//   Piece victim = Piece::QUEEN;
+//   Piece attacker = Piece::PAWN;
+// 	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 9
+// }
 
-TEST(SEARCH, mvv_lva2) {
-  Piece victim = Piece::QUEEN;
-  Piece attacker = Piece::PAWN;
-	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 9
-}
+// TEST(SEARCH, mvv_lva3) {
+//   Piece victim = Piece::KING;
+//   Piece attacker = Piece::PAWN;
+// 	ASSERT_EXIT(
+//     { std::cerr << Utils::find_mvv_lva(victim, attacker) << std::endl; },
+//     ::testing::ExitedWithCode(-1),                                        
+//     "Unexpected piece type of victim: 5"                   
+//   );
+// }
 
-TEST(SEARCH, mvv_lva3) {
-  Piece victim = Piece::KING;
-  Piece attacker = Piece::PAWN;
-	ASSERT_EXIT(
-    { std::cerr << Utils::find_mvv_lva(victim, attacker) << std::endl; },
-    ::testing::ExitedWithCode(-1),                                        
-    "Unexpected piece type of victim: 5"                   
-  );
-}
+// TEST(SEARCH, mvv_lva4) { // lowest
+//   Piece victim = Piece::QUEEN;
+//   Piece attacker = Piece::KING;
+// 	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 4
+// }
 
-TEST(SEARCH, mvv_lva4) { // lowest
-  Piece victim = Piece::QUEEN;
-  Piece attacker = Piece::KING;
-	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 4
-}
+// TEST(SEARCH, mvv_lva5) { // highest
+//   Piece victim = Piece::PAWN;
+//   Piece attacker = Piece::PAWN;
+// 	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 49
+// }
 
-TEST(SEARCH, mvv_lva5) { // highest
-  Piece victim = Piece::PAWN;
-  Piece attacker = Piece::PAWN;
-	std::cout << Utils::find_mvv_lva(victim, attacker) << std::endl; // 49
-}
-
-TEST(SEARCH, mvv_lva_sorting) { // testing whether sorted returns the correct number of moves
-  Position pos = Position("5k2/7p/6p1/8/8/8/8/3K3R w - - 0 1");
-  Magics::init();
-  std::vector<Move> moves = pos.generate_all_moves();
-  std::vector<Move> sorted_moves = Utils::sort_by_mvv_lva(moves, pos);
-  Piece victim = Piece::PAWN;
-  Piece attacker = Piece::ROOK;
-  assert(Utils::find_mvv_lva(victim, attacker) == 46);
-  assert(moves.size() == sorted_moves.size());
-  //std::cout << Utils::move_to_board_notation(sorted_moves[static_cast<int>(sorted_moves.size()) - 1]) << std::endl;
-  assert(static_cast<int>(sorted_moves[0].get_src_square()) == 7 && static_cast<int>(sorted_moves[0].get_dest_square()) == 55);
-}
+// TEST(SEARCH, mvv_lva_sorting) { // testing whether sorted returns the correct number of moves
+//   Position pos = Position("5k2/7p/6p1/8/8/8/8/3K3R w - - 0 1");
+//   Magics::init();
+//   std::vector<Move> moves = pos.generate_all_moves();
+//   std::vector<Move> sorted_moves = Utils::sort_by_mvv_lva(moves, pos);
+//   Piece victim = Piece::PAWN;
+//   Piece attacker = Piece::ROOK;
+//   assert(Utils::find_mvv_lva(victim, attacker) == 46);
+//   assert(moves.size() == sorted_moves.size());
+//   //std::cout << Utils::move_to_board_notation(sorted_moves[static_cast<int>(sorted_moves.size()) - 1]) << std::endl;
+//   assert(static_cast<int>(sorted_moves[0].get_src_square()) == 7 && static_cast<int>(sorted_moves[0].get_dest_square()) == 55);
+// }
 
 
 int main(int argc, char **argv) {

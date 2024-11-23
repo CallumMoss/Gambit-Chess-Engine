@@ -26,66 +26,66 @@ class Position { // Game state class
         void print_board(std::array<char, 64> board);
 
         // Move Gen:
-        u64 get_pawn_attacks(u8 square);
-        u64 get_knight_moves(u8 square);
-        u64 get_king_moves(u8 square);
-        u64 get_bishop_moves(u8 square);
-        u64 get_rook_moves(u8 square);
-        u64 get_queen_moves(u8 square);
-        std::vector<Move> generate_all_moves();
-        u64 generate_piece_attacks(Piece type, u8 square);
-        std::vector<Move> generate_piece_moves(Piece type, u8 square);
-        std::vector<u64> extract_piece_moves(u64 attacks);
-        std::vector<Move> bb_to_move_list(Piece type, u8 square, u64 attacks);
+        u64 get_pawn_attacks(u8 square) const;
+        u64 get_knight_moves(u8 square) const;
+        u64 get_king_moves(u8 square) const;
+        u64 get_bishop_moves(u8 square) const;
+        u64 get_rook_moves(u8 square) const;
+        u64 get_queen_moves(u8 square) const;
+        std::vector<Move> generate_all_moves() const;
+        u64 generate_piece_attacks(Piece type, u8 square) const;
+        std::vector<Move> generate_piece_moves(Piece type, u8 square) const;
+        std::vector<u64> extract_piece_moves(u64 attacks) const;
+        std::vector<Move> bb_to_move_list(Piece type, u8 square, u64 attacks) const;
         void make_move(Move& move);
-        bool legality_check(Move& move);
+        bool legality_check(Move& move) const;
         u64 split_perft(int current_depth, const int& desired_depth, const bool& output_split);
 
         // Getters and Setters:
-        Piece get_piece_type_from_square(u8 square);
-        const std::array<u64, 6>& get_pieces();
-        const std::array<u64, 2>& get_colours();
-        u64 get_en_passant_target();
-        u8 get_half_move_clock();
-        u8 get_full_move_counter();
-        u8 get_castling_rights();
-        Turn get_turn();
-        Turn get_opp_turn();
+        Piece get_piece_type_from_square(u8 square) const;
+        std::array<u64, 6> get_pieces() const;
+        std::array<u64, 2> get_colours() const;
+        u64 get_en_passant_target() const;
+        u8 get_half_move_clock() const;
+        u8 get_full_move_counter() const;
+        u8 get_castling_rights() const;
+        Turn get_turn() const;
+        Turn get_opp_turn() const;
 
-        u64 get_pawns();
-        u64 get_white_pawns();
-        u64 get_black_pawns();
+        u64 get_pawns() const;
+        u64 get_white_pawns() const;
+        u64 get_black_pawns() const;
 
-        u64 get_knights();
-        u64 get_white_knights();
-        u64 get_black_knights();
+        u64 get_knights() const;
+        u64 get_white_knights() const;
+        u64 get_black_knights() const;
 
-        u64 get_bishops();
-        u64 get_white_bishops();
-        u64 get_black_bishops();
+        u64 get_bishops() const;
+        u64 get_white_bishops() const;
+        u64 get_black_bishops() const;
 
-        u64 get_rooks ();
-        u64 get_white_rooks();
-        u64 get_black_rooks();
+        u64 get_rooks () const;
+        u64 get_white_rooks() const;
+        u64 get_black_rooks() const;
 
-        u64 get_queens ();
-        u64 get_white_queen();
-        u64 get_black_queen();
+        u64 get_queens () const;
+        u64 get_white_queen() const;
+        u64 get_black_queen() const;
 
-        u64 get_kings ();
-        u64 get_white_king ();
-        u64 get_black_king ();
+        u64 get_kings () const;
+        u64 get_white_king () const;
+        u64 get_black_king () const;
 
-        u64 get_white_pieces();
-        u64 get_black_pieces();
+        u64 get_white_pieces() const;
+        u64 get_black_pieces() const;
 
-        u64 get_pieces_from_current_turn();
-        u64 get_board();
+        u64 get_pieces_from_current_turn() const;
+        u64 get_board() const;
 
-        bool get_wscr(); // returns true if white has short castling rights
-        bool get_wlcr();
-        bool get_bscr();
-        bool get_blcr();
+        bool get_wscr() const; // returns true if white has short castling rights
+        bool get_wlcr() const;
+        bool get_bscr() const;
+        bool get_blcr() const;
 
         void remove_wscr();
         void remove_wlcr();

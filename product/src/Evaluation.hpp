@@ -4,8 +4,8 @@
 #include "Utils.hpp"
 
 namespace Evaluation {
-    int evaluate(Position& pos);
-    int count_material(Position& pos, Colour colour);
+    int evaluate(const Position& pos);
+    int count_material(const Position& pos, Colour colour);
 }
 
 #endif // #ifndef EVALUATION_HPP
