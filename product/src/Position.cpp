@@ -443,6 +443,53 @@ std::vector<Move> Position::bb_to_move_list(Piece type, u8 src_square, u64 attac
     return move_list;
 }
 
+bool Position::in_check() const { // used to detect stalemate. Finds if we are currently in check after make move has been applied
+    u64 king_square_u64;
+    u64 our_pieces;
+    u64 opponent_pieces;
+    if(turn == Turn::BLACK) { // is flipped because we flip turn after make move, so we check if we are in check
+        our_pieces = get_white_pieces();
+        opponent_pieces = get_black_pieces();
+        king_square_u64 = get_white_king();
+    }
+    else {
+        our_pieces = get_black_pieces();
+        opponent_pieces = get_white_pieces();
+        king_square_u64 = get_black_king();
+    }
+        if(king_square_u64 == 0ULL) { // if king has been taken. Should not happen but will be helpful for strange FENs
+        return false;
+    }
+
+    u8 king_square_index = Utils::find_piece_index(king_square_u64);
+
+    // Finding if king is in check
+    // Finding squares where if a piece is on, would see the king.
+    // OR queen attacks from the square with knight attacks
+    // generate attacks for opponents pieces on these squares
+    u64 king_target_mask = Utils::QUEEN_ATTACKS[king_square_index];
+    king_target_mask |= Utils::KNIGHT_ATTACKS[king_square_index]; // squares where if opponents piece is on could attack king
+    u64 opponent_relevant_pieces = king_target_mask & opponent_pieces; // squares with an opponents piece on
+    
+    // Check if opponents relevant pieces can actually attack the king
+    // Is there a faster way than generating them?
+    // Generate attacks for pieces on these squares
+    // if return val & king_square_u64 then return false
+
+    u8 index;
+    u64 attacks;
+    Piece type;
+    while(opponent_relevant_pieces) {
+        index = Utils::find_piece_index(opponent_relevant_pieces);
+        type = get_piece_type_from_square(index);
+        attacks = generate_piece_attacks(type, index);
+        if(attacks & king_square_u64) { // if there is a piece hitting the king
+            return true;
+        }
+        opponent_relevant_pieces = Utils::clear_bit(opponent_relevant_pieces, index);
+    }
+    return false;
+}
 // Checks whether after applying a pseudo move, if the position is legal.
 bool Position::legality_check(Move& move) const
 {
@@ -579,6 +626,8 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
 
     // Adapting for special flags
     switch(flag) {
+        case PAWN_FLAG:
+            half_move_clock = 0; // reset when pawn move is made
         case ROOK_FLAG: // removing castling rights
             if(castling_rights == 0) { // if already cant castle, ignore removing castling
                 break;
@@ -608,6 +657,7 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
             break;
 
         case PAWN_TWO_FORWARD_FLAG:
+            half_move_clock = 0; // reset when pawn move is made
             if(turn == Turn::WHITE) {
                 en_passant_target = dest_square - 8;
             }
@@ -617,20 +667,25 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
 
             break;
         case EN_PASSANT_FLAG:
+            half_move_clock = 0; // reset when pawn move is made
             set_pieces_and_colours(Piece::PAWN, Piece::PAWN, Piece::INVALID, turn, src_square, dest_square, true);
              // if this flag, then the dest square and target square are different.
             break;
 
         case KNIGHT_PROMOTION_FLAG:
+            half_move_clock = 0; // reset when pawn move is made
             promoted_piece_type = Piece::KNIGHT;
             break;
         case BISHOP_PROMOTION_FLAG:
+            half_move_clock = 0; // reset when pawn move is made
             promoted_piece_type = Piece::BISHOP;
             break;
         case ROOK_PROMOTION_FLAG:
+            half_move_clock = 0; // reset when pawn move is made
             promoted_piece_type = Piece::ROOK;
             break;
         case QUEEN_PROMOTION_FLAG:
+            half_move_clock = 0; // reset when pawn move is made
             promoted_piece_type = Piece::QUEEN;
             break;
 
@@ -669,6 +724,7 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
 
     if ((en_passant_target != Utils::NULL_EN_PASSANT) && (flag != PAWN_TWO_FORWARD_FLAG)) {en_passant_target = Utils::NULL_EN_PASSANT;} // reset en passant if double push hasnt been played
     turn = get_opp_turn();
+    if(captured_piece_type != Piece::INVALID) { half_move_clock = 0; } // reset when a capture has occured
 }
 
 // Uses reference for data type larger than u64

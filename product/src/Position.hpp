@@ -39,6 +39,7 @@ class Position { // Game state class
         std::vector<Move> bb_to_move_list(Piece type, u8 square, u64 attacks) const;
         void make_move(Move& move);
         bool legality_check(Move& move) const;
+        bool in_check() const;
         u64 split_perft(int current_depth, const int& desired_depth, const bool& output_split);
 
         // Getters and Setters:

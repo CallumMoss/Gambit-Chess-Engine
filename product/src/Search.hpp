@@ -27,16 +27,25 @@ class Search {
         int negamax_ab(Position& pos, u8 depth, int alpha, int beta, PV* pline, Timer& timer);
 
         int negamax2(int depth, int ply, const Position& pos);
+        int iterative_deepening(const Position& pos, Timer& timer);
+        int negamax2_timer(int depth, int ply, const Position& pos, Timer& timer, Move temp_last_6_half_moves[6]);
 
         // Getters and Setters
         Move get_root_best_move() { return root_best_move; }
-        bool get_has_found_a_legal_root_move() { return has_found_a_legal_root_move; }
+        bool get_has_found_a_legal_move() { return has_found_a_legal_move; }
+        void set_last_6_half_moves(const Move arr[6]) {
+            for(int i = 0; i < 6; i++) {
+                last_6_half_moves[i] = arr[i];
+            }
+        }
 
     private:
-        Move root_best_move = Move(0, 0, Move_Flag::NULL_FLAG);
-        bool has_found_a_legal_root_move = false;
+        Move root_best_move;
+        int root_best_score = -INT_MAX;
+        bool has_found_a_legal_move = false;
         Search_Type search_type;
         Search_Algorithm search_algorithm;
+        Move last_6_half_moves[6];
 };
 
 #endif // #ifndef SEARCH_HPP

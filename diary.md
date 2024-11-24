@@ -1,5 +1,11 @@
+24/11/2024:
+Added checks for 3 fold repetition and 50 move rule
+
+23/11/2024:
+Implemented iterative deepening
+
 22/11/2024:
-Reorganised to relevant files
+Reorganised to relevant files, fixed some bugs and worked on basics for search
 
 21/11/2024:
 Ran SPRTs for negamax_fixed_depth_2 vs random_mover and negamax_iterative_deepening vs negamax_fixed_depth_2. Found issues so implemented quintescence search

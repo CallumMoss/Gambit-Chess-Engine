@@ -686,16 +686,230 @@
 //   assert(static_cast<int>(sorted_moves[0].get_src_square()) == 7 && static_cast<int>(sorted_moves[0].get_dest_square()) == 55);
 // }
 
-TEST(FIXED_DEPTH_NEGAMAX, mate_in_1) {
-  Position pos = Position("2k2r2/1pp5/p2q4/3np2n/8/2P1P3/PP3p1q/1RB2KN1 w - - 0 38");
+// TEST(FIXED_DEPTH_NEGAMAX, self_mate_in_1) {
+//   Position pos = Position("2k2r2/1pp5/p2q4/3np2n/8/2P1P3/PP3p1q/1RB2KN1 w - - 0 38");
+//   Magics::init();
+//   //4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/4R1P1/B1Q2RK1 b - - 4 32
+//   Search search = Search();
+//   int depth = 4;
+//   search.negamax2(depth, 0, pos);
+//   std::cout << Utils::move_to_board_notation(search.get_root_best_move()) << std::endl;
+// }
+
+
+void test_negamax_fixed_depth_2_opponent_mate_in_1() {
+  // Positions from: https://lichess.org/study/IPtfJlNl
   Magics::init();
-  //4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/4R1P1/B1Q2RK1 b - - 4 32
+  Position pos = Position("4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/4R1P1/B1Q2RK1 b - - 4 32");
+  Search search = Search();
+  int depth = 2;
+  search.negamax2(depth, 0, pos);
+  Move expected_move = Move(31, 15, Move_Flag::QUEEN_FLAG);
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_1: Test 1 passed\n";
+
+  pos = Position("4rb2/3qrk2/1p1p1n2/7p/P2P4/4R2P/1BQN1P2/1K4R1 w - - 3 39");
+  search = Search();
+  depth = 3; // testing at various depths to see if it doesnt look past mate
+  search.negamax2(depth, 0, pos);
+  expected_move = Move(10, 46, Move_Flag::QUEEN_FLAG);
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_1: Test 2 passed\n";
+
+  pos = Position("r1bqkbnr/pp2pp1p/3p2p1/2p5/3nP3/2N3PP/PPP1NP2/R1BQKB1R b KQkq - 1 6");
+  search = Search();
+  depth = 4; // testing at various depths to see if it doesnt look past mate
+  search.negamax2(depth, 0, pos);
+  expected_move = Move(27, 21, Move_Flag::KNIGHT_FLAG);
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_1: Test 3 passed\n";
+
+  pos = Position("r2q1rk1/1bppb1pp/n3p3/5P2/2BP1P2/4P3/1PPnQK1P/R1B3NR b - - 1 12");
+  search = Search();
+  depth = 2;
+  search.negamax2(depth, 0, pos);
+  expected_move = Move(52, 31, Move_Flag::BISHOP_FLAG);
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_1: Test 4 passed\n";
+
+  pos = Position("3q1rk1/1bp3pp/r3P3/3p4/3PnP1b/1P2P3/2PNQ2P/R1BK2NR b - - 0 15");
+  search = Search();
+  depth = 2;
+  search.negamax2(depth, 0, pos);
+  expected_move = Move(28, 18, Move_Flag::KNIGHT_FLAG);
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_1: Test 5 passed\n";
+}
+
+void test_negamax_fixed_depth_2_opponent_mate_in_2() {
+  Magics::init();
+  Position pos = Position("4r3/1pp2rbk/6pn/4n3/P3BN1q/1PB2bPP/8/2Q1RRK1 b - - 0 31");
   Search search = Search();
   int depth = 4;
   search.negamax2(depth, 0, pos);
-  std::cout << Utils::move_to_board_notation(search.get_root_best_move()) << std::endl;
+  Move expected_move = Move(31, 22, Move_Flag::QUEEN_FLAG);
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_2: Test 1 passed\n";
+
+  pos = Position("r2k1b1r/p1ppq2p/np3np1/5p2/1PPP4/P3PQ2/3N1PPP/R1B1K2R w KQ - 1 13");
+  search = Search();
+  depth = 4; //
+  search.negamax2(depth, 0, pos);
+  expected_move = Move(21, 56, Move_Flag::QUEEN_FLAG);
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_2: Test 2 passed\n";
+
+  pos = Position("rn3r2/p2q1pBk/1p2p3/3pP3/P1bNnQ2/5NP1/1P3PBP/R3b1K1 w - - 1 19");
+  search = Search();
+  depth = 4; //
+  search.negamax2(depth, 0, pos);
+  expected_move = Move(29, 47, Move_Flag::QUEEN_FLAG);
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_2: Test 3 passed\n";
 }
 
+void test_negamax_iterative_deepening_opponent_mate_in_1() {
+  // Positions from: https://lichess.org/study/IPtfJlNl
+  Magics::init();
+  Position pos = Position("4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/4R1P1/B1Q2RK1 b - - 4 32");
+  Search search = Search();
+  Timer timer;
+  u64 wtime = 60'000; // white has x msec left on the clock
+  u64 btime = 60'000; // black has x msec left on the clock
+  u64 winc = 0; // white increment per move in mseconds if x > 0
+  u64 binc = 0; // black increment per move in mseconds if x > 0
+  if(pos.get_turn() == Turn::WHITE) {
+      timer.set_fields(wtime, winc);
+  }
+  else {
+      timer.set_fields(btime, binc);
+  }
+  timer.start_timer();
+  search.iterative_deepening(pos, timer);
+  Move expected_move = Move(31, 15, Move_Flag::QUEEN_FLAG);
+  std::cout << Utils::move_to_board_notation(search.get_root_best_move()) << std::endl;
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_iterative_deepening_opponent_mate_in_1: Test 1 passed\n";
+
+  pos = Position("4rb2/3qrk2/1p1p1n2/7p/P2P4/4R2P/1BQN1P2/1K4R1 w - - 3 39");
+  search = Search();
+  timer = Timer();
+  wtime = 60'000; // white has x msec left on the clock
+  btime = 60'000; // black has x msec left on the clock
+  winc = 0; // white increment per move in mseconds if x > 0
+  binc = 0; // black increment per move in mseconds if x > 0
+  if(pos.get_turn() == Turn::WHITE) {
+      timer.set_fields(wtime, winc);
+  }
+  else {
+      timer.set_fields(btime, binc);
+  }
+  timer.start_timer();
+  search.iterative_deepening(pos, timer);
+  expected_move = Move(10, 46, Move_Flag::QUEEN_FLAG);
+  std::cout << Utils::move_to_board_notation(search.get_root_best_move()) << std::endl;
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_iterative_deepening_opponent_mate_in_1: Test 2 passed\n";
+
+  pos = Position("r1bqkbnr/pp2pp1p/3p2p1/2p5/3nP3/2N3PP/PPP1NP2/R1BQKB1R b KQkq - 1 6");
+  search = Search();
+  timer = Timer();
+  wtime = 60'000; // white has x msec left on the clock
+  btime = 60'000; // black has x msec left on the clock
+  winc = 0; // white increment per move in mseconds if x > 0
+  binc = 0; // black increment per move in mseconds if x > 0
+  if(pos.get_turn() == Turn::WHITE) {
+      timer.set_fields(wtime, winc);
+  }
+  else {
+      timer.set_fields(btime, binc);
+  }
+  timer.start_timer();
+  search.iterative_deepening(pos, timer);
+  expected_move = Move(27, 21, Move_Flag::KNIGHT_FLAG);
+  std::cout << Utils::move_to_board_notation(search.get_root_best_move()) << std::endl;
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_1: Test 3 passed\n";
+
+  pos = Position("r2q1rk1/1bppb1pp/n3p3/5P2/2BP1P2/4P3/1PPnQK1P/R1B3NR b - - 1 12");
+  search = Search();
+  timer = Timer();
+  wtime = 60'000; // white has x msec left on the clock
+  btime = 60'000; // black has x msec left on the clock
+  winc = 0; // white increment per move in mseconds if x > 0
+  binc = 0; // black increment per move in mseconds if x > 0
+  if(pos.get_turn() == Turn::WHITE) {
+      timer.set_fields(wtime, winc);
+  }
+  else {
+      timer.set_fields(btime, binc);
+  }
+  timer.start_timer();
+  search.iterative_deepening(pos, timer);
+  expected_move = Move(52, 31, Move_Flag::BISHOP_FLAG);
+  std::cout << Utils::move_to_board_notation(search.get_root_best_move()) << std::endl;
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_1: Test 4 passed\n";
+
+  pos = Position("3q1rk1/1bp3pp/r3P3/3p4/3PnP1b/1P2P3/2PNQ2P/R1BK2NR b - - 0 15");
+  search = Search();
+  timer = Timer();
+  wtime = 60'000; // white has x msec left on the clock
+  btime = 60'000; // black has x msec left on the clock
+  winc = 0; // white increment per move in mseconds if x > 0
+  binc = 0; // black increment per move in mseconds if x > 0
+  if(pos.get_turn() == Turn::WHITE) {
+      timer.set_fields(wtime, winc);
+  }
+  else {
+      timer.set_fields(btime, binc);
+  }
+  timer.start_timer();
+  search.iterative_deepening(pos, timer);
+  expected_move = Move(28, 18, Move_Flag::KNIGHT_FLAG);
+  std::cout << Utils::move_to_board_notation(search.get_root_best_move()) << std::endl;
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_1: Test 5 passed\n";
+}
+
+void test_negamax_iterative_deepening_opponent_mate_in_2() {
+  Magics::init();
+  Position pos = Position("4r3/1pp2rbk/6pn/4n3/P3BN1q/1PB2bPP/8/2Q1RRK1 b - - 0 31");
+  Search search = Search();
+  int depth = 4;
+  search.negamax2(depth, 0, pos);
+  Move expected_move = Move(31, 22, Move_Flag::QUEEN_FLAG);
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_2: Test 1 passed\n";
+
+  pos = Position("r2k1b1r/p1ppq2p/np3np1/5p2/1PPP4/P3PQ2/3N1PPP/R1B1K2R w KQ - 1 13");
+  search = Search();
+  depth = 4; //
+  search.negamax2(depth, 0, pos);
+  expected_move = Move(21, 56, Move_Flag::QUEEN_FLAG);
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_2: Test 2 passed\n";
+
+  pos = Position("rn3r2/p2q1pBk/1p2p3/3pP3/P1bNnQ2/5NP1/1P3PBP/R3b1K1 w - - 1 19");
+  search = Search();
+  depth = 4; //
+  search.negamax2(depth, 0, pos);
+  expected_move = Move(29, 47, Move_Flag::QUEEN_FLAG);
+  assert(search.get_root_best_move().equals(expected_move));
+  std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_2: Test 3 passed\n";
+}
+
+// TEST(FIXED_DEPTH_NEGAMAX, opponent_mate_in_x) {
+//   test_negamax_fixed_depth_2_opponent_mate_in_1();
+//   test_negamax_fixed_depth_2_opponent_mate_in_2();
+// }
+
+TEST(ITERATIVE_DEEPENING_NEGAMAX, opponent_mate_in_x) {
+  test_negamax_iterative_deepening_opponent_mate_in_1();
+  test_negamax_iterative_deepening_opponent_mate_in_2();
+}
+
+// Testing 3 fold by creating various arrays and testing
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

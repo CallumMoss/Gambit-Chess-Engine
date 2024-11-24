@@ -40,7 +40,7 @@ std::vector<std::string> UCI::split_args(std::string input)
     */
 
 // Inspired by https://github.com/AndyGrant/Ethereal/blob/master/src/uci.c#L133
-void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
+Move UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, const Move last_6_half_moves[6]) {
     // Give default values which are updated later
     // Usually these values for wtime and btime should always be updated, so value here is technically irrelevant
     u64 wtime = 60'000; // white has x msec left on the clock
@@ -73,20 +73,28 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
     timer.start_timer();
 
     Search search = Search();
+    search.set_last_6_half_moves(last_6_half_moves);
 
-   //** Random Mover: **//
+    //** Random Mover: **//
     // std::string best_move = Utils::move_to_board_notation(search.find_random_move(pos));
     // std::cout << "bestmove " << best_move << std::endl;
+    //** ------------- **//
     
     //** Negamax Fixed Depth (No Timer) **//
-    int depth = 4;
-    search.negamax2(depth, 0, pos); // find best move
+    // int depth = 2;
+    // int score = search.negamax2(depth, 0, pos); // find best move
+    // std::string best_move = Utils::move_to_board_notation(search.get_root_best_move());
+    // std::cout << "info score cp " << score << " depth " << depth << std::endl;
+    // std::cout << "bestmove " << best_move << std::endl;
+    //** ------------------------------ **//
+
+    //** Negamax Iterative Deepening (With Timer) **//
+    int score = search.iterative_deepening(pos, timer);
     std::string best_move = Utils::move_to_board_notation(search.get_root_best_move());
     std::cout << "bestmove " << best_move << std::endl;
-
-    //** Negamax with MVV-LVA: **//
-    // std::string best_move = Utils::move_to_board_notation(search.find_best_move(pos, timer, true));
-    // std::cout << "bestmove " << best_move << std::endl;
+    //** ---------------------------------------- **//
+    
+    return search.get_root_best_move();
 }
 
 void UCI::position(std::vector<std::string>& args, Position& pos) {

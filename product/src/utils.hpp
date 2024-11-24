@@ -74,6 +74,10 @@ struct Move {
     //     src    dest    flag
     u16 move = 0;
 
+    Move() {
+        move = 0;
+    }
+
     Move(u8 src_square, u8 dest_square, Move_Flag move_flag) {
         // &s with bitstring of desired length to ensure the correct bits are being updated.
         move |= (move_flag & 0x0F);                  // Move flag (4 bits) - bits 0-3
@@ -178,13 +182,15 @@ namespace Utils {
     Move encode_move(Piece type, u8 src_square, u8 dest_square, u8 en_passant_target);
     std::string move_to_board_notation(Move move);
     Move board_notation_to_move(std::string board_notation, Position& pos);
-
+    bool three_fold_repetition_has_occured(Move last_6_half_moves[6]);
     int find_mvv_lva(Piece& victim_type, Piece& attacker_type);
     int value_of_piece_from_type_and_capture_role(Piece& type, bool is_victim);
     std::vector<Move> sort_by_mvv_lva(std::vector<Move>& moves, Position& pos);
 
     static constexpr u8 NULL_EN_PASSANT = 64;
     static constexpr int MATE_SCORE = -INT_MAX + 1;
+    static constexpr int DRAW_SCORE = -0.1; // can change this to vary level of contempt
+
     constexpr u64 WHITE_PAWN_ATTACKS[64] {
         0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, // although a white pawn from here could move, there should never be one here
         0x1030000ULL, 0x2070000ULL, 0x40e0000ULL, 0x81c0000ULL, 0x10380000ULL, 0x20700000ULL, 1088421888ULL, 0x80c00000ULL,

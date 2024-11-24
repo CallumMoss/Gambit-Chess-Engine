@@ -249,7 +249,28 @@ std::vector<Move> Utils::sort_by_mvv_lva(std::vector<Move>& moves, Position& pos
     return sorted_moves;
 }
 
-
+/**
+ * @brief Determines whether a 3 fold repetition has occured based on the past 6 half moves
+ * 
+ * @return true if a repetition has occured
+ * @return false if a repetition has not occured
+ */
+bool Utils::three_fold_repetition_has_occured(Move last_6_half_moves[6]) {
+    Move null_move;
+    for(int i = 0; i < 6; i++) { // checking if not equal to the inital null array
+        if(last_6_half_moves[i].equals(null_move)) { return false; }    
+    }
+    if(last_6_half_moves[0].equals(last_6_half_moves[2])) {
+        if(last_6_half_moves[2].equals(last_6_half_moves[4])) {
+            if(last_6_half_moves[1].equals(last_6_half_moves[3])) {
+                if(last_6_half_moves[3].equals(last_6_half_moves[5])) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
 
 // std::vector<Move> Utils::sort_by_mvv_lva_and_remove_captures(std::vector<Move>& moves, u64 board) {
 //     for(Move move : moves) {
