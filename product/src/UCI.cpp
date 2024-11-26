@@ -40,7 +40,7 @@ std::vector<std::string> UCI::split_args(std::string input)
     */
 
 // Inspired by https://github.com/AndyGrant/Ethereal/blob/master/src/uci.c#L133
-Move UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, const Move last_6_half_moves[6]) {
+Move UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
     // Give default values which are updated later
     // Usually these values for wtime and btime should always be updated, so value here is technically irrelevant
     u64 wtime = 60'000; // white has x msec left on the clock
@@ -73,7 +73,6 @@ Move UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, const 
     timer.start_timer();
 
     Search search = Search();
-    search.set_last_6_half_moves(last_6_half_moves);
 
     //** Random Mover: **//
     // std::string best_move = Utils::move_to_board_notation(search.find_random_move(pos));

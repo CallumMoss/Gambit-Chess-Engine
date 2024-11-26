@@ -85,7 +85,7 @@ struct Move {
         move |= ((src_square & 0x3F) << 10);         // Source square (6 bits) - bits 10-15
     }
 
-    Move_Flag get_flag() {
+    Move_Flag get_flag() const {
         switch(move & 0x0F) {
             case PAWN_FLAG:
                 return PAWN_FLAG;
@@ -174,7 +174,6 @@ namespace Utils {
     u64 shift_left(u64 board);
     u64 shift_right(u64 board);
     bool piece_is_at_square(uint64_t board, int square);
-    u64 get_ls1b(u64 board); // gets the least significant bit that is 1 (furthest right in bitstring)
     void PrintBB(u64 board, int board_center = 64); // defaults to 64 if no argument provided (no center)
     int count_number_of_1bs(u64 board);
     u8 find_piece_index(u64 bitboard);
@@ -186,6 +185,8 @@ namespace Utils {
     int find_mvv_lva(Piece& victim_type, Piece& attacker_type);
     int value_of_piece_from_type_and_capture_role(Piece& type, bool is_victim);
     std::vector<Move> sort_by_mvv_lva(std::vector<Move>& moves, Position& pos);
+    std::string square_to_board_notation(u8 square);
+
 
     static constexpr u8 NULL_EN_PASSANT = 64;
     static constexpr int MATE_SCORE = -INT_MAX + 1;

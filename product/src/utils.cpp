@@ -28,7 +28,6 @@ int Utils::count_number_of_1bs(u64 board) {
     return __builtin_popcountll(board);
 }
 
-// Use this to determine whether there is a piece of same colour on corresponding square (can check if & 1 << square_of_ls1b)
 // Finds the square index of the ls1b
 // Credit to https://www.chessprogramming.org/BitScan#DeBruijnMultiplation and Reference: Hacker's Delight by Henry S. Warren, Jr. and ChatGPT
 u8 Utils::find_piece_index(u64 bitboard) {
@@ -270,6 +269,13 @@ bool Utils::three_fold_repetition_has_occured(Move last_6_half_moves[6]) {
         }
     }
     return false;
+}
+
+std::string Utils::square_to_board_notation(u8 square) {
+    std::string board_notation = "";
+    board_notation += 'a' + (square % 8);  // Calculate file ('a' to 'h')
+    board_notation += '1' + (square / 8);  // Calculate rank ('1' to '8')
+    return board_notation;
 }
 
 // std::vector<Move> Utils::sort_by_mvv_lva_and_remove_captures(std::vector<Move>& moves, u64 board) {

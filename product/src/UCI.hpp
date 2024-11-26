@@ -9,7 +9,7 @@
 
 namespace UCI {
     std::vector<std::string> split_args(std::string input);
-    Move go(std::vector<std::string>& args, Timer& timer, Position& pos, const Move last_6_half_moves[6]);
+    Move go(std::vector<std::string>& args, Timer& timer, Position& pos);
     void position(std::vector<std::string>& args, Position& pos);
 }
 

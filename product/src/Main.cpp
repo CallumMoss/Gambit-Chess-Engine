@@ -5,18 +5,18 @@
 #include "Magics.hpp"
 #include "UCI.hpp"
 #include "Timer.hpp"
-
+#include "Zobrist.hpp"
 
 int main() {
-    std::string version = "v1.1.1";
+    std::string version = "v1.1.3";
 
     Magics::init();
+    Zobrist zobrist;
     std::string input = "";
     std::string output = "";
-    Position pos = Position();
     Timer timer;
     Move null_move;
-    Move last_6_half_moves[6] = {null_move, null_move, null_move, null_move, null_move, null_move}; // used to check for 3 fold repetition
+    Position pos = Position();
 
     // Inspired by https://github.com/TiltedDFA/TDFA/blob/c26a01e29ba87c41af50700c2c8321e3e2667c8f/src/Uci.cpp
     while(std::getline(std::cin, input)) { // whilst isnt empty
@@ -39,12 +39,7 @@ int main() {
             UCI::position(args, pos);
         }
         else if (command == "go") {
-            Move best_move = UCI::go(args, timer, pos, last_6_half_moves);
-            // Update the last 6 half-moves
-            for (int i = 5; i > 0; i--) {
-                last_6_half_moves[i] = last_6_half_moves[i - 1];
-            }
-            last_6_half_moves[0] = best_move;
+            Move best_move = UCI::go(args, timer, pos);
         }
         else if(command == "quit") {
             break;

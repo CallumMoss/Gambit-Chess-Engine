@@ -28,16 +28,11 @@ class Search {
 
         int negamax2(int depth, int ply, const Position& pos);
         int iterative_deepening(const Position& pos, Timer& timer);
-        int negamax2_timer(int depth, int ply, const Position& pos, Timer& timer, Move temp_last_6_half_moves[6]);
+        int negamax2_timer(int depth, int ply, const Position& pos, Timer& timer);
 
         // Getters and Setters
         Move get_root_best_move() { return root_best_move; }
         bool get_has_found_a_legal_move() { return has_found_a_legal_move; }
-        void set_last_6_half_moves(const Move arr[6]) {
-            for(int i = 0; i < 6; i++) {
-                last_6_half_moves[i] = arr[i];
-            }
-        }
 
     private:
         Move root_best_move;
@@ -45,7 +40,6 @@ class Search {
         bool has_found_a_legal_move = false;
         Search_Type search_type;
         Search_Algorithm search_algorithm;
-        Move last_6_half_moves[6];
 };
 
 #endif // #ifndef SEARCH_HPP

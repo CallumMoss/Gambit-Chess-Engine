@@ -77,13 +77,10 @@ int Search::negamax2(int depth, int ply, const Position& pos) {
     else if(pos.get_half_move_clock() == 100) { // 50 move rule
         best_score = Utils::DRAW_SCORE;
     }
-    else if(Utils::three_fold_repetition_has_occured(last_6_half_moves)) { // 3 fold repetition rule
-        best_score = Utils::DRAW_SCORE;
-    }
     return best_score;
 }
 
-int Search::negamax2_timer(int depth, int ply, const Position& pos, Timer& timer, Move temp_last_6_half_moves[6]) {
+int Search::negamax2_timer(int depth, int ply, const Position& pos, Timer& timer) {
     if(depth == 0) {
         return Evaluation::evaluate(pos);
     }
@@ -100,22 +97,9 @@ int Search::negamax2_timer(int depth, int ply, const Position& pos, Timer& timer
             continue;
         }
         if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
-        int score = -negamax2_timer(depth - 1, ply + 1, new_position, timer, temp_last_6_half_moves);
-        // if(timer.is_out_of_time()) {
-        //     return best_score; // could return anything as this score wont be used
-        // }
-        // if(best_score == Utils::MATE_SCORE + ply + 1) {
-        //     return score;
-        // }
-        for (int i = 5; i > 0; i--) {
-            temp_last_6_half_moves[i] = temp_last_6_half_moves[i - 1];
-        }
-        temp_last_6_half_moves[0] = move;
+        int score = -negamax2_timer(depth - 1, ply + 1, new_position, timer);
         
         if(pos.get_half_move_clock() == 100) { // 50 move rule
-            best_score = Utils::DRAW_SCORE;
-        }
-        else if(Utils::three_fold_repetition_has_occured(temp_last_6_half_moves)) { // 3 fold repetition rule
             best_score = Utils::DRAW_SCORE;
         }
 
@@ -143,7 +127,7 @@ int Search::iterative_deepening(const Position& pos, Timer& timer) {
     int last_best_score = -INT_MAX;
     int depth = 1;
     while(true) {
-        int score = -negamax2_timer(depth, 0, pos, timer, last_6_half_moves);
+        int score = -negamax2_timer(depth, 0, pos, timer);
         if(timer.is_out_of_time()) {
             root_best_move = last_best_move;
             return last_best_score;
@@ -153,11 +137,6 @@ int Search::iterative_deepening(const Position& pos, Timer& timer) {
         has_found_a_legal_move = false;
         std::cout << "info score cp " << score << " depth " << depth << std::endl;
         depth++;
-        // Update the last 6 half-moves
-        for (int i = 5; i > 0; i--) {
-            last_6_half_moves[i] = last_6_half_moves[i - 1];
-        }
-        last_6_half_moves[0] = last_best_move;
     }
     return 0; // shouldnt need to return anything as this shouldnt be reached
 }

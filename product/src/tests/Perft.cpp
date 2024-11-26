@@ -34,7 +34,8 @@ static u64 test_perft(u8 depth, u64 expected_nodes, uint16_t test_number, const 
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    u64 total_nodes = pos.split_perft(depth, depth, output_perft);
+    Move null_move = Move(0, 0, Move_Flag::NULL_FLAG);
+    u64 total_nodes = pos.split_perft(depth, depth, output_perft, null_move);
 
     auto end = std::chrono::high_resolution_clock::now();
 
@@ -55,7 +56,10 @@ static u64 test_perft(u8 depth, u64 expected_nodes, uint16_t test_number, const 
 static bool run_perft_suite(const bool& output_perft) {
     std::fstream perft_file("../product/src/tests/perftsuite.epd", std::ios::in);
 
-    if(!perft_file.is_open()){return false;}
+    if(!perft_file.is_open()){
+        std::cerr << "Perft file could not open\n";
+        return false;
+    }
 
     std::string line;
 
@@ -83,5 +87,6 @@ static bool run_perft_suite(const bool& output_perft) {
     }
 
     perft_file.close();
+
     return true;
 }

@@ -7,13 +7,16 @@
 
 #include "utils.hpp"
 #include "Timer.hpp"
+#include "Zobrist.hpp"
 
-enum class Turn: u8 {
-    WHITE,
-    BLACK
+enum class Turn: u8
+{
+    WHITE = 0,
+    BLACK = 1
 };
-
-struct PV {
+constexpr Turn operator!(Turn t) {return Turn(int(t) ^ 1);}
+struct PV
+{
     int num_of_moves;
     std::vector<Move> moves;
 };
@@ -24,6 +27,8 @@ class Position { // Game state class
         void print_position();
         std::array<char, 64> board_to_char_array(u64 board);
         void print_board(std::array<char, 64> board);
+        void compute_zobrist_key();
+        void recompute_zobrist_key();
 
         // Move Gen:
         u64 get_pawn_attacks(u8 square) const;
@@ -40,7 +45,7 @@ class Position { // Game state class
         void make_move(Move& move);
         bool legality_check(Move& move) const;
         bool in_check() const;
-        u64 split_perft(int current_depth, const int& desired_depth, const bool& output_split);
+        u64 split_perft(int current_depth, const int& desired_depth, const bool& output_split, Move& last_move);
 
         // Getters and Setters:
         Piece get_piece_type_from_square(u8 square) const;
@@ -87,6 +92,9 @@ class Position { // Game state class
         bool get_wlcr() const;
         bool get_bscr() const;
         bool get_blcr() const;
+        Colour get_colour_from_square(u8 square);
+
+        u64 get_zobrist_key() const;
 
         void remove_wscr();
         void remove_wlcr();
@@ -95,6 +103,9 @@ class Position { // Game state class
 
         void set_turn(Turn);
         void set_pieces_and_colours(const Piece& moved_piece_type, const Piece& captured_piece_type, const Piece& promoted_piece_type, const Turn& turn, const u8& src_square, const u8& dest_square, bool is_en_passant);
+        bool equals(const Position& posb) const;
+        std::string equals_with_debugging(const Position& posb) const;
+        std::string zobrist_equals_with_debugging(const u64& zobrist_key_b) const;
 
     private:
         // Piece-centric bitboards for storing the position of the pieces by types and colour
@@ -105,6 +116,8 @@ class Position { // Game state class
 		u8 full_move_counter; // how many moves have been played
         u8 castling_rights; // XXXX-BL-BS-WL-WS, last 4 bits, 0 if cannot castle
         Turn turn;
+
+        u64 zobrist_key = 0ULL; // hash value representing a position (discluding half clock, full move)
 
         // //if pawn starting square is on the right rank and destination is next to pawn of opposing colour on the right rank
 
