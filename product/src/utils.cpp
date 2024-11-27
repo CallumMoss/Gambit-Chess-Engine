@@ -1,7 +1,5 @@
-#include "Types.hpp" // Needed in every file with an assert for assert checker macro
-
 #include "Utils.hpp"
-#include "Position.hpp"
+
 #include <algorithm> 
 // Shifts should only be used for indiviual piece bbs, not entire board bbs. Aka a singular pawn attack.
 u64 Utils::shift_up(u64 board) { // Moving the board up a rank (can be used for seeing possible pawn moves for example)

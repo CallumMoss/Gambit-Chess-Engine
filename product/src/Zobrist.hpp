@@ -1,7 +1,9 @@
 #ifndef ZOBRIST_HPP
 #define ZOBRIST_HPP
 
+#include "Types.hpp"
 #include "utils.hpp"
+
 #include <array>
 #include <random>
 #include <vector>

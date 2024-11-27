@@ -1,6 +1,4 @@
-#include "Types.hpp" // Needed in every file with an assert for assert checker macro
 #include "UCI.hpp"
-#include "Search.hpp"
 
 std::vector<std::string> UCI::split_args(std::string input)
 {

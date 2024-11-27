@@ -1,17 +1,16 @@
-#include "Types.hpp" // Needed in every file with an assert for assert checker macro
 #include "Evaluation.hpp"
 #include "Position.hpp"
 
 int Evaluation::evaluate(const Position& pos) {
-    int eval = count_material(pos, Colour::WHITE) - count_material(pos, Colour::BLACK);
+    int eval = count_material(pos, Turn::WHITE) - count_material(pos, Turn::BLACK);
     if(pos.get_turn() == Turn::WHITE) { return eval; }
     else { return -eval; } 
 }
 
-int Evaluation::count_material(const Position& pos, Colour colour) {
+int Evaluation::count_material(const Position& pos, Turn colour) {
     int material = 0;
     u64 board;
-    if(colour == Colour::WHITE) {
+    if(colour == Turn::WHITE) {
         board = pos.get_white_pieces();
     }
     else {

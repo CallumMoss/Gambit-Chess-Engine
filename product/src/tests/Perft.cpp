@@ -6,8 +6,8 @@
 #include <iostream>
 #include <chrono>
 
-#include "../Position.hpp"
 #include "../Types.hpp"
+#include "../Position.hpp"
 
 
 // Perft suite used: http://www.rocechess.ch/perft.html

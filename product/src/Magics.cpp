@@ -1,4 +1,3 @@
-#include "Types.hpp" // Needed in every file with an assert for assert checker macro
 #include "Magics.hpp"
 
 #include <random>
@@ -13,8 +12,8 @@
 // Final_Magic bishop_magics_table[64] = {};
 // Final_Magic rook_magics_table[64] = {};
 
-bb_vector bishop_magics_table[64] = {};
-bb_vector rook_magics_table[64] = {};
+std::vector<u64> bishop_magics_table[64] = {};
+std::vector<u64> rook_magics_table[64] = {};
 
 u64 rook_magics[64] = {
 396326115742859266ULL, 18023881798320192ULL, 1225014287313027080ULL, 36033745626597376ULL,
@@ -108,12 +107,12 @@ void Magics::init() {
 }
 
 // Attempts to make the table used for the precomputations of magic attacks
-bb_vector Magics::create_magic_table(Piece piece_type, u64 magic_number, int square) {
+std::vector<u64> Magics::create_magic_table(Piece piece_type, u64 magic_number, int square) {
     MagicEntry magic;
     magic.mask = get_relevant_blocker_squares(piece_type, square); // Bitboard of spaces where blockers would be an issue if occupied
     magic.index_bits = Utils::count_number_of_1bs(magic.mask);
     magic.magic_number = magic_number;
-    bb_vector table(1 << magic.index_bits, 0ULL);
+    std::vector<u64> table(1 << magic.index_bits, 0ULL);
     u64 moves;
     for(u64 blockers : get_blocker_combinations(magic.mask)) {
         if(piece_type == Piece::BISHOP) { moves = pseudo_legalise_bishop_attacks_slow(square, blockers); }
@@ -154,8 +153,8 @@ u64 Magics::get_relevant_blocker_squares(Piece piece_type, int square) {
     return 0ULL;
 }
 
-bb_vector Magics::get_blocker_combinations(u64 blockers) {
-    bb_vector blocker_combinations;
+std::vector<u64> Magics::get_blocker_combinations(u64 blockers) {
+    std::vector<u64> blocker_combinations;
     // Start from the full mask and generate all subsets
     u64 subset = blockers;
     do {

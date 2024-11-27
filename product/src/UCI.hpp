@@ -1,11 +1,12 @@
 #ifndef UCI_HPP
 #define UCI_HPP
 
-#include <chrono>
-
 #include "Types.hpp"
+#include "Search.hpp"
 #include "Position.hpp"
 #include "Timer.hpp"
+
+#include <chrono>
 
 namespace UCI {
     std::vector<std::string> split_args(std::string input);

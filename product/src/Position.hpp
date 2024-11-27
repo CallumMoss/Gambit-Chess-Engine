@@ -5,23 +5,14 @@
 #include <array>
 #include <vector>
 
+#include "Types.hpp"
+#include "Magics.hpp"
 #include "utils.hpp"
 #include "Timer.hpp"
 #include "Zobrist.hpp"
 
-enum class Turn: u8
-{
-    WHITE = 0,
-    BLACK = 1
-};
-constexpr Turn operator!(Turn t) {return Turn(int(t) ^ 1);}
-struct PV
-{
-    int num_of_moves;
-    std::vector<Move> moves;
-};
-
-class Position { // Game state class
+class Position
+{ // Game state class
     public:
         Position(const std::string& fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         void print_position();
@@ -42,7 +33,12 @@ class Position { // Game state class
         std::vector<Move> generate_piece_moves(Piece type, u8 square) const;
         std::vector<u64> extract_piece_moves(u64 attacks) const;
         std::vector<Move> bb_to_move_list(Piece type, u8 square, u64 attacks) const;
+
+        // Applying moves and legality checks
         void make_move(Move& move);
+        void handle_move(const Piece& src_square_type, const Piece& dest_square_type, const Piece& captured_piece_type, const u8& src_square, const u8& dest_square);
+        void handle_en_passant(const u8& src_square, const u8& dest_square);
+        void handle_castling(const u8& src_square, const u8& dest_square);
         bool legality_check(Move& move) const;
         bool in_check() const;
         u64 split_perft(int current_depth, const int& desired_depth, const bool& output_split, Move& last_move);
@@ -92,7 +88,7 @@ class Position { // Game state class
         bool get_wlcr() const;
         bool get_bscr() const;
         bool get_blcr() const;
-        Colour get_colour_from_square(u8 square);
+        //Colour get_colour_from_square(u8 square);
 
         u64 get_zobrist_key() const;
 
@@ -111,32 +107,13 @@ class Position { // Game state class
         // Piece-centric bitboards for storing the position of the pieces by types and colour
         std::array<u64, 6> pieces;
         std::array<u64, 2> colours;
-		u8 en_passant_target;
+		u8 en_passant_target; // square the pawn travels to in order to take the double pushed pawn
         u8 half_move_clock; // number of half moves, to test for 50 move rule
 		u8 full_move_counter; // how many moves have been played
         u8 castling_rights; // XXXX-BL-BS-WL-WS, last 4 bits, 0 if cannot castle
         Turn turn;
 
         u64 zobrist_key = 0ULL; // hash value representing a position (discluding half clock, full move)
-
-        // //if pawn starting square is on the right rank and destination is next to pawn of opposing colour on the right rank
-
-        // Move List
-        // If this move causes en passant next move, turn on the en passant flag 
-
-        // 8 - 15 source squares
-        // en_passant ranks: 48 - 55,
-
-
-
-        // check if a move causes en passant, set flag to that square
-
-        // check if en passant is an option currently available
-        // if en passant flag is true, check its target square, check if there is a pawn on a square that could target it
-        
-        // for example, for a given colour and target square, possible squares a pawn must be on would be +7 and +9 of the target square
-        // then we & with the pawns
-
 };
 
 #endif // #ifndef POSITION_HPP

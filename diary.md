@@ -1,3 +1,6 @@
+25/11/2024:
+Rewrote make_move to be much less complex. Attempts at writing zobrist.
+
 24/11/2024:
 Added checks for 3 fold repetition and 50 move rule
 

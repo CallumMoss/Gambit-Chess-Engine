@@ -1,8 +1,10 @@
 #ifndef SEARCH_HPP
 #define SEARCH_HPP
 
+#include "Types.hpp"
 #include "utils.hpp"
 #include "Position.hpp"
+#include "Evaluation.hpp"
 
 enum Search_Type {
     FIXED_DEPTH,

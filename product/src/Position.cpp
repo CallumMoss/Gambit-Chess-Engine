@@ -1,7 +1,4 @@
-#include "Types.hpp" // Needed in every file with an assert for assert checker macro
-
 #include "Position.hpp"
-#include "Magics.hpp"
 
 #include <vector>
 #include <sstream>
@@ -60,18 +57,18 @@ Position::Position(const std::string& fen):
                 // Bit boards are all 0s, by using or, the 1 is added in.
                 // Need to use or instead of equals as after the first pawn is detected,
                 // square wont remember where the 1 was originally for the first pawn
-                case 'P': pieces[Piece::PAWN] |= square; colours[Colour::WHITE] |= square; break;
-                case 'N': pieces[Piece::KNIGHT] |= square; colours[Colour::WHITE] |= square; break;
-                case 'B': pieces[Piece::BISHOP] |= square; colours[Colour::WHITE] |= square; break;
-                case 'R': pieces[Piece::ROOK] |= square; colours[Colour::WHITE] |= square; break;
-                case 'Q': pieces[Piece::QUEEN] |= square; colours[Colour::WHITE] |= square; break;
-                case 'K': pieces[Piece::KING] |= square; colours[Colour::WHITE] |= square; break;
-                case 'p': pieces[Piece::PAWN] |= square; colours[Colour::BLACK] |= square; break;
-                case 'n': pieces[Piece::KNIGHT] |= square; colours[Colour::BLACK] |= square; break;
-                case 'b': pieces[Piece::BISHOP] |= square; colours[Colour::BLACK] |= square; break;
-                case 'r': pieces[Piece::ROOK] |= square; colours[Colour::BLACK] |= square; break;
-                case 'q': pieces[Piece::QUEEN] |= square; colours[Colour::BLACK] |= square; break;
-                case 'k': pieces[Piece::KING] |= square; colours[Colour::BLACK] |= square; break;
+                case 'P': pieces[Piece::PAWN] |= square; colours[Turn::WHITE] |= square; break;
+                case 'N': pieces[Piece::KNIGHT] |= square; colours[Turn::WHITE] |= square; break;
+                case 'B': pieces[Piece::BISHOP] |= square; colours[Turn::WHITE] |= square; break;
+                case 'R': pieces[Piece::ROOK] |= square; colours[Turn::WHITE] |= square; break;
+                case 'Q': pieces[Piece::QUEEN] |= square; colours[Turn::WHITE] |= square; break;
+                case 'K': pieces[Piece::KING] |= square; colours[Turn::WHITE] |= square; break;
+                case 'p': pieces[Piece::PAWN] |= square; colours[Turn::BLACK] |= square; break;
+                case 'n': pieces[Piece::KNIGHT] |= square; colours[Turn::BLACK] |= square; break;
+                case 'b': pieces[Piece::BISHOP] |= square; colours[Turn::BLACK] |= square; break;
+                case 'r': pieces[Piece::ROOK] |= square; colours[Turn::BLACK] |= square; break;
+                case 'q': pieces[Piece::QUEEN] |= square; colours[Turn::BLACK] |= square; break;
+                case 'k': pieces[Piece::KING] |= square; colours[Turn::BLACK] |= square; break;
             }
             file++;
         }
@@ -141,9 +138,9 @@ void Position::compute_zobrist_key() {
     zobrist_key ^= (Zobrist::get_side_to_move() * static_cast<int>(turn));
     u64 temp_board = get_board();
     int square;
-    for(u8 sq = Utils::find_piece_index(temp_board); temp_board; temp_board = Utils::clear_bit(temp_board, static_cast<int>(sq)), sq = Utils::find_piece_index(temp_board))
+    for(u8 sq = Utils::find_piece_index(temp_board); temp_board; temp_board = Utils::clear_bit(temp_board, sq), sq = Utils::find_piece_index(temp_board))
     {
-        zobrist_key ^= (Zobrist::get_piece(sq, get_piece_type_from_square(sq) + (6 * get_colour_from_square(sq))));
+        zobrist_key ^= (Zobrist::get_piece(sq, get_piece_type_from_square(sq) + (6 * turn)));
     }
     if(en_passant_target != Utils::NULL_EN_PASSANT) {
         zobrist_key ^= Zobrist::get_en_passant(en_passant_target);
@@ -326,7 +323,7 @@ Piece Position::get_piece_type_from_square(u8 square) const {
 
 // Should probably be private
  std::vector<u64> Position::extract_piece_moves(u64 attacks) const {
-    bb_vector attacks_vector;  // Use a vector for dynamic storage
+    std::vector<u64> attacks_vector;  // Use a vector for dynamic storage
     while (attacks) {
         // Get the least significant 1 bit (LS1B)
         u64 ls1b = attacks & -attacks;
@@ -361,7 +358,7 @@ std::vector<Move> Position::generate_all_moves() const // uses the board state t
 
 u64 Position::get_rook_moves(u8 square) const {
     // Returns the attack mask of a rook on a given square
-    bb_vector attacks_on_square = rook_magics_table[square];
+    std::vector<u64> attacks_on_square = rook_magics_table[square];
     MagicEntry magic;
     magic.magic_number = rook_magics[square];
     magic.mask = Magics::get_relevant_blocker_squares(Piece::ROOK, square);
@@ -373,7 +370,7 @@ u64 Position::get_rook_moves(u8 square) const {
 
 u64 Position::get_bishop_moves(u8 square) const {
     // Returns the long table of moves for a rook on that square. To choose which ones apply, you should return 
-    bb_vector attacks_on_square = bishop_magics_table[square];
+    std::vector<u64> attacks_on_square = bishop_magics_table[square];
     MagicEntry magic;
     magic.magic_number = bishop_magics[square];
     magic.mask = Magics::get_relevant_blocker_squares(Piece::BISHOP, square);
@@ -633,372 +630,213 @@ bool Position::legality_check(Move& move) const
 
     return true;
 }
+
+/**
+ * @brief Updates internal board state of pieces and colours, handles all moves besides en passant and castling.
+ * 
+ * @param src_square_type the piece type that is moving
+ * @param dest_square_type the piece type that should be on the dest square after move (varies on promotion)
+ * @param captured_piece_type the piece type of a captured piece (if applicable)
+ * @param src_square 
+ * @param dest_square 
+ */
+void Position::handle_move(const Piece& src_square_type, const Piece& dest_square_type, const Piece& captured_piece_type, const u8& src_square, const u8& dest_square)
+{   // Update pieces:
+    pieces[src_square_type] = Utils::clear_bit(pieces[src_square_type], src_square);
+    if(captured_piece_type != Piece::INVALID) { pieces[captured_piece_type] = Utils::clear_bit(pieces[captured_piece_type], dest_square); }
+    pieces[dest_square_type] |= 1ULL << dest_square;
+
+    // Update colours:
+    colours[turn] = Utils::clear_bit(colours[turn], src_square);
+    if(captured_piece_type != Piece::INVALID) { colours[!turn] = Utils::clear_bit(colours[!turn], dest_square); }
+    colours[turn] |= 1ULL << dest_square;
+}
+
+/**
+ * @brief Updated internal board state of pieces and colours for en passant
+ * 
+ * @param src_square 
+ * @param dest_square 
+ */
+void Position::handle_en_passant(const u8& src_square, const u8& dest_square)
+{   // Update pieces:
+    //  En passant target has to be the dest square of the attacking pawn opposed to the square of the attacked pawn due to how FEN works
+    pieces[Piece::PAWN] = Utils::clear_bit(pieces[Piece::PAWN], src_square);
+    if(turn == Turn::WHITE) {
+        pieces[Piece::PAWN] = Utils::clear_bit(pieces[Piece::PAWN], en_passant_target - 8);   
+    }
+    else {
+        pieces[Piece::PAWN] = Utils::clear_bit(pieces[Piece::PAWN], en_passant_target + 8);
+    }
+    pieces[Piece::PAWN] |= 1ULL << dest_square;
+
+    // Update colours:
+    colours[turn] = Utils::clear_bit(colours[turn], src_square);
+    if(turn == Turn::WHITE) {
+        colours[Turn::BLACK] = Utils::clear_bit(colours[Turn::BLACK], en_passant_target - 8);   
+    }
+    else {
+        colours[Turn::WHITE] = Utils::clear_bit(colours[Turn::WHITE], en_passant_target + 8);
+    }
+    colours[turn] |= 1ULL << dest_square;
+}
+
+/**
+ * @brief Updated internal board state of pieces and colours for castling
+ * 
+ * @param src_square 
+ * @param dest_square 
+ */
+void Position::handle_castling(const u8& src_square, const u8& dest_square) {
+    // Update King:
+    handle_move(Piece::KING, Piece::KING, Piece::INVALID, src_square, dest_square);
+
+    // Update Rook:
+    if(dest_square == 2) { // white long castle
+        handle_move(Piece::ROOK, Piece::ROOK, Piece::INVALID, 0, 3);
+    }
+    else if(dest_square == 6) { // white short castle
+        handle_move(Piece::ROOK, Piece::ROOK, Piece::INVALID, 7, 5);
+    }
+    else if(dest_square == 58) { // black long castle
+        handle_move(Piece::ROOK, Piece::ROOK, Piece::INVALID, 56, 59);
+    }
+    else { // if dest_square == 62 // black short castle
+        handle_move(Piece::ROOK, Piece::ROOK, Piece::INVALID, 63, 61);
+    }
+}
+
 // Applies changes to a copy of the Position object that calls it. Returns said copy.
 void Position::make_move(Move& move) // simpler than make and unmake but slightly slower.
 {
-    // Decode Move:
     Move_Flag flag = move.get_flag();
     u8 src_square = move.get_src_square();
     u8 dest_square = move.get_dest_square();
-    Piece piece_type = get_piece_type_from_square(src_square);
+    Piece moved_piece_type = get_piece_type_from_square(src_square);
     Piece captured_piece_type = get_piece_type_from_square(dest_square);
     Piece promoted_piece_type = Piece::INVALID;
     half_move_clock++;
     full_move_counter = half_move_clock / 2; // ints floor divide in C++
 
-    // Updating zobrist: //
-
-    // Zobrist checklist:
-    // Remove piece from source square with its type (always) // can do at end
-
-    // IF capture AND NOT en_passant: // can do at end
-        // Remove piece from capture square with the captured piece type
-
-    // ELSE IF capture AND en_passant: // must do before en passant square change
-        // Remove Piece::PAWN + (6 * !turn) at en passant square
-        
-    // After Switch::    
-    // IF NOT promotion:
-        // Add piece type to dest square
-    // Else:
-        // Add promotion piece type to dest square
-
-    // IF double push: // in switch
-        // IF en passant square != NULL SQUARE:
-            // Reset en passant square
-        // Add new en passant square
-
-    // At end:
-    // Update side to move, en passant square (if not double pawn push) and if not null square
-
-    // Removing piece from source square
-    // at source square, remove the piece type. We determine its colour by multiplying 6 by turn and adding.
-    // If turn is white, turn equals 0, so nothing is added. This means white pieces are 0 - 5.
-    // If turn is black, turn equals 1, so 6 is added, meaning black pieces will be 6 - 11.
-    // zobrist_key ^= Zobrist::get_piece(src_square, piece_type + 6 *static_cast<int>(turn));
-
     switch(flag) {
-        case PAWN_FLAG:
-            half_move_clock = 0; // reset when pawn move is made
-            // Remove from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (piece_type + (6 * static_cast<int>(turn))));
-            // Add to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (piece_type + (6 * static_cast<int>(turn))));
-            break;
+        case NULL_FLAG:
+            std::cerr << "Error: Flag type for a move was invalid.\n";
+            std::exit(-1);
 
-        case KNIGHT_FLAG:
-            // Remove from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (piece_type + (6 * static_cast<int>(turn))));
-            // Add to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (piece_type + (6 * static_cast<int>(turn))));
-            break;
-
-        case BISHOP_FLAG:
-            // Remove from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (piece_type + (6 * static_cast<int>(turn))));
-            // Add to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (piece_type + (6 * static_cast<int>(turn))));
-            break;
-
-        case ROOK_FLAG: // removing castling rights
-            // Must update piece in zobrist before breaking if castle rights == 0
-            // Remove from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (piece_type + (6 * static_cast<int>(turn))));
-            // Add to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (piece_type + (6 * static_cast<int>(turn))));
-            if(castling_rights == 0) { // if already cant castle, ignore removing castling
-                break;
+        case ROOK_FLAG:
+            handle_move(Piece::ROOK, Piece::ROOK, captured_piece_type, src_square, dest_square);
+            if(src_square == 0) { // no need to check colour as a rook moving from this square implies the original has been or is being moved
+                if(get_wlcr()) { remove_wlcr(); } // only update if has not been removed already
             }
-                zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // remove old castling rights value
-                // no need to check colour as this implies if any rook got to src square that they cant castle that side
-                if(src_square == 0) {
-                    remove_wlcr();
-                }
-                else if(src_square == 7) {
-                    remove_wscr();
-                }
-                else if(src_square == 56) {
-                    remove_blcr();
-                }
-                else if(src_square == 63) {
-                    remove_bscr();
-                }
-                zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // add updated castling rights value
-            break;
-
-        case QUEEN_FLAG:
-            // Remove from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (piece_type + (6 * static_cast<int>(turn))));
-            // Add to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (piece_type + (6 * static_cast<int>(turn))));
+            else if(src_square == 7) {
+                if(get_wscr()) { remove_wscr(); }
+            }
+            else if(src_square == 56) {
+                if(get_blcr()) { remove_blcr(); }
+            }
+            else if(src_square == 63) {
+                if(get_bscr()) { remove_bscr(); }
+            }
             break;
 
         case KING_FLAG:
-            // Remove from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (piece_type + (6 * static_cast<int>(turn))));
-            // Add to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (piece_type + (6 * static_cast<int>(turn))));
-            if(castling_rights != 0) {
-                zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // remove old castling rights value
-                if(turn == Turn::WHITE) {
-                    remove_wlcr();
-                    remove_wscr();
-                }
-                else {
-                    remove_blcr();
-                    remove_bscr();
-                }
-                zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // add new castling rights value
+            handle_move(Piece::KING, Piece::KING, captured_piece_type, src_square, dest_square);
+            if(turn == Turn::WHITE) {
+                if(get_wlcr()) { remove_wlcr(); }
+                if(get_wscr()) { remove_wscr(); }
+            }
+            else {
+                if(get_blcr()) { remove_blcr(); }
+                if(get_bscr()) { remove_bscr(); }
             }
             break;
-        // can be a pawn, pawn two, king, knight, some capture, some promotion (from pawn to knight)
-        // what have to do with position rep?
-        // Pawn two (en passant), king (castling stuff), some capture maybe, some promotion
 
         case PAWN_TWO_FORWARD_FLAG:
-            if(en_passant_target != Utils::NULL_EN_PASSANT) { // check if en passant has a value before removing it from zobrist
-                zobrist_key ^= Zobrist::get_en_passant(en_passant_target); // remove the current en passant square if there is one
-            }
-            //zobrist_key ^= Zobrist::get_en_passant(en_passant_target); // remove the current en passant square if there is one
-            half_move_clock = 0; // reset when pawn move is made
+            handle_move(Piece::PAWN, Piece::PAWN, Piece::INVALID, src_square, dest_square);
             if(turn == Turn::WHITE) {
                 en_passant_target = dest_square - 8;
             }
             else {
                 en_passant_target = dest_square + 8;
             }
-            zobrist_key ^= Zobrist::get_en_passant(en_passant_target); // add new en passant square
-
-            // Remove from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (piece_type + (6 * static_cast<int>(turn))));
-            // Add to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (piece_type + (6 * static_cast<int>(turn))));
             break;
 
         case EN_PASSANT_FLAG:
-            half_move_clock = 0; // reset when pawn move is made
-            set_pieces_and_colours(Piece::PAWN, Piece::PAWN, Piece::INVALID, turn, src_square, dest_square, true);
-            // Remove from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (Piece::PAWN + (6 * static_cast<int>(turn))));
-            // Add to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (Piece::PAWN + (6 * static_cast<int>(turn)))); // if this flag, then the dest square and target square are different.
-            // Remove opponent piece from target square
-            // Must hard code piece::pawn as capture piece type for en passant will be invalid based on dest square
-            if(turn == Turn::WHITE) {
-                zobrist_key ^= Zobrist::get_piece(en_passant_target - 8, Piece::PAWN + 6);
-            }
-            else {
-                zobrist_key ^= Zobrist::get_piece(en_passant_target + 8, Piece::PAWN);
-            }
+            handle_en_passant(src_square, dest_square);
             break;
 
         case KNIGHT_PROMOTION_FLAG:
-            half_move_clock = 0; // reset when pawn move is made
-            promoted_piece_type = Piece::KNIGHT;
-            // Remove pawn from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (piece_type + (6 * static_cast<int>(turn))));
-            // Add promoted piece to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (promoted_piece_type + (6 * static_cast<int>(turn)))); 
-
-            // if(turn == Turn::WHITE) {
-                
-            // }
+            // dest square piece type changes to knight for promotion
+            handle_move(Piece::PAWN, Piece::KNIGHT, captured_piece_type, src_square, dest_square);
             break;
 
         case BISHOP_PROMOTION_FLAG:
-            half_move_clock = 0; // reset when pawn move is made
-            promoted_piece_type = Piece::BISHOP;
-            // Remove pawn from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (Piece::PAWN + (6 * static_cast<int>(turn))));
-            // Add promoted piece to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (Piece::BISHOP + (6 * static_cast<int>(turn)))); 
+            handle_move(Piece::PAWN, Piece::BISHOP, captured_piece_type, src_square, dest_square);
             break;
 
-        // Promotion:
-        // your colour pawn moves to the end, transforming into your colour new piece.
-        // Remove pawn from the source square
-        // Add new piece to dest square
         case ROOK_PROMOTION_FLAG:
-            half_move_clock = 0; // reset when pawn move is made
-            promoted_piece_type = Piece::ROOK;
-            // Remove pawn from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (Piece::PAWN + (6 * static_cast<int>(turn))));
-            // Add promoted piece to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (Piece::ROOK + (6 * static_cast<int>(turn)))); 
+            handle_move(Piece::PAWN, Piece::ROOK, captured_piece_type, src_square, dest_square);
             break;
 
         case QUEEN_PROMOTION_FLAG:
-            half_move_clock = 0; // reset when pawn move is made
-            promoted_piece_type = Piece::QUEEN;
-            // Remove pawn from source square
-            zobrist_key ^= Zobrist::get_piece(src_square, (Piece::PAWN + (6 * static_cast<int>(turn))));
-            // Add promoted piece to dest square
-            zobrist_key ^= Zobrist::get_piece(dest_square, (Piece::QUEEN + (6 * static_cast<int>(turn)))); 
+            handle_move(Piece::PAWN, Piece::QUEEN, captured_piece_type, src_square, dest_square);
             break;
 
         case CASTLING_FLAG:
-            zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // remove old castling rights
-            // remove corresponding castling rights and play rook portion. After this it will move king as if normal move.
+            handle_castling(src_square, dest_square);
             if(turn == Turn::WHITE) {
-                if(dest_square == 6) { // has short castled
-                    set_pieces_and_colours(Piece::ROOK, Piece::INVALID, Piece::INVALID, turn, 7, 5, false);
-                    zobrist_key ^= Zobrist::get_piece(7, Piece::ROOK); // remove rook from starting square
-                    zobrist_key ^= Zobrist::get_piece(5, Piece::ROOK); // add rook to appropriate square
-
-                    zobrist_key ^= Zobrist::get_piece(4, Piece::KING); // remove king from starting square
-                    zobrist_key ^= Zobrist::get_piece(6, Piece::KING); // add king to appropriate square
-                }
-                else { // has long castled
-                    set_pieces_and_colours(Piece::ROOK, Piece::INVALID, Piece::INVALID, turn, 0, 3, false);
-                    zobrist_key ^= Zobrist::get_piece(0, Piece::ROOK); // remove rook from starting square
-                    zobrist_key ^= Zobrist::get_piece(3, Piece::ROOK); // add rook to appropriate square
-
-                    // Update king squares (no need to check turn as we already know its white)
-                    zobrist_key ^= Zobrist::get_piece(4, Piece::KING); // remove king from starting square
-                    zobrist_key ^= Zobrist::get_piece(2, Piece::KING); // add king to appropriate square
-                }
-                remove_wscr();
-                remove_wlcr();
-            }
-            else { // if black
-                if(dest_square == 62) { // has short castled
-                    set_pieces_and_colours(Piece::ROOK, Piece::INVALID, Piece::INVALID, turn, 63, 61, false);
-                    zobrist_key ^= Zobrist::get_piece(63, Piece::ROOK + 6); // remove king from starting square
-                    zobrist_key ^= Zobrist::get_piece(61, Piece::ROOK + 6); // add rook to appropriate square
-
-                    // Update king squares (no need to check turn as we already know its black)
-                    zobrist_key ^= Zobrist::get_piece(60, Piece::KING + 6); // remove king from starting square
-                    zobrist_key ^= Zobrist::get_piece(62, Piece::KING + 6); // add king to appropriate square
-                }
-                else { // has long castled
-                    set_pieces_and_colours(Piece::ROOK, Piece::INVALID, Piece::INVALID, turn, 56, 59, false);
-                    zobrist_key ^= Zobrist::get_piece(56, Piece::ROOK + 6); // remove rook from starting square
-                    zobrist_key ^= Zobrist::get_piece(59, Piece::ROOK + 6); // add rook to appropriate square
-
-                    // Update king squares (no need to check turn as we already know its black)
-                    zobrist_key ^= Zobrist::get_piece(60, Piece::KING + 6); // remove king from starting square
-                    zobrist_key ^= Zobrist::get_piece(58, Piece::KING + 6); // add king to appropriate square
-                }
-                remove_bscr();
-                remove_blcr();
-            }
-            zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // add new castling rights
-            break;
-
-        default:
-            std::cerr << "Error: Flag type for a move was invalid.\n";
-            std::exit(-1);
-    }
-    // Remove captured piece
-    if(captured_piece_type != Piece::INVALID) { // en passant sees this as null and capture has been handled earlier
-        // remove captured piece from dest square
-        zobrist_key ^= Zobrist::get_piece(dest_square, (captured_piece_type + (6 * static_cast<int>(!turn)))); 
-    }
-
-    // Update pieces and colours.
-    // Does this if it isnt an en passant. Other specials  use of this, for example castling plays this as a rook move previously
-    if (flag != EN_PASSANT_FLAG) {
-        set_pieces_and_colours(piece_type, captured_piece_type, promoted_piece_type, turn, src_square, dest_square, false);
-    }
-    // reset en passant if double push hasnt been played
-    if ((en_passant_target != Utils::NULL_EN_PASSANT) && (flag != PAWN_TWO_FORWARD_FLAG)) {
-        zobrist_key ^= Zobrist::get_en_passant(en_passant_target);        
-        en_passant_target = Utils::NULL_EN_PASSANT;
-    }
-    turn = get_opp_turn();
-    //turn = !turn; // update pos turn
-    zobrist_key ^= Zobrist::get_side_to_move(); // update zobrist turn
-    if(captured_piece_type != Piece::INVALID) { half_move_clock = 0; } // reset when a capture has occured
-}
-
-// Updates pieces and colours depending on who moved what and if it took a piece and what the promotion is
-void Position::set_pieces_and_colours(const Piece& moved_piece_type, const Piece& captured_piece_type, const Piece& promoted_piece_type, const Turn& turn, const u8& src_square, const u8& dest_square, bool is_en_passant) {
-    // Determine who is what colour based off whose turn it is. (Turn -> colour.)
-    Colour playerA_colour;
-    Colour playerB_colour;
-    if(turn == Turn::WHITE) {
-        playerA_colour = Colour::WHITE;
-        playerB_colour = Colour::BLACK;
-    }
-    else {
-        playerA_colour = Colour::BLACK;
-        playerB_colour = Colour::WHITE;
-    }
-
-    // Updating representation for piece on starting square by removing it from its starting square
-    u64 moved_piece = pieces[moved_piece_type];
-    moved_piece = Utils::clear_bit(moved_piece, src_square);
-    pieces[moved_piece_type] = moved_piece;
-
-    // Updating our colours
-    u64 playerA_pieces = colours[playerA_colour];
-    playerA_pieces = Utils::clear_bit(playerA_pieces, src_square);
-    playerA_pieces |= 1ULL << dest_square;
-    colours[playerA_colour] = playerA_pieces;
-
-    // Updating representation for piece on destination square by adding it to the destination square
-    // Handling promotions
-    if(promoted_piece_type != Piece::INVALID) { // if there is a promotion
-        pieces[promoted_piece_type] |= 1ULL << dest_square; // add new piece to the board
-    }
-    else { // if no promotion, add piece to new square
-        pieces[moved_piece_type] |= 1ULL << dest_square;
-    }
-    if(captured_piece_type != Piece::INVALID) { // if has been a capture, update playerB's board accordingly
-        if(moved_piece_type != captured_piece_type) { // if same type, then capture has already occured for pieces board
-            u64 captured_piece = pieces[captured_piece_type];
-            captured_piece = Utils::clear_bit(captured_piece, dest_square);
-            pieces[captured_piece_type] = captured_piece;
-        }
-        else if(is_en_passant) { // or if the same type has been captured, it needs to remove the piece at the en passant target.
-            u64 captured_piece = pieces[captured_piece_type];
-            if(playerB_colour == Colour::WHITE) {
-                captured_piece = Utils::clear_bit(captured_piece, en_passant_target + 8); // we have captured whites piece with en passant
-                    pieces[captured_piece_type] = captured_piece;
-                u64 playerB_pieces = colours[playerB_colour];
-                playerB_pieces = Utils::clear_bit(playerB_pieces, en_passant_target + 8);
-                colours[playerB_colour] = playerB_pieces;
+                if(get_wlcr()) { remove_wlcr(); }
+                if(get_wscr()) { remove_wscr(); }
             }
             else {
-                captured_piece = Utils::clear_bit(captured_piece, en_passant_target - 8);
-                pieces[captured_piece_type] = captured_piece;
-                u64 playerB_pieces = colours[playerB_colour];
-                playerB_pieces = Utils::clear_bit(playerB_pieces, en_passant_target - 8);
-                colours[playerB_colour] = playerB_pieces;
-            } // ref //
-            return;
-        }
+                if(get_blcr()) { remove_blcr(); }
+                if(get_bscr()) { remove_bscr(); }
+            }
+            break;
 
-        u64 playerB_pieces = colours[playerB_colour];
-        playerB_pieces = Utils::clear_bit(playerB_pieces, dest_square);
-        colours[playerB_colour] = playerB_pieces;
+        default: // Pawn, knight, bishop, queen move
+            handle_move(moved_piece_type, moved_piece_type, captured_piece_type, src_square, dest_square);
+            break;
     }
+
+    // Half move clock restarts whenever a pawn move or capture has occured
+    if(moved_piece_type == Piece::PAWN || captured_piece_type != Piece::INVALID) {
+        half_move_clock = 0;
+    }
+
+    // Unless we have caused a new en passant, we should reset en passant square
+    if(flag != PAWN_TWO_FORWARD_FLAG) {
+        en_passant_target = Utils::NULL_EN_PASSANT;
+    }
+
+    // Flip the turn
+    turn = !turn;
 }
 
 u64 Position::split_perft(int current_depth, const int& desired_depth, const bool& output_split, Move& last_move) // desired depth being the initial depth input
 {
-    Move null_move = Move(0, 0, NULL_FLAG);
-    if(!last_move.equals(null_move)) {
-        Position current_pos = *this;
-        current_pos.recompute_zobrist_key(); // reset zobrist key then recalculate to see if the key has been updated properly based on the position
-        u64 carried = this->get_zobrist_key();
-        u64 actual = current_pos.get_zobrist_key();
-        if(actual != carried) {
-            if(!current_pos.equals(*this)){
-                std::cerr << "Error: " << equals_with_debugging(current_pos) << std::endl;
-            }
-            std::cerr << "Error: " << zobrist_equals_with_debugging(actual) << std::endl;
-            std::cerr << "Last move applied: " << Utils::move_to_board_notation(last_move) << "\tMove Flag: " << static_cast<int>(last_move.get_flag()) << std::endl;
-            std::cerr << "Board: " << std::endl;
-            Utils::PrintBB(get_board());
-            print_position();
-            std::cout << "Piece Type: " << get_piece_type_from_square(last_move.get_dest_square()) << std::endl;
-            std::cout << "Zobrist call log:" << std::endl;
-            Zobrist::print_log();
-            std::exit(-1);
-        }
-    }
-    Zobrist::clear_log();
+    // Move null_move = Move(0, 0, NULL_FLAG);
+    // if(!last_move.equals(null_move)) {
+    //     Position current_pos = *this;
+    //     current_pos.recompute_zobrist_key(); // reset zobrist key then recalculate to see if the key has been updated properly based on the position
+    //     u64 carried = this->get_zobrist_key();
+    //     u64 actual = current_pos.get_zobrist_key();
+    //     if(actual != carried) {
+    //         if(!current_pos.equals(*this)){
+    //             std::cerr << "Error: " << equals_with_debugging(current_pos) << std::endl;
+    //         }
+    //         std::cerr << "Error: " << zobrist_equals_with_debugging(actual) << std::endl;
+    //         std::cerr << "Last move applied: " << Utils::move_to_board_notation(last_move) << "\tMove Flag: " << static_cast<int>(last_move.get_flag()) << std::endl;
+    //         std::cerr << "Board: " << std::endl;
+    //         Utils::PrintBB(get_board());
+    //         print_position();
+    //         std::cout << "Piece Type: " << get_piece_type_from_square(last_move.get_dest_square()) << std::endl;
+    //         std::cout << "Zobrist call log:" << std::endl;
+    //         Zobrist::print_log();
+    //         std::exit(-1);
+    //     }
+    // }
+    // Zobrist::clear_log();
 
     if (current_depth == 0) {
         return 1ULL;
@@ -1016,7 +854,11 @@ u64 Position::split_perft(int current_depth, const int& desired_depth, const boo
         if(!new_position.legality_check(move)) { // if move isnt legal, don't count
             continue;
         }
-
+        // Move current_move = Move(32, 41, EN_PASSANT_FLAG);
+        // if(last_move.equals(current_move)) {
+        //     std::cout << Utils::move_to_board_notation(move) << ": 1" << std::endl;
+        //     print_position();
+        // }
         nodes = new_position.split_perft(current_depth - 1, desired_depth, output_split, move);
         sum += nodes;
 
@@ -1128,16 +970,16 @@ std::string Position::zobrist_equals_with_debugging(const u64& zobrist_key_b) co
     return ret;
 }
 
-Colour Position::get_colour_from_square(u8 square) {
-    assert(get_board() & 1ULL << square);
-    return Colour(bool(get_black_pieces() & (1ULL << square)));
-    // if(get_white_pieces() & 1ULL << square) {
-    //     return Colour::WHITE;
-    // }
-    // else {
-    //     return Colour::BLACK;
-    // }
-}
+// Colour Position::get_colour_from_square(u8 square) {
+//     assert(get_board() & 1ULL << square);
+//     return Colour(bool(get_black_pieces() & (1ULL << square)));
+//     // if(get_white_pieces() & 1ULL << square) {
+//     //     return Colour::WHITE;
+//     // }
+//     // else {
+//     //     return Colour::BLACK;
+//     // }
+// }
 
 // Uses reference for data type larger than u64
 std::array<u64, 6> Position::get_pieces() const { return pieces; }
@@ -1149,34 +991,34 @@ u8 Position::get_castling_rights() const { return castling_rights; }
 Turn Position::get_turn() const { return turn; }
 Turn Position::get_opp_turn() const { if(turn == Turn::WHITE) { return Turn::BLACK; } return Turn::WHITE; }
 u64 Position::get_pawns() const { return pieces[Piece::PAWN]; }
-u64 Position::get_white_pawns() const { return pieces[Piece::PAWN] & colours[Colour::WHITE]; }
-u64 Position::get_black_pawns() const { return pieces[Piece::PAWN] & colours[Colour::BLACK]; }
+u64 Position::get_white_pawns() const { return pieces[Piece::PAWN] & colours[Turn::WHITE]; }
+u64 Position::get_black_pawns() const { return pieces[Piece::PAWN] & colours[Turn::BLACK]; }
 
 u64 Position::get_knights() const { return pieces[Piece::KNIGHT]; }
-u64 Position::get_white_knights() const { return pieces[Piece::KNIGHT] & colours[Colour::WHITE]; }
-u64 Position::get_black_knights() const { return pieces[Piece::KNIGHT] & colours[Colour::BLACK]; }
+u64 Position::get_white_knights() const { return pieces[Piece::KNIGHT] & colours[Turn::WHITE]; }
+u64 Position::get_black_knights() const { return pieces[Piece::KNIGHT] & colours[Turn::BLACK]; }
 
 u64 Position::get_bishops() const { return pieces[Piece::BISHOP];}
-u64 Position::get_white_bishops() const { return pieces[Piece::BISHOP] & colours[Colour::WHITE]; }
-u64 Position::get_black_bishops() const { return pieces[Piece::BISHOP] & colours[Colour::BLACK]; }
+u64 Position::get_white_bishops() const { return pieces[Piece::BISHOP] & colours[Turn::WHITE]; }
+u64 Position::get_black_bishops() const { return pieces[Piece::BISHOP] & colours[Turn::BLACK]; }
 
 u64 Position::get_rooks() const { return pieces[Piece::ROOK]; }
-u64 Position::get_white_rooks() const { return pieces[Piece::ROOK] & colours[Colour::WHITE]; }
-u64 Position::get_black_rooks() const { return pieces[Piece::ROOK] & colours[Colour::BLACK]; }
+u64 Position::get_white_rooks() const { return pieces[Piece::ROOK] & colours[Turn::WHITE]; }
+u64 Position::get_black_rooks() const { return pieces[Piece::ROOK] & colours[Turn::BLACK]; }
 
 u64 Position::get_queens() const { return pieces[Piece::QUEEN];}
-u64 Position::get_white_queen() const { return pieces[Piece::QUEEN] & colours[Colour::WHITE]; }
-u64 Position::get_black_queen() const { return pieces[Piece::QUEEN] & colours[Colour::BLACK]; }
+u64 Position::get_white_queen() const { return pieces[Piece::QUEEN] & colours[Turn::WHITE]; }
+u64 Position::get_black_queen() const { return pieces[Piece::QUEEN] & colours[Turn::BLACK]; }
 
 u64 Position::get_kings() const { return pieces[Piece::KING]; }
-u64 Position::get_white_king() const { return pieces[Piece::KING] & colours[Colour::WHITE]; }
-u64 Position::get_black_king() const { return pieces[Piece::KING] & colours[Colour::BLACK]; }
+u64 Position::get_white_king() const { return pieces[Piece::KING] & colours[Turn::WHITE]; }
+u64 Position::get_black_king() const { return pieces[Piece::KING] & colours[Turn::BLACK]; }
 
-u64 Position::get_white_pieces() const { return colours[Colour::WHITE]; } 
-u64 Position::get_black_pieces() const { return colours[Colour::BLACK]; } 
+u64 Position::get_white_pieces() const { return colours[Turn::WHITE]; } 
+u64 Position::get_black_pieces() const { return colours[Turn::BLACK]; } 
 u64 Position::get_pieces_from_current_turn() const { if(turn == Turn::WHITE) { return get_white_pieces(); } return get_black_pieces(); }
 
-u64 Position::get_board() const { return colours[Colour::WHITE] | colours[Colour::BLACK]; }
+u64 Position::get_board() const { return colours[Turn::WHITE] | colours[Turn::BLACK]; }
 
 bool Position::get_wscr() const { return castling_rights & (1 << Castling_Rights::WHITE_SHORT); }
 bool Position::get_wlcr() const { return castling_rights & (1 << Castling_Rights::WHITE_LONG); }

@@ -1,14 +1,14 @@
 #include "Types.hpp" // Needed in every file with an assert for assert checker macro
-#include <iostream>
-
 #include "Position.hpp"
 #include "Magics.hpp"
 #include "UCI.hpp"
 #include "Timer.hpp"
 #include "Zobrist.hpp"
 
+#include <iostream>
+
 int main() {
-    std::string version = "v1.1.3";
+    std::string version = "v1.1.4";
 
     Magics::init();
     Zobrist zobrist;
