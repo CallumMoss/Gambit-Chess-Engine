@@ -22,12 +22,6 @@ Position::Position(const std::string& fen):
     turn(Turn::WHITE),
     zobrist_key() {
 
-		// turn: 0 for white, 1 for black
-        // castling_rights: XXXX-BL-BS-WL-WS, last 4 bits, 0 if cannot castle
-		// en_passant_target: the target square of en passant
-	    // half_move_clock: number of half moves, to test for 50 move rule
-		// full_move_counter: how many moves have been played
-
     // Create a stringstream from the input string
     std::istringstream iss(fen);
     std::vector<std::string> words;
@@ -53,7 +47,7 @@ Position::Position(const std::string& fen):
             // shifts 1 bit, to represent there is a piece on the square, across the bitboard's bitstring
             // For example, c4 in LERF is 26. So you want to push a 1 onto the 26th bit of the bitstring
             switch (c) {
-                using namespace Utils;
+                //using namespace Types;
                 // Bit boards are all 0s, by using or, the 1 is added in.
                 // Need to use or instead of equals as after the first pawn is detected,
                 // square wont remember where the 1 was originally for the first pawn
@@ -135,21 +129,21 @@ void Position::compute_zobrist_key() {
     // c XOR a = b
     // If turn is white, then zobrist key will not be XORd.
     // This state represents white.
-    zobrist_key ^= (Zobrist::get_side_to_move() * static_cast<int>(turn));
     u64 temp_board = get_board();
     int square;
     for(u8 sq = Utils::find_piece_index(temp_board); temp_board; temp_board = Utils::clear_bit(temp_board, sq), sq = Utils::find_piece_index(temp_board))
     {
-        zobrist_key ^= (Zobrist::get_piece(sq, get_piece_type_from_square(sq) + (6 * turn)));
+        zobrist_key ^= (Zobrist::get_piece(get_piece_type_from_square(sq) + (6 * get_colour_value_from_square(sq)), sq));
     }
     if(en_passant_target != Utils::NULL_EN_PASSANT) {
         zobrist_key ^= Zobrist::get_en_passant(en_passant_target);
     }
-    assert(!(castling_rights & 0xf0)); // if castling rights is valid (not more than 16 as this is an invalid castling rights)
-    if(static_cast<int>(castling_rights) != 0) {
-     zobrist_key ^= Zobrist::get_castling_rights(castling_rights);
-    }
 
+    assert(!(castling_rights & 0xf0)); // if castling rights is valid (not more than 16 as this is an invalid castling rights)
+    //if(static_cast<int>(castling_rights) != 0) {
+     zobrist_key ^= Zobrist::get_castling_rights(castling_rights);
+    //}
+    zobrist_key ^= (Zobrist::get_side_to_move() * static_cast<int>(turn));
 }
 
 void Position::recompute_zobrist_key() {
@@ -650,6 +644,13 @@ void Position::handle_move(const Piece& src_square_type, const Piece& dest_squar
     colours[turn] = Utils::clear_bit(colours[turn], src_square);
     if(captured_piece_type != Piece::INVALID) { colours[!turn] = Utils::clear_bit(colours[!turn], dest_square); }
     colours[turn] |= 1ULL << dest_square;
+
+    // Zobrist: Update src, capture and desc square
+    zobrist_key ^= Zobrist::get_piece(src_square_type + (6 * static_cast<int>(turn)), src_square); // remove from src square
+    if(captured_piece_type != Piece::INVALID) {
+        zobrist_key ^= Zobrist::get_piece(captured_piece_type + (6 * static_cast<int>(!turn)), dest_square); // remove opponents piece from the dest square
+    }
+    zobrist_key ^= Zobrist::get_piece(dest_square_type + (6 * static_cast<int>(turn)), dest_square); // add to dest square
 }
 
 /**
@@ -663,22 +664,32 @@ void Position::handle_en_passant(const u8& src_square, const u8& dest_square)
     //  En passant target has to be the dest square of the attacking pawn opposed to the square of the attacked pawn due to how FEN works
     pieces[Piece::PAWN] = Utils::clear_bit(pieces[Piece::PAWN], src_square);
     if(turn == Turn::WHITE) {
-        pieces[Piece::PAWN] = Utils::clear_bit(pieces[Piece::PAWN], en_passant_target - 8);   
+        pieces[Piece::PAWN] = Utils::clear_bit(pieces[Piece::PAWN], dest_square - 8);
     }
     else {
-        pieces[Piece::PAWN] = Utils::clear_bit(pieces[Piece::PAWN], en_passant_target + 8);
+        pieces[Piece::PAWN] = Utils::clear_bit(pieces[Piece::PAWN], dest_square + 8);
     }
     pieces[Piece::PAWN] |= 1ULL << dest_square;
 
     // Update colours:
     colours[turn] = Utils::clear_bit(colours[turn], src_square);
     if(turn == Turn::WHITE) {
-        colours[Turn::BLACK] = Utils::clear_bit(colours[Turn::BLACK], en_passant_target - 8);   
+        colours[Turn::BLACK] = Utils::clear_bit(colours[Turn::BLACK], dest_square - 8);   
     }
     else {
-        colours[Turn::WHITE] = Utils::clear_bit(colours[Turn::WHITE], en_passant_target + 8);
+        colours[Turn::WHITE] = Utils::clear_bit(colours[Turn::WHITE], dest_square + 8);
     }
     colours[turn] |= 1ULL << dest_square;
+
+    // Zobrist: Update src, capture and desc square
+    zobrist_key ^= Zobrist::get_piece(Piece::PAWN + (6 * turn), src_square); // update src square
+    if(turn == Turn::WHITE) {
+        zobrist_key ^= Zobrist::get_piece(Piece::PAWN + 6, dest_square - 8); // update relevant capture square
+    }
+    else {
+        zobrist_key ^= Zobrist::get_piece(Piece::PAWN, dest_square + 8); // update relevant capture square
+    }
+    zobrist_key ^= Zobrist::get_piece(Piece::PAWN + (6 * turn), dest_square); // update dest square
 }
 
 /**
@@ -725,22 +736,30 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
 
         case ROOK_FLAG:
             handle_move(Piece::ROOK, Piece::ROOK, captured_piece_type, src_square, dest_square);
-            if(src_square == 0) { // no need to check colour as a rook moving from this square implies the original has been or is being moved
-                if(get_wlcr()) { remove_wlcr(); } // only update if has not been removed already
+            // if(castling_rights == 0) { // if already cant castle, ignore removing castling
+            //     break;
+            // }
+            zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // remove old castling rights value
+            //std::cout << std::to_string(castling_rights ^ Zobrist::get_castling_rights(0)) << std::endl;
+            // no need to check colour as this implies if any rook got to src square that they cant castle that side
+            if(src_square == 0) {
+                remove_wlcr();
             }
             else if(src_square == 7) {
-                if(get_wscr()) { remove_wscr(); }
+                remove_wscr();
             }
             else if(src_square == 56) {
-                if(get_blcr()) { remove_blcr(); }
+                remove_blcr();
             }
             else if(src_square == 63) {
-                if(get_bscr()) { remove_bscr(); }
+                remove_bscr();
             }
+            zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // add updated castling rights value
             break;
 
         case KING_FLAG:
             handle_move(Piece::KING, Piece::KING, captured_piece_type, src_square, dest_square);
+            zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // remove old castling rights
             if(turn == Turn::WHITE) {
                 if(get_wlcr()) { remove_wlcr(); }
                 if(get_wscr()) { remove_wscr(); }
@@ -749,16 +768,21 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
                 if(get_blcr()) { remove_blcr(); }
                 if(get_bscr()) { remove_bscr(); }
             }
+            zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // add new castling rights
             break;
 
         case PAWN_TWO_FORWARD_FLAG:
             handle_move(Piece::PAWN, Piece::PAWN, Piece::INVALID, src_square, dest_square);
+            if(en_passant_target != Utils::NULL_EN_PASSANT) {
+                zobrist_key ^= Zobrist::get_en_passant(en_passant_target); // remove old value
+            }
             if(turn == Turn::WHITE) {
-                en_passant_target = dest_square - 8;
+                en_passant_target = dest_square - 8; // set the target to the destination square of a pawn taking with en passant
             }
             else {
                 en_passant_target = dest_square + 8;
             }
+            zobrist_key ^= Zobrist::get_en_passant(en_passant_target); // add new value
             break;
 
         case EN_PASSANT_FLAG:
@@ -784,6 +808,7 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
 
         case CASTLING_FLAG:
             handle_castling(src_square, dest_square);
+            zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // remove old castling rights
             if(turn == Turn::WHITE) {
                 if(get_wlcr()) { remove_wlcr(); }
                 if(get_wscr()) { remove_wscr(); }
@@ -792,6 +817,7 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
                 if(get_blcr()) { remove_blcr(); }
                 if(get_bscr()) { remove_bscr(); }
             }
+            zobrist_key ^= Zobrist::get_castling_rights(castling_rights); // add new castling rights
             break;
 
         default: // Pawn, knight, bishop, queen move
@@ -804,39 +830,41 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
         half_move_clock = 0;
     }
 
-    // Unless we have caused a new en passant, we should reset en passant square
+    // Unless we have caused a new en passant, we should reset en passant square, only if isnt already null
     if(flag != PAWN_TWO_FORWARD_FLAG) {
-        en_passant_target = Utils::NULL_EN_PASSANT;
+        if(en_passant_target != Utils::NULL_EN_PASSANT) {
+            zobrist_key ^= Zobrist::get_en_passant(en_passant_target); // remove old en passant value
+            en_passant_target = Utils::NULL_EN_PASSANT;
+            // zobrist_key ^= Zobrist::get_en_passant(en_passant_target); // add new en passant value
+        }
     }
-
     // Flip the turn
     turn = !turn;
+    zobrist_key ^= Zobrist::get_side_to_move();
 }
 
 u64 Position::split_perft(int current_depth, const int& desired_depth, const bool& output_split, Move& last_move) // desired depth being the initial depth input
 {
-    // Move null_move = Move(0, 0, NULL_FLAG);
-    // if(!last_move.equals(null_move)) {
-    //     Position current_pos = *this;
-    //     current_pos.recompute_zobrist_key(); // reset zobrist key then recalculate to see if the key has been updated properly based on the position
-    //     u64 carried = this->get_zobrist_key();
-    //     u64 actual = current_pos.get_zobrist_key();
-    //     if(actual != carried) {
-    //         if(!current_pos.equals(*this)){
-    //             std::cerr << "Error: " << equals_with_debugging(current_pos) << std::endl;
-    //         }
-    //         std::cerr << "Error: " << zobrist_equals_with_debugging(actual) << std::endl;
-    //         std::cerr << "Last move applied: " << Utils::move_to_board_notation(last_move) << "\tMove Flag: " << static_cast<int>(last_move.get_flag()) << std::endl;
-    //         std::cerr << "Board: " << std::endl;
-    //         Utils::PrintBB(get_board());
-    //         print_position();
-    //         std::cout << "Piece Type: " << get_piece_type_from_square(last_move.get_dest_square()) << std::endl;
-    //         std::cout << "Zobrist call log:" << std::endl;
-    //         Zobrist::print_log();
-    //         std::exit(-1);
-    //     }
-    // }
-    // Zobrist::clear_log();
+    Move null_move = Move(0, 0, NULL_FLAG);
+    if(!last_move.equals(null_move)) {
+        Position current_pos = *this;
+        current_pos.recompute_zobrist_key(); // reset zobrist key then recalculate to see if the key has been updated properly based on the position
+        u64 carried = this->get_zobrist_key();
+        u64 actual = current_pos.get_zobrist_key();
+        if(actual != carried) {
+            // std::cerr << equals_with_debugging(current_pos);
+            // std::cerr << zobrist_equals_with_debugging(actual) << std::endl;
+            std::cerr << "Last move applied: " << Utils::move_to_board_notation(last_move) << "\tMove Flag: " << static_cast<int>(last_move.get_flag()) << std::endl;
+            std::cerr << "Board: " << std::endl;
+            Utils::PrintBB(get_board());
+            print_position();
+            std::cout << "Piece Type: " << get_piece_type_from_square(last_move.get_dest_square()) << std::endl;
+            std::cout << "Zobrist call log:" << std::endl;
+            Zobrist::print_log();
+            std::exit(-1);
+        }
+    }
+    Zobrist::clear_log();
 
     if (current_depth == 0) {
         return 1ULL;
@@ -854,11 +882,6 @@ u64 Position::split_perft(int current_depth, const int& desired_depth, const boo
         if(!new_position.legality_check(move)) { // if move isnt legal, don't count
             continue;
         }
-        // Move current_move = Move(32, 41, EN_PASSANT_FLAG);
-        // if(last_move.equals(current_move)) {
-        //     std::cout << Utils::move_to_board_notation(move) << ": 1" << std::endl;
-        //     print_position();
-        // }
         nodes = new_position.split_perft(current_depth - 1, desired_depth, output_split, move);
         sum += nodes;
 
@@ -899,7 +922,7 @@ bool Position::equals(const Position& posb) const {
 }
 
 std::string Position::equals_with_debugging(const Position& posb) const {
-    std::string ret_string = "";
+    std::string ret_string = "Error: ";
     if (get_white_pieces() != posb.get_white_pieces()) {
         ret_string += "White pieces were not equal.\n";
     }
@@ -925,7 +948,7 @@ std::string Position::equals_with_debugging(const Position& posb) const {
 
     if (turn != posb.get_turn()) {  ret_string += "Turns were not equal"; }
     
-    if(ret_string == "") {
+    if(ret_string == "Error: ") {
         return "The two positions are equal.\n";
     }
     return ret_string;
@@ -938,25 +961,25 @@ std::string Position::zobrist_equals_with_debugging(const u64& zobrist_key_b) co
     
     std::string ret = "";
     if (zobrist_key == (zobrist_key_b ^ Zobrist::get_side_to_move())) {
-        return "The turn within the zobrist keys are not equal.\n";
+        return "Error: The turn within the zobrist keys are not equal.\n";
     }
     for(int i = 0; i < 16; i++) {
-        if(zobrist_key == (zobrist_key_b ^ Zobrist::get_castling_rights(i))) {
-            return "The castling rights within the zobrist keys are not equal.\n";
+        if(zobrist_key == (zobrist_key_b ^ Zobrist::get_castling_rights(static_cast<u8>(i)))) {
+            return "Error: The castling rights within the zobrist keys are not equal.\nTrue castling rights: " + std::to_string(castling_rights) + "\nZobrist castling rights ^ that succeeded: " + std::to_string(i) + "\n";
         }
     }
 
     for(int j = 0; j < 64; j++) {
         if(zobrist_key == (zobrist_key_b ^ Zobrist::get_en_passant(j))) {
-            return "The en passant targets within the zobrist keys are not equal.\n";
+            return "Error: The en passant targets within the zobrist keys are not equal.\n";
         }
     }
     for(int type = 0; type < 12; type++) {
         for(int square = 0; square < 64; square++) {
-            if(zobrist_key == (zobrist_key_b ^ Zobrist::get_piece(static_cast<u8>(square), type))) {
+            if(zobrist_key == (zobrist_key_b ^ Zobrist::get_piece(type, static_cast<u8>(square)))) {
                 // will only become true if we can find the exact disrepency for a specific piece type and square.
                 // otherwise computation would be too expensive to calculate all possibilities.
-                ret += "The following piece type on the following square within the zobrist keys are not equal.\n";
+                ret += "Error: The following piece type on the following square within the zobrist keys are not equal.\n";
                 ret += "Piece type: " + std::to_string(type);
                 ret += "\nSquare: " + std::to_string(square);
                 ret += "\n";
@@ -964,22 +987,11 @@ std::string Position::zobrist_equals_with_debugging(const u64& zobrist_key_b) co
             }
         }
     }
-    ret += "The pieces within the zobrist keys are not equal, but could not determine which piece and on which squares. There is a many to many discrepency between zobrist representation of types and squares. The turn, castling rights and en passant targets are equal.\n";
+    ret += "Error: The keys are not equal for more than one reason. Reasons could be any combination of errors, not just a single error. This could be errors with pieces or any combinations of pieces and/or other values.\n";
     ret += "Zobrist Key 1: " + std::to_string(zobrist_key) + "\n";
     ret += "Zobrist Key 2: " + std::to_string(zobrist_key_b) + "\n";
     return ret;
 }
-
-// Colour Position::get_colour_from_square(u8 square) {
-//     assert(get_board() & 1ULL << square);
-//     return Colour(bool(get_black_pieces() & (1ULL << square)));
-//     // if(get_white_pieces() & 1ULL << square) {
-//     //     return Colour::WHITE;
-//     // }
-//     // else {
-//     //     return Colour::BLACK;
-//     // }
-// }
 
 // Uses reference for data type larger than u64
 std::array<u64, 6> Position::get_pieces() const { return pieces; }
@@ -1031,5 +1043,9 @@ void Position::remove_wscr() { castling_rights = castling_rights & ~(1 << Castli
 void Position::remove_wlcr() { castling_rights = castling_rights & ~(1 << Castling_Rights::WHITE_LONG); }
 void Position::remove_bscr() { castling_rights = castling_rights & ~(1 << Castling_Rights::BLACK_SHORT); }
 void Position::remove_blcr() { castling_rights = castling_rights & ~(1 << Castling_Rights::BLACK_LONG); }
+
+// Returns 0 for white and 1 for black
+int Position::get_colour_value_from_square(u8 square) { return (get_black_pieces() & (1ULL << square)) ? 1 : 0; }
+
 
 void Position::set_turn(Turn turn) {this->turn = turn;}

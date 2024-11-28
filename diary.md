@@ -1,3 +1,6 @@
+26/11/2024 - 28/11/2024:
+Finished zobrist hashing and tested with perft.
+
 25/11/2024:
 Rewrote make_move to be much less complex. Attempts at writing zobrist.
 

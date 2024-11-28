@@ -8,7 +8,7 @@
 #include <iostream>
 
 int main() {
-    std::string version = "v1.1.4";
+    std::string version = "v1.1.5";
 
     Magics::init();
     Zobrist zobrist;

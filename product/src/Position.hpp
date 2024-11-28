@@ -97,6 +97,8 @@ class Position
         void remove_bscr();
         void remove_blcr();
 
+        int get_colour_value_from_square(u8 square);
+
         void set_turn(Turn);
         void set_pieces_and_colours(const Piece& moved_piece_type, const Piece& captured_piece_type, const Piece& promoted_piece_type, const Turn& turn, const u8& src_square, const u8& dest_square, bool is_en_passant);
         bool equals(const Position& posb) const;

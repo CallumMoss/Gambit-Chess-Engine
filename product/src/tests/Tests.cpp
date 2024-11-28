@@ -915,70 +915,29 @@ void test_negamax_iterative_deepening_opponent_mate_in_2() {
 // TEST(ZOBRIST, zobrist1) {
 // // Use cutechess and grab one of the outputs of position startpos moves ...
 // // apply these moves to start pos and see if it equals the new position, using the FEN from cutechess (may need to plug into lichess to get FEN)
-
-//   Zobrist::clear_log();
 //   Position pos = Position();
-//   Zobrist::print_log();
-//   // std::cout << "\n\n\n\n\n\n";
 //   Move move = Move(1, 16, Move_Flag::KNIGHT_FLAG);
-//   Zobrist::clear_log();
-//   Position new_position = Position("rnbqkbnr/pppppppp/8/8/8/N7/PPPPPPPP/R1BQKBNR b KQkq - 1 1");
-//   Zobrist::print_log();
-//   // std::cout << "\n\n\n\n\n\n";
-//   Zobrist::clear_log();; //empty out call vector
+//   Position new_pos = Position("rnbqkbnr/pppppppp/8/8/8/N7/PPPPPPPP/R1BQKBNR b KQkq - 1 1");
 //   pos.make_move(move); //calls to zobrist
-//   Zobrist::print_log();
-//   // Utils::PrintBB(pos.get_board());
-//   // Utils::PrintBB(new_position.get_board());
-//   // std::cout << static_cast<int>(pos.get_zobrist_key()) << std::endl;
-//   // std::cout << static_cast<int>(new_position.get_zobrist_key()) << std::endl;
-//   // assert(pos.get_zobrist_key() == (new_position.get_zobrist_key() ^ Zobrist::get_side_to_move()));
-//   assert(pos.get_zobrist_key() == new_position.get_zobrist_key());
+//   std::cout << pos.equals_with_debugging(new_pos);
+//   std::cout << pos.zobrist_equals_with_debugging(new_pos.get_zobrist_key());
+//   assert(pos.get_zobrist_key() == new_pos.get_zobrist_key());
 // }
-
-// TEST(ZOBRIST, zobrist2)
-// {
-//   Zobrist::clear_log();
-//   const auto pos_one_zkey = Position().get_zobrist_key();
-//   Zobrist::print_log();
-//   Zobrist::clear_log();
-//   const auto pos_two_zkey = Position("rnbqkbnr/pppppppp/8/8/8/N7/PPPPPPPP/R1BQKBNR b KQkq - 1 1").get_zobrist_key();
-//   // std::cout << "\n\n\n\n\n\n";
-//   Zobrist::print_log();
-//   assert(pos_one_zkey != pos_two_zkey);
-// }
-
 
 // TEST(ZOBRIST, zobrist3) {
 
-//   Zobrist::clear_log();
 //   Position pos = Position();
-//   Zobrist::print_log();
-//   // std::cout << "\n\n\n\n\n\n";
-
-//   Zobrist::clear_log();
 //   //Position new_position = Position("r4r2/p2q1pk1/3p2pp/2p5/4P3/5R2/PP4PP/5RK1 w - - 0 29");
 //   Position new_position = Position("r2q1rk1/2pp1pbp/b1n1pnp1/pp6/8/N4N2/PPPPPPPP/1RBQKB1R w K - 2 10");
-//   Zobrist::print_log();
-//   // std::cout << "\n\n\n\n\n\n";
-
 //   std::vector<std::string> moves = {"b1a3", "g7g6", "a1b1", "f8g7", "b1a1", "e7e6", "a1b1", "g8f6", "b1a1", "e8g8", "a1b1", "b8c6", "b1a1", "b7b5", "g1f3", "a7a5", "a1b1", "c8a6"};
 //   for(std::string move_string : moves)
 //   {
 //     Move move = Utils::board_notation_to_move(move_string, pos);
-//     Zobrist::clear_log(); //empty out call vector
 //     pos.make_move(move);
-//     Zobrist::print_log();
-//     //std::cout << "\n\n";
 //   }
 
-//   // Utils::PrintBB(pos.get_board());
-//   // Utils::PrintBB(new_position.get_board());
-//   // std::cout << static_cast<int>(pos.get_zobrist_key()) << std::endl;
-//   // std::cout << static_cast<int>(new_position.get_zobrist_key()) << std::endl;
-//   //assert(pos.get_zobrist_key() == (new_position.get_zobrist_key() ^ Zobrist::get_side_to_move()));
-//   // std::cout << pos.equals_with_debugging(new_position);
-//   // std::cout << pos.zobrist_equals_with_debugging(new_position.get_zobrist_key());
+//   std::cout << pos.equals_with_debugging(new_position);
+//   std::cout << pos.zobrist_equals_with_debugging(new_position.get_zobrist_key());
 //   assert(pos.equals(new_position));
 //   assert(pos.get_zobrist_key() == new_position.get_zobrist_key());
 // }
@@ -1217,7 +1176,60 @@ TEST(PERFT, perft_suite) {
   run_perft_suite(false);
 }
 
-// Testing 3 fold by creating various arrays and testing
+// TEST(test, test) {
+//   // Position pos = Position("rnbqkbnr/1ppppppp/8/p7/8/N7/PPPPPPPP/R1BQKBNR w KQkq - 0 2");
+//   Move move = Move(0, 1, Move_Flag::ROOK_FLAG);
+//   // pos.make_move(move);
+//   // Position copy = pos;
+//   // copy.recompute_zobrist_key();
+//   // assert(pos.get_zobrist_key() == copy.get_zobrist_key());
+
+//   // Move move2 = Move(57, 42, Move_Flag::KNIGHT_FLAG);
+//   // pos.make_move(move2);
+//   // Position copy_ = pos;
+//   // copy_.recompute_zobrist_key();
+//   // std::cout << pos.equals_with_debugging(copy_);
+//   // std::cout << pos.zobrist_equals_with_debugging(copy_.get_zobrist_key());
+//   // assert(copy_.get_zobrist_key() == pos.get_zobrist_key());
+
+//   Position pos2 = Position("rnbqkbnr/pppppppp/8/8/8/N7/PPPPPPPP/R1BQKBNR b KQkq - 1 1");
+//   Zobrist::print_log();
+//   Zobrist::clear_log();
+//   std::cout << "\n\n\n";
+//   Move move0 = Move(48, 32, Move_Flag::PAWN_TWO_FORWARD_FLAG);
+//   pos2.make_move(move0);
+//     Zobrist::print_log();
+//   Zobrist::clear_log();
+//   std::cout << "\n\n\n";
+//   Position copy2 = pos2;
+//   copy2.recompute_zobrist_key();
+//     Zobrist::print_log();
+//   Zobrist::clear_log();
+//   std::cout << "\n\n\n";
+//   std::cout << pos2.equals_with_debugging(copy2);
+//   std::cout << pos2.zobrist_equals_with_debugging(copy2.get_zobrist_key());
+//   assert(pos2.get_zobrist_key() == copy2.get_zobrist_key());
+
+//   pos2.make_move(move);
+//     Zobrist::print_log();
+//   Zobrist::clear_log();
+//   std::cout << "\n\n\n";
+//   Position copy3 = pos2;
+//   copy3.recompute_zobrist_key();
+//     Zobrist::print_log();
+//   Zobrist::clear_log();
+//   std::cout << "\n\n\n";
+//   std::cout << pos2.equals_with_debugging(copy3);
+//   std::cout << pos2.zobrist_equals_with_debugging(copy3.get_zobrist_key());
+//   assert(pos2.get_zobrist_key() == copy3.get_zobrist_key());
+// }
+
+
+// TEST(NEW_EN_PASSANT, one) {
+//   Position pos = Position("rnbqkbnr/p1pppppp/8/8/Pp6/5N1P/1PPPPPP1/RNBQKB1R b KQkq a3 0 3");
+//   std::cout << static_cast<int>(pos.get_en_passant_target()) << std::endl;
+//   assert(static_cast<int>(pos.get_en_passant_target()) == 16);
+// }
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

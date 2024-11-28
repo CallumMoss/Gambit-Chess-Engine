@@ -57,6 +57,7 @@ enum Turn
     WHITE = 0,
     BLACK = 1
 };
+
 constexpr Turn operator!(Turn t) { return Turn(int(t) ^ 1); }
 
 struct MagicEntry {

@@ -26,26 +26,30 @@ class Zobrist
             #endif
             return instance->side_to_move;
         }
-        static u64 get_piece(u8 square, int type)
+        static u64 get_piece(int type, u8 square)
         {
             #ifdef ZOBRIST_DBG
-                call_order.push_back(std::format("ZOBRIST_CALL:\tpiece sq:{}, \ttype:{} \treturned:{}", Utils::square_to_board_notation(square), type, instance->pieces[square][type]));
+                call_order.push_back(std::format("ZOBRIST_CALL:\tpiece sq:{}, \ttype:{} \treturned:{}", square, type, instance->pieces[square][type]));
             #endif
-            return instance->pieces[square][type];
+            // use of assert and comma operator. If condition is false, will output message and return exit(-1)
+            //assert(("Error: attempted to access an index of pieces outside of the array.\n", square >= instance->pieces[0].size() || type >= instance->pieces[1].size()));
+            return instance->pieces.at(square).at(type); // use of .at() to detect when accessing outside of array (amongst other checks)
         }
         static u64 get_en_passant(u8 square)
         {
             #ifdef ZOBRIST_DBG
-                call_order.push_back(std::format("ZOBRIST_CALL:\ten_passant sq:{}\treturned:{}", Utils::square_to_board_notation(square), instance->en_passant[square]));
+                call_order.push_back(std::format("ZOBRIST_CALL:\ten_passant sq:{}\treturned:{}", square, instance->en_passant[square]));
             #endif
-            return instance->en_passant[square];
+            //assert(("Error: attempted to access an index of en passant outside of the array.\n", static_cast<int>(square) >= instance->en_passant.size()));
+            return instance->en_passant.at(square);
         }
         static u64 get_castling_rights(u8 castling_right)
         {
             #ifdef ZOBRIST_DBG
                 call_order.push_back(std::format("ZOBRIST_CALL:\tcastling_rights cr:{}\treturned:{}", castling_right, instance->castling_rights[castling_right]));
             #endif
-            return instance->castling_rights[castling_right];
+            //assert(("Error: attempted to access an index of castling rights that should not be accessed.\n", static_cast<int>(castling_right) > 15));
+            return instance->castling_rights.at(castling_right);
         }
         static void print_log()
         {
@@ -62,7 +66,6 @@ class Zobrist
         }
     private:
         // array of 64 arrays of 12 u64s
-        //HAS TO BE DONE!!!!!!
         //0-5(inclusive) = white, (6-11) = black
         std::array<std::array<u64, 12>, 64> pieces; // filled with pseudorandom numbers, 64 squares and 12 piece types (white rook, black rook etc). Unique for different piece type on each square
         std::array<u64, 64> en_passant;
