@@ -7,11 +7,6 @@
 #include <array>
 #include <cstdint>
 
-
-// ARCHIVED:
-// Final_Magic bishop_magics_table[64] = {};
-// Final_Magic rook_magics_table[64] = {};
-
 std::vector<u64> bishop_magics_table[64] = {};
 std::vector<u64> rook_magics_table[64] = {};
 
@@ -55,49 +50,6 @@ u64 bishop_magics[64] =
     565150134571266ULL, 229756153125473537ULL, 1169309323264ULL, 2814761311963136ULL,
     9232379237187781376ULL, 1164251147877516544ULL, 19246212779639808ULL, 81100270007796240ULL
 };
-
-
-
-// // ARCHIVED:
-// // Initialises magic tables
-// void Magics::init()
-// {
-//     Final_Magic fm;
-//     int key;
-//     u64 attacks;
-// 	for(int square = 0; square < 64; square++)
-//     {
-    	
-// 	    bishop_magics_table[square] = Magics::find_magic(Piece::BISHOP, square);
-//      rook_magics_table[square] = Magics::find_magic(Piece::ROOK, square);
-
-//     }
-// }
-// // Inspiration drawn from: https://analog-hors.github.io/site/magic-bitboards/
-// Final_Magic Magics::find_magic(Piece piece_type, int square) {
-//     MagicEntry magic;
-//     magic.mask = get_relevant_blocker_squares(piece_type, square); // Bitboard of spaces where blockers would be an issue if occupied
-//     magic.index_bits = Utils::count_number_of_1bs(magic.mask);
-//     Final_Magic successful_magic;
-//     bb_vector magic_table;
-//     // Create a random device
-//     std::random_device rd;
-//     // Initialize a Mersenne Twister pseudo-random number generator
-//     std::mt19937_64 gen(rd());
-//     // Define the range of random numbers (inclusive)
-//     std::uniform_int_distribution<uint64_t> dis(0, UINT64_MAX);
-//     while(true) {
-//         // Magics require a low number of active bits, so we AND
-//         // by two more random values to cut down on the bits set.
-//         magic.magic_number = dis(gen) & dis(gen) & dis(gen); // creates a random u64 magic number
-//         magic_table = create_magic_table(piece_type, magic.magic_number, square);
-//         if (magic_table.size() == ((std::size_t)(1 << magic.index_bits))) { // if full table (meaning no collisions or missed computations)
-//             successful_magic.magic = magic;
-//             successful_magic.table = magic_table;
-//             return successful_magic;
-//         }
-//     }
-// }
 
 // Initialises magic tables
 void Magics::init() {

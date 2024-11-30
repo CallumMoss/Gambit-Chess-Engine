@@ -39,7 +39,7 @@ class Position
         void handle_move(const Piece& src_square_type, const Piece& dest_square_type, const Piece& captured_piece_type, const u8& src_square, const u8& dest_square);
         void handle_en_passant(const u8& src_square, const u8& dest_square);
         void handle_castling(const u8& src_square, const u8& dest_square);
-        bool legality_check(Move& move) const;
+        bool is_legal(Move& move) const;
         bool in_check() const;
         u64 split_perft(int current_depth, const int& desired_depth, const bool& output_split, Move& last_move);
 

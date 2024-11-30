@@ -38,7 +38,7 @@ std::vector<std::string> UCI::split_args(std::string input)
     */
 
 // Inspired by https://github.com/AndyGrant/Ethereal/blob/master/src/uci.c#L133
-Move UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
+u64 UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, std::vector<u64> game_history_stack) {
     // Give default values which are updated later
     // Usually these values for wtime and btime should always be updated, so value here is technically irrelevant
     u64 wtime = 60'000; // white has x msec left on the clock
@@ -70,28 +70,18 @@ Move UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos) {
 
     timer.start_timer();
 
-    Search search = Search();
-
-    //** Random Mover: **//
-    // std::string best_move = Utils::move_to_board_notation(search.find_random_move(pos));
-    // std::cout << "bestmove " << best_move << std::endl;
-    //** ------------- **//
-    
-    //** Negamax Fixed Depth (No Timer) **//
-    // int depth = 2;
-    // int score = search.negamax2(depth, 0, pos); // find best move
-    // std::string best_move = Utils::move_to_board_notation(search.get_root_best_move());
-    // std::cout << "info score cp " << score << " depth " << depth << std::endl;
-    // std::cout << "bestmove " << best_move << std::endl;
-    //** ------------------------------ **//
+    Search search = Search(game_history_stack);
 
     //** Negamax Iterative Deepening (With Timer) **//
     int score = search.iterative_deepening(pos, timer);
-    std::string best_move = Utils::move_to_board_notation(search.get_root_best_move());
-    std::cout << "bestmove " << best_move << std::endl;
+    Move best_move = search.get_root_best_move();
+    std::string best_move_str = Utils::move_to_board_notation(best_move);
+    std::cout << "bestmove " << best_move_str << std::endl;
     //** ---------------------------------------- **//
     
-    return search.get_root_best_move();
+    // Apply best move to pos so we can get its zobrist for game history
+    pos.make_move(best_move);
+    return pos.get_zobrist_key();
 }
 
 void UCI::position(std::vector<std::string>& args, Position& pos) {

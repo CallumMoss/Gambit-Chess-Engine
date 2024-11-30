@@ -17,6 +17,7 @@ int main() {
     Timer timer;
     Move null_move;
     Position pos = Position();
+    std::vector<u64> game_history_stack;
 
     // Inspired by https://github.com/TiltedDFA/TDFA/blob/c26a01e29ba87c41af50700c2c8321e3e2667c8f/src/Uci.cpp
     while(std::getline(std::cin, input)) { // whilst isnt empty
@@ -39,7 +40,8 @@ int main() {
             UCI::position(args, pos);
         }
         else if (command == "go") {
-            Move best_move = UCI::go(args, timer, pos);
+            u64 current_zobrist = UCI::go(args, timer, pos, game_history_stack);
+            game_history_stack.push_back(current_zobrist);
         }
         else if(command == "quit") {
             break;

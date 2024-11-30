@@ -1,3 +1,6 @@
+29/11/2024 - 30/11/2024:
+Implemented untested repetition detection. Removed dead code.
+
 26/11/2024 - 28/11/2024:
 Finished zobrist hashing and tested with perft.
 

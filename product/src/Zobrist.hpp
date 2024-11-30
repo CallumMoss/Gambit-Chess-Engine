@@ -31,8 +31,12 @@ class Zobrist
             #ifdef ZOBRIST_DBG
                 call_order.push_back(std::format("ZOBRIST_CALL:\tpiece sq:{}, \ttype:{} \treturned:{}", square, type, instance->pieces[square][type]));
             #endif
-            // use of assert and comma operator. If condition is false, will output message and return exit(-1)
-            //assert(("Error: attempted to access an index of pieces outside of the array.\n", square >= instance->pieces[0].size() || type >= instance->pieces[1].size()));
+            if(square >= instance->pieces.size() || type >= instance->pieces[0].size()) {
+                std::cerr << "Error: attempted to access an index of pieces outside of the array." << std::endl;
+                std::cerr << "Square:" << static_cast<int>(square) << std::endl;
+                std::cerr << "Type:" << static_cast<int>(type) << std::endl;
+                std::exit(-1);
+            }
             return instance->pieces.at(square).at(type); // use of .at() to detect when accessing outside of array (amongst other checks)
         }
         static u64 get_en_passant(u8 square)
@@ -40,7 +44,9 @@ class Zobrist
             #ifdef ZOBRIST_DBG
                 call_order.push_back(std::format("ZOBRIST_CALL:\ten_passant sq:{}\treturned:{}", square, instance->en_passant[square]));
             #endif
-            //assert(("Error: attempted to access an index of en passant outside of the array.\n", static_cast<int>(square) >= instance->en_passant.size()));
+            if(static_cast<int>(square) >= instance->en_passant.size()) {
+                std::cerr << "Error: attempted to access an index of en passant outside of the array.\n";
+            }
             return instance->en_passant.at(square);
         }
         static u64 get_castling_rights(u8 castling_right)
@@ -48,7 +54,9 @@ class Zobrist
             #ifdef ZOBRIST_DBG
                 call_order.push_back(std::format("ZOBRIST_CALL:\tcastling_rights cr:{}\treturned:{}", castling_right, instance->castling_rights[castling_right]));
             #endif
-            //assert(("Error: attempted to access an index of castling rights that should not be accessed.\n", static_cast<int>(castling_right) > 15));
+            if(static_cast<int>(castling_right) > 15) {
+                std::cerr << "Error: attempted to access an index of castling rights that should not be accessed.\n";
+            }
             return instance->castling_rights.at(castling_right);
         }
         static void print_log()

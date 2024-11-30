@@ -513,7 +513,7 @@ bool Position::in_check() const { // used to detect stalemate. Finds if we are c
     return false;
 }
 // Checks whether after applying a pseudo move, if the position is legal.
-bool Position::legality_check(Move& move) const
+bool Position::is_legal(Move& move) const
 {
     // Finding King Square and opponents pieces:
     u64 king_square_u64;
@@ -879,7 +879,7 @@ u64 Position::split_perft(int current_depth, const int& desired_depth, const boo
         Position new_position = *this;
         new_position.make_move(move); // apply move to current pos
 
-        if(!new_position.legality_check(move)) { // if move isnt legal, don't count
+        if(!new_position.is_legal(move)) { // if move isnt legal, don't count
             continue;
         }
         nodes = new_position.split_perft(current_depth - 1, desired_depth, output_split, move);
