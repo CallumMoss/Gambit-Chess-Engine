@@ -1,6 +1,5 @@
 #include "Utils.hpp"
 
-#include <algorithm> 
 // Shifts should only be used for indiviual piece bbs, not entire board bbs. Aka a singular pawn attack.
 u64 Utils::shift_up(u64 board) { // Moving the board up a rank (can be used for seeing possible pawn moves for example)
     return board << 8;
@@ -48,7 +47,7 @@ u8 Utils::find_piece_index(u64 bitboard) {
 }
 
 // Prints the board in bit representation, puts an X where the piece by specifying board center
-void Utils::PrintBB(u64 board, int board_center) {
+void Utils::print_bb(u64 board, int board_center) {
         bool mirrored = true;
         std::string output{}, current_line{};
         for(int row{0}; row < 8; ++row)
@@ -177,109 +176,9 @@ Move Utils::board_notation_to_move(std::string board_notation, Position& pos) {
     }
 }
 
-// Most Valuable Victim - Least Valuable Aggressor
-// Simply heuristic to help sort captures in a way where it is more likely to benefit from the exchange
-// Ranges from [4, 49], where the lower the number the higher the priority
-int Utils::find_mvv_lva(Piece& victim_type, Piece& attacker_type) { // we give weight towards the victim to ensure it gets sorted first
-    return ((value_of_piece_from_type_and_capture_role(victim_type, true) * 10) - value_of_piece_from_type_and_capture_role(attacker_type, false));
-}
-
-int Utils::value_of_piece_from_type_and_capture_role(Piece& type, bool is_victim) {
-    if(is_victim) {
-        switch(type) {
-            case Piece::PAWN:
-                return 5;
-            case Piece::KNIGHT:
-                return 4;
-            case Piece::BISHOP:
-                return 3;
-            case Piece::ROOK:
-                return 2;
-            case Piece::QUEEN:
-                return 1;
-            default: // king cannot be taken
-                std::cerr << "Unexpected piece type of victim: " << type;
-                std::exit(-1);
-        }
-    }
-    //else if attacker
-    return type + 1; // king is most valuable attacker as it implies that it is free, as he cannot walk into check
-}
-
-struct Mvv_lva_log {
-    Move move;
-    int mvv_lva_score;
-};
-
-std::vector<Move> Utils::sort_by_mvv_lva(std::vector<Move>& moves, Position& pos) {
-    std::vector<Mvv_lva_log> move_logs;
-    // Iterate through each move
-    for(Move move : moves) {
-        // Check if it's a capture (if the destination has a piece)
-        if(!Utils::piece_is_at_square(pos.get_board(), static_cast<int>(move.get_dest_square()))) {
-            // Not a capture, assign lowest priority (50)
-            Mvv_lva_log move_log = {move, 50};
-            move_logs.push_back(move_log);
-        } else {
-            // It's a capture, calculate MVV-LVA score
-            Piece victim = pos.get_piece_type_from_square(move.get_dest_square());
-            Piece attacker = pos.get_piece_type_from_square(move.get_src_square());
-            int mvv_lva_score = find_mvv_lva(victim, attacker); // This should give a score prioritizing valuable captures
-
-            // Log the move and its score
-            Mvv_lva_log move_log = {move, mvv_lva_score};
-            move_logs.push_back(move_log);
-        }
-    }
-
-    // Sort the moves based on MVV-LVA score, higher priority first
-    std::sort(move_logs.begin(), move_logs.end(), [](const Mvv_lva_log& a, const Mvv_lva_log& b) {
-        return a.mvv_lva_score < b.mvv_lva_score; // lower scores at the front
-    });
-
-    // Extract sorted moves from the logs
-    std::vector<Move> sorted_moves;
-    for(Mvv_lva_log& log : move_logs) {
-        sorted_moves.push_back(log.move);
-    }
-    
-    return sorted_moves;
-}
-
-/**
- * @brief Determines whether a 3 fold repetition has occured based on the past 6 half moves
- * 
- * @return true if a repetition has occured
- * @return false if a repetition has not occured
- */
-bool Utils::three_fold_repetition_has_occured(Move last_6_half_moves[6]) {
-    Move null_move;
-    for(int i = 0; i < 6; i++) { // checking if not equal to the inital null array
-        if(last_6_half_moves[i].equals(null_move)) { return false; }    
-    }
-    if(last_6_half_moves[0].equals(last_6_half_moves[2])) {
-        if(last_6_half_moves[2].equals(last_6_half_moves[4])) {
-            if(last_6_half_moves[1].equals(last_6_half_moves[3])) {
-                if(last_6_half_moves[3].equals(last_6_half_moves[5])) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
 std::string Utils::square_to_board_notation(u8 square) {
     std::string board_notation = "";
     board_notation += 'a' + (square % 8);  // Calculate file ('a' to 'h')
     board_notation += '1' + (square / 8);  // Calculate rank ('1' to '8')
     return board_notation;
 }
-
-// std::vector<Move> Utils::sort_by_mvv_lva_and_remove_captures(std::vector<Move>& moves, u64 board) {
-//     for(Move move : moves) {
-//         if(!Utils::piece_is_at_square(move.get_dest_square(), board)) { // if not a capture
-//             continue;
-//         }
-//     }
-// }

@@ -25,9 +25,15 @@ class Search {
         // Search algorithms
         int negamax(int depth, int ply, const Position& pos, Timer& timer);
         int iterative_deepening(const Position& pos, Timer& timer);
+        int alpha_beta(int depth, int ply, const Position& pos, Timer& timer, int alpha, int beta);
 
         // Utils
-        bool is_repetition(const int& ply, const Position& pos);
+        bool is_draw(const int& ply, const Position& pos);
+        bool three_fold_repetition_has_occured(Move last_6_half_moves[6]);
+        int find_mvv_lva(Piece& victim_type, Piece& attacker_type);
+        int value_of_piece_from_type_and_capture_role(Piece& type, bool is_victim);
+        std::vector<Move> sort_by_mvv_lva(const std::vector<Move>& moves, const Position& pos);
+
 
         // Getters and Setters
         Move get_root_best_move() { return root_best_move; }

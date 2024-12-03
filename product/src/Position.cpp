@@ -856,7 +856,7 @@ u64 Position::split_perft(int current_depth, const int& desired_depth, const boo
             // std::cerr << zobrist_equals_with_debugging(actual) << std::endl;
             std::cerr << "Last move applied: " << Utils::move_to_board_notation(last_move) << "\tMove Flag: " << static_cast<int>(last_move.get_flag()) << std::endl;
             std::cerr << "Board: " << std::endl;
-            Utils::PrintBB(get_board());
+            Utils::print_bb(get_board());
             print_position();
             std::cout << "Piece Type: " << get_piece_type_from_square(last_move.get_dest_square()) << std::endl;
             std::cout << "Zobrist call log:" << std::endl;

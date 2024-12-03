@@ -17,17 +17,13 @@ namespace Utils {
     u64 shift_left(u64 board);
     u64 shift_right(u64 board);
     bool piece_is_at_square(uint64_t board, int square);
-    void PrintBB(u64 board, int board_center = 64); // defaults to 64 if no argument provided (no center)
+    void print_bb(u64 board, int board_center = 64); // defaults to 64 if no argument provided (no center)
     int count_number_of_1bs(u64 board);
     u8 find_piece_index(u64 bitboard);
     u64 clear_bit(u64 board, int index);
     Move encode_move(Piece type, u8 src_square, u8 dest_square, u8 en_passant_target);
     std::string move_to_board_notation(Move move);
     Move board_notation_to_move(std::string board_notation, Position& pos);
-    bool three_fold_repetition_has_occured(Move last_6_half_moves[6]);
-    int find_mvv_lva(Piece& victim_type, Piece& attacker_type);
-    int value_of_piece_from_type_and_capture_role(Piece& type, bool is_victim);
-    std::vector<Move> sort_by_mvv_lva(std::vector<Move>& moves, Position& pos);
     std::string square_to_board_notation(u8 square);
 
 

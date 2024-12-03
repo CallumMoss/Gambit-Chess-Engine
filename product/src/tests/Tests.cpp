@@ -121,19 +121,19 @@
 // Manually reviewing precomputations (passes regardless)
 // TEST(PRECOMPUTATION_VALIDATION, all_pieces_validation) {
 // 	for(int i = 0; i < 64; i++) {
-// 		Utils::PrintBB(Utils::ROOK_ATTACKS[i], i, true);
+// 		Utils::print_bb(Utils::ROOK_ATTACKS[i], i, true);
 // 	}
 // 	for(int i = 0; i < 64; i++) {
-// 		Utils::PrintBB(Utils::BISHOP_ATTACKS[i], i, true);
+// 		Utils::print_bb(Utils::BISHOP_ATTACKS[i], i, true);
 // 	}
 // 	for(int i = 0; i < 64; i++) {
-// 		Utils::PrintBB(Utils::KNIGHT_ATTACKS[i], i, true);
+// 		Utils::print_bb(Utils::KNIGHT_ATTACKS[i], i, true);
 // 	}
 // 	for(int i = 0; i < 64; i++) {
-// 		Utils::PrintBB(Utils::QUEEN_ATTACKS[i], i, true);
+// 		Utils::print_bb(Utils::QUEEN_ATTACKS[i], i, true);
 // 	}
 // 	for(int i = 0; i < 64; i++) {
-// 		Utils::PrintBB(Utils::KING_ATTACKS[i], i, true);
+// 		Utils::print_bb(Utils::KING_ATTACKS[i], i, true);
 // 	}
 // }
 // Manually reviewing precomputations (passes regardless)
@@ -142,7 +142,7 @@
 // 	int i = 30;
 // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::KNIGHT, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// 		Utils::PrintBB(moves[q], i, true);
+// 		Utils::print_bb(moves[q], i, true);
 // 	}
 // }
 
@@ -152,7 +152,7 @@
 // 	int i = 30;
 // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::BISHOP, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// 		Utils::PrintBB(moves[q], i, true);
+// 		Utils::print_bb(moves[q], i, true);
 // 	}
 // }
 
@@ -162,7 +162,7 @@
 // 	int i = 30;
 // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::ROOK, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// 		Utils::PrintBB(moves[q], i, true);
+// 		Utils::print_bb(moves[q], i, true);
 // 	}
 // }
 
@@ -172,7 +172,7 @@
 // 	int i = 30;
 // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::QUEEN, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// 		Utils::PrintBB(moves[q], i, true);
+// 		Utils::print_bb(moves[q], i, true);
 // 	}
 // }
 
@@ -182,7 +182,7 @@
 // 	int i = 30;
 // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::KING, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// 		Utils::PrintBB(moves[q], i, true);
+// 		Utils::print_bb(moves[q], i, true);
 // 	}
 // }
 
@@ -192,7 +192,7 @@
 // 	int i = 12;
 // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::PAWN, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// 		Utils::PrintBB(moves[q], i, true);
+// 		Utils::print_bb(moves[q], i, true);
 // 	}
 // }
 
@@ -202,7 +202,7 @@
 // 	int i = 12 + (4*8);
 // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::PAWN, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// 		Utils::PrintBB(moves[q], i, true);
+// 		Utils::print_bb(moves[q], i, true);
 // 	}
 // }
 
@@ -213,7 +213,7 @@
 // 	int i = 12 + (5*8);
 // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::PAWN, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// 		Utils::PrintBB(moves[q], i, true);
+// 		Utils::print_bb(moves[q], i, true);
 // 	}
 // }
 
@@ -224,7 +224,7 @@
 // 	int i = 20;
 // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::PAWN, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// 		Utils::PrintBB(moves[q], i, true);
+// 		Utils::print_bb(moves[q], i, true);
 // 	}
 // }
 
@@ -235,7 +235,7 @@
 // 	int i = 20;
 // 	std::vector<u64> moves = pos.generate_piece_moves(Piece::PAWN, i);
 // 	for(std::size_t q = 0; q < moves.size(); q++) { // uses std::size_t because thats the return type of size
-// 		Utils::PrintBB(moves[q], i, true);
+// 		Utils::print_bb(moves[q], i, true);
 // 	}
 // }
 
@@ -246,7 +246,7 @@
 // // 	u64 moves;
 // // 	for(int i = 0; i < 64; i++) {
 // // 		moves = pos.pseudo_legalise_rook_attacks(i, 0);
-// // 		Utils::PrintBB(moves, i, true);
+// // 		Utils::print_bb(moves, i, true);
 // // 	}
 // // }
 
@@ -257,19 +257,19 @@
 // // 	u64 moves;
 // // 	int i = 0;
 // // 	moves = pos.pseudo_legalise_rook_attacks(i, 0);
-// // 	Utils::PrintBB(moves, i, true);
+// // 	Utils::print_bb(moves, i, true);
 
 // // 	i = 5;
 // // 	moves = pos.pseudo_legalise_rook_attacks(i, 0);
-// // 	Utils::PrintBB(moves, i, true);
+// // 	Utils::print_bb(moves, i, true);
 
 // // 	i = 59;
 // // 	moves = pos.pseudo_legalise_rook_attacks(i, 0);
-// // 	Utils::PrintBB(moves, i, true);
+// // 	Utils::print_bb(moves, i, true);
 
 // // 	i = 63;
 // // 	moves = pos.pseudo_legalise_rook_attacks(i, 0);
-// // 	Utils::PrintBB(moves, i, true);
+// // 	Utils::print_bb(moves, i, true);
 // // }
 
 // // // Manually reviewing rook moves (passes regardless)
@@ -279,23 +279,23 @@
 // // 	u64 moves;
 // // 	int i = 25;
 // // 	moves = pos.pseudo_legalise_rook_attacks(i, 0);
-// // 	Utils::PrintBB(moves, i, true);
+// // 	Utils::print_bb(moves, i, true);
 
 // // 	i = 39;
 // // 	moves = pos.pseudo_legalise_rook_attacks(i, 0);
-// // 	Utils::PrintBB(moves, i, true);
+// // 	Utils::print_bb(moves, i, true);
 // // } 
 
 // // // Manually reviewing rook moves (passes regardless)
 // // TEST(GEN_MOVES_VALIDATION, rook_relevant_blockers) {
 // // 	Position pos = Position();
 // // 	pos.set_turn(Turn::WHITE);
-// // 	Utils::PrintBB(pos.get_blockers(20), 20, true);
+// // 	Utils::print_bb(pos.get_blockers(20), 20, true);
 
 // // 	// bb_vector moves;
 // // 	// for(int i = 0; i < 64; i++) {
 // // 	// 	moves = pos.pseudo_legalise_rook_attacks(0, Utils::ROOK_ATTACKS[0]);
-// // 	// 	Utils::PrintBB(moves[i], 0, true);
+// // 	// 	Utils::print_bb(moves[i], 0, true);
 // // 	// }
 // // }
 
@@ -303,11 +303,11 @@
 // // TEST(GEN_MOVES_VALIDATION, rook_relevant_blockers) {
 // // 	Position pos = Position();
 // // 	pos.set_turn(Turn::WHITE);
-// // 	// Utils::PrintBB(pos.pseudo_legalise_rook_attacks_slow(20, Utils::ROOK_ATTACKS[20]), 20, true);
+// // 	// Utils::print_bb(pos.pseudo_legalise_rook_attacks_slow(20, Utils::ROOK_ATTACKS[20]), 20, true);
 
 // // 	bb_vector moves;
 // // 	for(int i = 0; i < 64; i++) {
-// // 		Utils::PrintBB(pos.pseudo_legalise_rook_attacks_slow(i, Utils::ROOK_ATTACKS[i]), i, true);
+// // 		Utils::print_bb(pos.pseudo_legalise_rook_attacks_slow(i, Utils::ROOK_ATTACKS[i]), i, true);
 // // 	}
 // // }
 
@@ -316,7 +316,7 @@
 // 	Position pos = Position();
 // 	pos.set_turn(Turn::WHITE);
 // 	for(int i = 0; i < 64; i++) {
-// 		Utils::PrintBB(Utils::BISHOP_ATTACKS_NO_EDGES[i], i, true);
+// 		Utils::print_bb(Utils::BISHOP_ATTACKS_NO_EDGES[i], i, true);
 // 	}
 // }
 
@@ -327,7 +327,7 @@
 // 	for(int i = 0; i < 64; i++) {
 // 		u64 queen_attacks = Utils::BISHOP_ATTACKS[i] | Utils::ROOK_ATTACKS[i];
 // 		std::cout << queen_attacks << std::endl;
-// 		Utils::PrintBB(queen_attacks, i, true);
+// 		Utils::print_bb(queen_attacks, i, true);
 // 	}
 // }
 
@@ -338,7 +338,7 @@
 // 	for(int i = 0; i < 64; i++) {
 // 		u64 queen_attacks = Utils::BISHOP_ATTACKS_NO_EDGES[i] | Utils::ROOK_ATTACKS_NO_EDGES[i];
 // 		std::cout << queen_attacks << std::endl;
-// 		//Utils::PrintBB(queen_attacks, i, true);
+// 		//Utils::print_bb(queen_attacks, i, true);
 // 	}
 // }
 
@@ -347,7 +347,7 @@
 // 	Position pos = Position();
 // 	pos.set_turn(Turn::WHITE);
 // 	for(int i = 0; i < 64; i++) {
-// 		Utils::PrintBB(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
+// 		Utils::print_bb(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
 // 	}
 // }
 
@@ -357,7 +357,7 @@
 // 	pos.set_turn(Turn::WHITE);
 // 	int square = 0;
 // 	u64 blocker_squares = Magics::get_relevant_blocker_squares(Piece::ROOK, square);
-// 	Utils::PrintBB(blocker_squares, square);
+// 	Utils::print_bb(blocker_squares, square);
 // 	Final_Magic magic = Magics::find_magic(Piece::ROOK, square);
 // 	std::cout << "Done";
 // 	std::cout << "\nMagic Number: " << magic.magic.magic_number << "\n";
@@ -374,11 +374,11 @@
 // 	int i = 27;
 // 	Final_Magic fm = Magics::find_magic(Piece::ROOK, i);
 // 	u64 attacks = fm.table[Magics::get_magic_index(fm.magic, Magics::get_blockers(i, pos.get_board()))];
-// 	Utils::PrintBB(pos.get_board(), i, true);
-// 	Utils::PrintBB(Utils::ROOK_ATTACKS[i], i, true);
-// 	Utils::PrintBB(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
-// 	Utils::PrintBB(Magics::get_blockers(i, pos.get_board()), i, true);
-// 	Utils::PrintBB(attacks, i, true);
+// 	Utils::print_bb(pos.get_board(), i, true);
+// 	Utils::print_bb(Utils::ROOK_ATTACKS[i], i, true);
+// 	Utils::print_bb(Utils::ROOK_ATTACKS_NO_EDGES[i], i, true);
+// 	Utils::print_bb(Magics::get_blockers(i, pos.get_board()), i, true);
+// 	Utils::print_bb(attacks, i, true);
 // }
 
 // ARCHIVED:
@@ -403,7 +403,7 @@
 // 	int square = 0;
 // 	bb_vector attack_table_for_square = rook_magics_table[square];
 // 	// for(int i = 0; i < (int)attack_table_for_square.size(); i++) {
-// 	// 	Utils::PrintBB(attack_table_for_square[i], square, true);
+// 	// 	Utils::print_bb(attack_table_for_square[i], square, true);
 // 	// }
 // }
 
@@ -415,7 +415,7 @@
 // 	bb_vector attack_table_for_square = rook_magics_table[square];
 // 	for(int i = 0; i < (int)attack_table_for_square.size(); i++) {
 // 		std::cout << i << std::endl;
-// 		Utils::PrintBB(attack_table_for_square[i], square, true);
+// 		Utils::print_bb(attack_table_for_square[i], square, true);
 // 	}
 // }
 
@@ -426,7 +426,7 @@
 // 	int square = 27;
 // 	std::cout << "Hey\n";
 // 	u64 rook_moves = pos.get_rook_moves(pos, square);
-// 	Utils::PrintBB(rook_moves, square, true);
+// 	Utils::print_bb(rook_moves, square, true);
 // }
 
 // TEST(GEN_MOVES_VALIDATION, using_generated_magics3)
@@ -436,7 +436,7 @@
 // 	int square = 27;
 // 	bb_vector rook_moves = pos.generate_piece_moves(Piece::ROOK, square);
 // 	for(u64 rook_move : rook_moves) {
-// 		Utils::PrintBB(rook_move, square, true);
+// 		Utils::print_bb(rook_move, square, true);
 // 	}
 // }
 
@@ -447,7 +447,7 @@
 // // 	u64 moves;
 // // 	for(int i = 0; i < 64; i++) {
 // // 		moves = Magics::pseudo_legalise_bishop_attacks_slow(i, 0);
-// // 		Utils::PrintBB(moves, i, true);
+// // 		Utils::print_bb(moves, i, true);
 // // 	}
 // // }
 
@@ -458,7 +458,7 @@
 // // 	u64 moves;
 // // 	for(int i = 0; i < 64; i++) {
 // // 		moves = Magics::pseudo_legalise_bishop_attacks_slow(i, Magics::get_blockers(Piece::BISHOP, i, pos.get_board()));
-// // 		Utils::PrintBB(moves, i, true);
+// // 		Utils::print_bb(moves, i, true);
 // // 	}
 // // }
 
@@ -478,7 +478,7 @@
 // // 	int square = 27;
 // // 	bb_vector moves = pos.generate_piece_moves(Piece::ROOK, square);
 // // 	for(u64 move : moves) {
-// // 		Utils::PrintBB(move, square, true);
+// // 		Utils::print_bb(move, square, true);
 // // 	}
 // // }
 
@@ -489,7 +489,7 @@
 // 	int square = 27;
 // 	bb_vector moves = pos.generate_piece_moves(Piece::BISHOP, square);
 // 	for(u64 move : moves) {
-// 		Utils::PrintBB(move, square, true);
+// 		Utils::print_bb(move, square, true);
 // 	}
 // }
 
@@ -501,7 +501,7 @@
 // 	int square = 27;
 // 	bb_vector moves = pos.generate_piece_moves(Piece::QUEEN, square);
 // 	for(u64 move : moves) {
-// 		Utils::PrintBB(move, square, true);
+// 		Utils::print_bb(move, square, true);
 // 	}
 // }
 
@@ -513,7 +513,7 @@
 // 	int square = 27;
 // 	bb_vector moves = pos.generate_piece_moves(Piece::BISHOP, square);
 // 	for(u64 move : moves) {
-// 		Utils::PrintBB(move, square, true);
+// 		Utils::print_bb(move, square, true);
 // 	}
 // }
 
@@ -525,7 +525,7 @@
 // 	int square = 27;
 // 	bb_vector moves = pos.generate_piece_moves(Piece::ROOK, square);
 // 	for(u64 move : moves) {
-// 		Utils::PrintBB(move, square, true);
+// 		Utils::print_bb(move, square, true);
 // 	}
 // }
 
@@ -537,7 +537,7 @@
 // 	int square = 27;
 // 	bb_vector moves = pos.generate_piece_moves(Piece::QUEEN, square);
 // 	for(u64 move : moves) {
-// 		Utils::PrintBB(move, square, true);
+// 		Utils::print_bb(move, square, true);
 // 	}
 // }
 
@@ -554,10 +554,10 @@
 // 	u8 dest_square = 20;
 // 	Move move = Move(src_square, dest_square, Move_Flag::PAWN_FLAG);
 // 	pos.copy_make(move, pos);
-// 	Utils::PrintBB(pos.get_board(), src_square, true);
-// 	Utils::PrintBB(pos.get_pawns(), src_square, true);
-// 	Utils::PrintBB(pos.get_white_pawns(), src_square, true);
-// 	Utils::PrintBB(pos.get_white_pieces(), src_square, true);
+// 	Utils::print_bb(pos.get_board(), src_square, true);
+// 	Utils::print_bb(pos.get_pawns(), src_square, true);
+// 	Utils::print_bb(pos.get_white_pawns(), src_square, true);
+// 	Utils::print_bb(pos.get_white_pieces(), src_square, true);
 // }
 
 // TEST(MAKE_MOVES, testing_forward_two_pawn_push) {
@@ -566,10 +566,10 @@
 // 	u8 dest_square = 28;
 // 	Move move = Move(src_square, dest_square, Move_Flag::PAWN_TWO_FORWARD_FLAG);
 // 	pos.copy_make(move, pos);
-// 	Utils::PrintBB(pos.get_board(), src_square, true);
-// 	Utils::PrintBB(pos.get_pawns(), src_square, true);
-// 	Utils::PrintBB(pos.get_white_pawns(), src_square, true);
-// 	Utils::PrintBB(pos.get_white_pieces(), src_square, true);
+// 	Utils::print_bb(pos.get_board(), src_square, true);
+// 	Utils::print_bb(pos.get_pawns(), src_square, true);
+// 	Utils::print_bb(pos.get_white_pawns(), src_square, true);
+// 	Utils::print_bb(pos.get_white_pieces(), src_square, true);
 // }
 
 // TEST(SQUARE_CONVERSION, x1) {
@@ -1114,10 +1114,10 @@
 //   pos.make_move(move2);
 //   Position new_pos = pos;
 //   new_pos.recompute_zobrist_key();
-//     Utils::PrintBB(pos.get_pawns());
-//   Utils::PrintBB(new_pos.get_pawns());
-//   Utils::PrintBB(pos.get_black_pieces());
-//   Utils::PrintBB(new_pos.get_black_pieces());
+//     Utils::print_bb(pos.get_pawns());
+//   Utils::print_bb(new_pos.get_pawns());
+//   Utils::print_bb(pos.get_black_pieces());
+//   Utils::print_bb(new_pos.get_black_pieces());
 //   std::cout << pos.equals_with_debugging(new_pos);
 //   std::cout << pos.zobrist_equals_with_debugging(new_pos.get_zobrist_key());
 //   assert(new_pos.get_zobrist_key() == pos.get_zobrist_key());
@@ -1131,10 +1131,10 @@
 //   pos.make_move(move2);
 //   Position new_pos = pos;
 //   new_pos.recompute_zobrist_key();
-//     Utils::PrintBB(pos.get_pawns());
-//   Utils::PrintBB(new_pos.get_pawns());
-//   Utils::PrintBB(pos.get_black_pieces());
-//   Utils::PrintBB(new_pos.get_black_pieces());
+//     Utils::print_bb(pos.get_pawns());
+//   Utils::print_bb(new_pos.get_pawns());
+//   Utils::print_bb(pos.get_black_pieces());
+//   Utils::print_bb(new_pos.get_black_pieces());
 //   std::cout << pos.equals_with_debugging(new_pos);
 //   std::cout << pos.zobrist_equals_with_debugging(new_pos.get_zobrist_key());
 //   assert(new_pos.get_zobrist_key() == pos.get_zobrist_key());
@@ -1266,8 +1266,10 @@ TEST(PERFT, perft_suite) {
 //   //Position pos = Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 8 5");
 //   Search search = Search(game_history_stack);
 //   Timer timer;
-//   u64 wtime = 60'000; // white has x msec left on the clock
-//   u64 btime = 60'000; // black has x msec left on the clock
+//   // u64 wtime = 60'000; // white has x msec left on the clock
+//   // u64 btime = 60'000; // black has x msec left on the clock
+//   u64 wtime = 60; // white has x msec left on the clock
+//   u64 btime = 60; // black has x msec left on the clock
 //   u64 winc = 0; // white increment per move in mseconds if x > 0
 //   u64 binc = 0; // black increment per move in mseconds if x > 0
 //   if(pos.get_turn() == Turn::WHITE) {

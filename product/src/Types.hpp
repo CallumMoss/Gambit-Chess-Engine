@@ -189,6 +189,12 @@ struct Move {
 
 };
 
+struct Mvv_lva_log
+{
+    Move move;
+    int mvv_lva_score;
+};
+
 struct PV
 {
     int num_of_moves;
