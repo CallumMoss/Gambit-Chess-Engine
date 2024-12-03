@@ -71,7 +71,7 @@ int Search::alpha_beta(int depth, int ply, const Position& pos, Timer& timer, in
     int best_score = -INT_MAX;
     int score = -INT_MAX;
     std::vector<Move> moves = pos.generate_all_moves();
-    // moves = sort_by_mvv_lva(moves, pos);
+    moves = sort_by_mvv_lva(moves, pos);
     for(Move move : moves) {
         if(timer.is_out_of_time()) {
             return best_score; // could return anything as this score wont be used

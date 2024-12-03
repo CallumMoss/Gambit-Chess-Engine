@@ -1,5 +1,5 @@
 03/12/2024:
-Implemented alpha beta.
+Implemented alpha beta and MVV-LVA.
 
 29/11/2024 - 30/11/2024:
 Implemented untested repetition detection. Removed dead code.
