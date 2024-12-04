@@ -4,14 +4,17 @@
 #include "UCI.hpp"
 #include "Timer.hpp"
 #include "Zobrist.hpp"
+#include "Transposition_Table.hpp"
 
 #include <iostream>
 
 int main() {
-    std::string version = "v1.1.5";
+    std::string version = "v1.9.0";
 
     Magics::init();
     Zobrist zobrist;
+    Transposition_Table tt;
+    tt.resize(16);
     std::string input = "";
     std::string output = "";
     Timer timer;
@@ -35,12 +38,17 @@ int main() {
         }
         else if(command == "ucinewgame") {
             pos = Position();
+            tt.clear_table();
+            
+        }
+        else if (command == "setoption") {
+            tt.resize(UCI::options(args));
         }
         else if(command == "position") {
             UCI::position(args, pos);
         }
         else if (command == "go") {
-            u64 current_zobrist = UCI::go(args, timer, pos, game_history_stack);
+            u64 current_zobrist = UCI::go(args, timer, pos, game_history_stack, tt);
             game_history_stack.push_back(current_zobrist);
         }
         else if(command == "quit") {

@@ -38,7 +38,7 @@ std::vector<std::string> UCI::split_args(std::string input)
     */
 
 // Inspired by https://github.com/AndyGrant/Ethereal/blob/master/src/uci.c#L133
-u64 UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, std::vector<u64> game_history_stack) {
+u64 UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, std::vector<u64> game_history_stack, Transposition_Table& tt) {
     // Give default values which are updated later
     // Usually these values for wtime and btime should always be updated, so value here is technically irrelevant
     u64 wtime = 60'000; // white has x msec left on the clock
@@ -73,7 +73,7 @@ u64 UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, std::ve
     Search search = Search(game_history_stack);
 
     //** Negamax Iterative Deepening (With Timer) **//
-    int score = search.iterative_deepening(pos, timer);
+    int score = search.iterative_deepening(pos, timer, tt);
     Move best_move = search.get_root_best_move();
     std::string best_move_str = Utils::move_to_board_notation(best_move);
     std::cout << "bestmove " << best_move_str << std::endl;
@@ -120,5 +120,11 @@ void UCI::position(std::vector<std::string>& args, Position& pos) {
     }
     else {
         return;
+    }
+}
+
+int UCI::options(std::vector<std::string>& args) {
+    if(args[2] == "Hash") {
+        return std::stoi(args[3]); // returns the number of megabytes used for the transposition table
     }
 }

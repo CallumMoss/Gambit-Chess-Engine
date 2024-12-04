@@ -74,7 +74,7 @@ class Zobrist
         }
     private:
         // array of 64 arrays of 12 u64s
-        //0-5(inclusive) = white, (6-11) = black
+        // 0-5(inclusive) = white, (6-11) = black
         std::array<std::array<u64, 12>, 64> pieces; // filled with pseudorandom numbers, 64 squares and 12 piece types (white rook, black rook etc). Unique for different piece type on each square
         std::array<u64, 64> en_passant;
         std::array<u64, 16> castling_rights; // stores pseudorandom numbers that represent all combinations of castling rights.

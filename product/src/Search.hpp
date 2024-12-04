@@ -5,6 +5,7 @@
 #include "utils.hpp"
 #include "Position.hpp"
 #include "Evaluation.hpp"
+#include "Transposition_Table.hpp"
 
 enum Search_Type {
     FIXED_DEPTH,
@@ -21,17 +22,18 @@ class Search {
     public:
         Search();
         Search(std::vector<u64> game_history_stack);
+        Search(std::vector<u64> game_history_stack, int tt_size_in_mb);
 
         // Search algorithms
         int negamax(int depth, int ply, const Position& pos, Timer& timer);
-        int iterative_deepening(const Position& pos, Timer& timer);
-        int alpha_beta(int depth, int ply, const Position& pos, Timer& timer, int alpha, int beta);
+        int iterative_deepening(const Position& pos, Timer& timer, Transposition_Table& tt);
+        int alpha_beta(int depth, int ply, const Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt);
 
         // Utils
         bool is_draw(const int& ply, const Position& pos);
         bool three_fold_repetition_has_occured(Move last_6_half_moves[6]);
-        int find_mvv_lva(Piece& victim_type, Piece& attacker_type);
-        int value_of_piece_from_type_and_capture_role(Piece& type, bool is_victim);
+        int find_mvv_lva(Piece victim_type, Piece attacker_type);
+        int value_of_piece_from_type_and_capture_role(Piece type, bool is_victim);
         std::vector<Move> sort_by_mvv_lva(const std::vector<Move>& moves, const Position& pos);
 
 

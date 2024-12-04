@@ -189,7 +189,34 @@ struct Move {
 
 };
 
-struct Mvv_lva_log
+enum Node_Type
+{
+    EXACT = 0,
+    UPPER = 1, // is an alpha
+    LOWER = 2, // is a beta
+    NULL_NODE = -1
+};
+
+struct TT_Entry
+{
+    TT_Entry(){}
+    
+    TT_Entry(u64 zobrist_key, int score, Move best_move, int depth, Node_Type node_type) {
+        this->zobrist_key = zobrist_key;
+        this->score = score;
+        this->best_move = best_move;
+        this->depth = depth;
+        this->node_type = node_type;
+    }
+
+    u64 zobrist_key;
+    int score;
+    Move best_move;
+    int depth;
+    Node_Type node_type;
+};
+
+struct MVV_LVA_Log
 {
     Move move;
     int mvv_lva_score;
