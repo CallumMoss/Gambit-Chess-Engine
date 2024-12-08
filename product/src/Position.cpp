@@ -828,6 +828,7 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
     // Half move clock restarts whenever a pawn move or capture has occured
     if(moved_piece_type == Piece::PAWN || captured_piece_type != Piece::INVALID) {
         half_move_clock = 0;
+        // reset search stack for 3 move repetitions
     }
 
     // Unless we have caused a new en passant, we should reset en passant square, only if isnt already null
@@ -1049,3 +1050,29 @@ int Position::get_colour_value_from_square(u8 square) { return (get_black_pieces
 
 
 void Position::set_turn(Turn turn) {this->turn = turn;}
+
+Move Position::board_notation_to_move(std::string board_notation) {
+    u8 src_square = (board_notation[0] - 'a') + (board_notation[1] - '1') * 8;
+    u8 dest_square = (board_notation[2] - 'a') + (board_notation[3] - '1') * 8;
+    Move_Flag flag;
+    if(board_notation.length() == 5) {
+        switch(board_notation[4]) {
+            case 'q':
+                flag = Move_Flag::QUEEN_PROMOTION_FLAG;
+                break;
+            case 'r':
+                flag = Move_Flag::ROOK_PROMOTION_FLAG;
+                break;
+            case 'b':
+                flag = Move_Flag::BISHOP_PROMOTION_FLAG;
+                break;
+            case 'n':
+                flag = Move_Flag::KNIGHT_PROMOTION_FLAG;
+                break;
+        }
+        return Move(src_square, dest_square, flag);
+    }
+    else {
+        return Utils::encode_move(get_piece_type_from_square(src_square), src_square, dest_square, get_en_passant_target());
+    }
+}

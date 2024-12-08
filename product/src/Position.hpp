@@ -10,7 +10,6 @@
 #include "utils.hpp"
 #include "Timer.hpp"
 #include "Zobrist.hpp"
-
 class Position
 { // Game state class
     public:
@@ -104,6 +103,7 @@ class Position
         bool equals(const Position& posb) const;
         std::string equals_with_debugging(const Position& posb) const;
         std::string zobrist_equals_with_debugging(const u64& zobrist_key_b) const;
+        Move board_notation_to_move(std::string board_notation);
 
     private:
         // Piece-centric bitboards for storing the position of the pieces by types and colour

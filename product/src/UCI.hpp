@@ -5,13 +5,14 @@
 #include "Search.hpp"
 #include "Position.hpp"
 #include "Timer.hpp"
+#include "Game_History.hpp"
 
 #include <chrono>
 
 namespace UCI {
     std::vector<std::string> split_args(std::string input);
-    u64 go(std::vector<std::string>& args, Timer& timer, Position& pos, std::vector<u64> game_history_stack, Transposition_Table& tt);
-    void position(std::vector<std::string>& args, Position& pos);
+    void go(std::vector<std::string>& args, Timer& timer, Position& pos, Transposition_Table& tt, Game_History& gh);
+    void position(std::vector<std::string>& args, Position& pos, Game_History& gh);
     int options(std::vector<std::string>& args);
 }
 

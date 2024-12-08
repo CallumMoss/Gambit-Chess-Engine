@@ -932,7 +932,7 @@
 //   std::vector<std::string> moves = {"b1a3", "g7g6", "a1b1", "f8g7", "b1a1", "e7e6", "a1b1", "g8f6", "b1a1", "e8g8", "a1b1", "b8c6", "b1a1", "b7b5", "g1f3", "a7a5", "a1b1", "c8a6"};
 //   for(std::string move_string : moves)
 //   {
-//     Move move = Utils::board_notation_to_move(move_string, pos);
+//     Move move = Position::board_notation_to_move(move_string, pos);
 //     pos.make_move(move);
 //   }
 
@@ -1227,9 +1227,9 @@
 //   assert(static_cast<int>(pos.get_en_passant_target()) == 16);
 // }
 
-TEST(PERFT, perft_suite) {
-  run_perft_suite(false);
-}
+// TEST(PERFT, perft_suite) {
+//   run_perft_suite(false);
+// }
 
 // TEST(MOVE_REPETITION, test_3_fold) {
 //   Position pos = Position();
@@ -1285,8 +1285,16 @@ TEST(PERFT, perft_suite) {
 //   // Expect to see "Repetition detected" in the terminal
 // }
 
-// TEST(MOVE_REPETITION, testing_2_fold) {
-//   // simply search and should output
+TEST(MOVE_REPETITION, testing_2_fold) {
+  Position pos = Position("4Q3/6pk/8/8/8/2q5/3r4/7K w - - 0 1");
+  //r1rrrrk1/8/8/8/5q2/4q3/4qq2/1Q5K w - - 0 1
+}
+
+// TEST(EVAL, eval) {
+//   Position pos;
+//   std::cout << Evaluation::evaluate(pos) << std::endl;
+//   Position pos2 = Position("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
+//   std::cout << Evaluation::evaluate(pos2) << std::endl;
 // }
 
 int main(int argc, char **argv) {

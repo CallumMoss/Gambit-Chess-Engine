@@ -6,31 +6,25 @@
 #include "Position.hpp"
 #include "Evaluation.hpp"
 #include "Transposition_Table.hpp"
+#include "Game_History.hpp"
 
-enum Search_Type {
-    FIXED_DEPTH,
-    ITERATIVE_DEEPENING
-};
-
-enum Search_Algorithm {
-    NEGAMAX,
-    ALPHA_BETA,
-    GAMBIT_SEARCH
-};
+// enum Forced_Flag {
+//     NO_FORCED,
+//     STALEMATE,
+//     CHECKMATE
+// };
 
 class Search {
     public:
         Search();
-        Search(std::vector<u64> game_history_stack);
-        Search(std::vector<u64> game_history_stack, int tt_size_in_mb);
+        //Search(std::vector<u64>& game_history_stack, int tt_size_in_mb);
 
         // Search algorithms
-        int negamax(int depth, int ply, const Position& pos, Timer& timer);
-        int iterative_deepening(const Position& pos, Timer& timer, Transposition_Table& tt);
-        int alpha_beta(int depth, int ply, const Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt);
+        int iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, Game_History& gh);
+        int alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, Game_History& gh);
 
         // Utils
-        bool is_draw(const int& ply, const Position& pos);
+        bool is_draw(Position& pos, Game_History& gh, int ply);
         bool three_fold_repetition_has_occured(Move last_6_half_moves[6]);
         int find_mvv_lva(Piece victim_type, Piece attacker_type);
         int value_of_piece_from_type_and_capture_role(Piece type, bool is_victim);
@@ -45,8 +39,7 @@ class Search {
         Move root_best_move;
         int root_best_score = -INT_MAX;
         bool has_found_a_legal_move = false;
-        
-        std::vector<u64> zobrist_key_stack; // should be max size of 100, maybe 200?
+        //Forced_Flag forced_flag = Forced_Flag::NO_FORCED;
 };
 
 #endif // #ifndef SEARCH_HPP

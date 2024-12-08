@@ -12,8 +12,7 @@
 
 void Transposition_Table::add_entry(u64 zobrist_key, int score, Move best_move, int depth, Node_Type node_type) {
     TT_Entry entry(zobrist_key, score, best_move, depth, node_type);
-    int hi = find_tt_index(zobrist_key);
-    transposition_table[hi] = entry;
+    transposition_table[find_tt_index(zobrist_key)] = entry;
 }   
 
 /**

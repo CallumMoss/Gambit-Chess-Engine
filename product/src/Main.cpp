@@ -5,6 +5,7 @@
 #include "Timer.hpp"
 #include "Zobrist.hpp"
 #include "Transposition_Table.hpp"
+#include "Game_History.hpp"
 
 #include <iostream>
 
@@ -20,7 +21,7 @@ int main() {
     Timer timer;
     Move null_move;
     Position pos = Position();
-    std::vector<u64> game_history_stack;
+    Game_History gh; // object that stores previously played moves and is updated and reverted during search to check for repetitions
 
     // Inspired by https://github.com/TiltedDFA/TDFA/blob/c26a01e29ba87c41af50700c2c8321e3e2667c8f/src/Uci.cpp
     while(std::getline(std::cin, input)) { // whilst isnt empty
@@ -39,17 +40,17 @@ int main() {
         else if(command == "ucinewgame") {
             pos = Position();
             tt.clear_table();
-            
+            gh.clear();
         }
         else if (command == "setoption") {
             tt.resize(UCI::options(args));
         }
         else if(command == "position") {
-            UCI::position(args, pos);
+            gh.clear();
+            UCI::position(args, pos, gh);
         }
         else if (command == "go") {
-            u64 current_zobrist = UCI::go(args, timer, pos, game_history_stack, tt);
-            game_history_stack.push_back(current_zobrist);
+            UCI::go(args, timer, pos, tt, gh);
         }
         else if(command == "quit") {
             break;

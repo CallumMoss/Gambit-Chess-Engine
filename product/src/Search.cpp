@@ -4,70 +4,20 @@
 #include <cmath>
 #include <algorithm>
 
-Search::Search(){}
-
-Search::Search(std::vector<u64> game_history_stack) { zobrist_key_stack = game_history_stack; }
-
-int Search::negamax(int depth, int ply, const Position& pos, Timer& timer) {
-    if(depth == 0) {
-        return Evaluation::evaluate(pos);
-    }
-    int best_score = -INT_MAX;
-    int score = -INT_MAX;
-    std::vector<Move> moves = pos.generate_all_moves();
-    for(Move move : moves) {
-        if(timer.is_out_of_time()) {
-            return best_score; // could return anything as this score wont be used
-        }
-        // reset position
-        Position new_position = pos;
-        new_position.make_move(move);
-        if(!new_position.is_legal(move)) {
-            continue;
-        }
-
-        if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
-
-        // Checking for 50 move and repetition
-        if(is_draw(ply, new_position)) {
-            // Score is draw score and search from this node is stopped as a draw wouldve already occured
-            score = Utils::DRAW_SCORE;
-            std::cout << "Repetition detected at depth: " << depth << std::endl;
-            std::cout << Utils::move_to_board_notation(move) << std::endl;
-            //std::exit(-1);
-            // position startpos moves b1c3 b8c6 c3b1 c6b8 b1c3 b8c6 c3b1 c6b8 b1c3 b8c6 c3b1 c6b8
-        }
-        else {
-            // Continue searching
-            score = -negamax(depth - 1, ply + 1, new_position, timer);
-            // std::cout << "Not repetition\n";
-            // std::cout << Utils::move_to_board_notation(move) << std::endl;
-        }
-
-        if(score > best_score) {
-            best_score = score;
-            if(ply == 0) { // if we have got the score for the best move at root (the one we will give to UCI to play)
-                root_best_move = move;
-                root_best_score = score;
-            }
-        }
-    }
-    if(!has_found_a_legal_move) { // if there are no legal moves at a depth past 1, then 
-        if(pos.in_check()) {
-            best_score = Utils::MATE_SCORE + ply; // checkmate
-        }
-        else {
-            best_score = Utils::DRAW_SCORE; // stalemate
-        }
-    }
-    return best_score;
-}
+Search::Search():
+    root_best_move(),
+    root_best_score(-INT_MAX),
+    has_found_a_legal_move(false) {}
 
 // Inspired by: https://www.chessprogramming.org/Alpha-Beta#Negamax_Framework
-int Search::alpha_beta(int depth, int ply, const Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt) {
-    if(depth == 0) {
-        return Evaluation::evaluate(pos);
-    }
+int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, Game_History& gh) {
+    // // if resulting position after a move is a draw, return draw score instantly
+    // if(ply != 0) {
+    //     if(is_draw(pos, gh, ply)) { return Utils::DRAW_SCORE; }
+    // }
+
+    if(depth == 0) { return Evaluation::evaluate(pos); }
+
     Node_Type node_type = Node_Type::UPPER;
     Move zobrist_move = Utils::NULL_MOVE;
     if(ply != 0) {
@@ -98,27 +48,13 @@ int Search::alpha_beta(int depth, int ply, const Position& pos, Timer& timer, in
         // reset position
         Position new_position = pos;
         new_position.make_move(move);
-        if(!new_position.is_legal(move)) {
-            continue;
-        }
+        if(!new_position.is_legal(move)) { continue; }
 
         if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
 
-        // Checking for 50 move and repetition
-        if(is_draw(ply, new_position)) {
-            // Score is draw score and search from this node is stopped as a draw wouldve already occured
-            score = Utils::DRAW_SCORE;
-            std::cout << "Repetition detected at depth: " << depth << std::endl;
-            std::cout << Utils::move_to_board_notation(move) << std::endl;
-            //std::exit(-1);
-            // position startpos moves b1c3 b8c6 c3b1 c6b8 b1c3 b8c6 c3b1 c6b8 b1c3 b8c6 c3b1 c6b8
-        }
-        else {
-            // Continue searching
-            score = -alpha_beta(depth - 1, ply + 1, new_position, timer, -beta, -alpha, tt);
-            // std::cout << "Not repetition\n";
-            // std::cout << Utils::move_to_board_notation(move) << std::endl;
-        }
+        //gh.add(new_position.get_zobrist_key());
+        score = -alpha_beta(depth - 1, ply + 1, new_position, timer, -beta, -alpha, tt, gh);
+        //gh.pop();
 
         if(score > best_score) {
             best_score = score;
@@ -140,27 +76,41 @@ int Search::alpha_beta(int depth, int ply, const Position& pos, Timer& timer, in
     }
 
     if(!has_found_a_legal_move) { // if there are no legal moves at a depth past 1, then 
-        if(pos.in_check()) { best_score = Utils::MATE_SCORE + ply; } // checkmate
+        if(pos.in_check()) {
+            best_score = Utils::MATE_SCORE + ply;
+            //forced_flag = Forced_Flag::CHECKMATE;
+        }
 
-        else { best_score = Utils::DRAW_SCORE; } // stalemate
+        else {
+            best_score = Utils::DRAW_SCORE;
+            //forced_flag = Forced_Flag::STALEMATE;
+        }
     }
     // unsure:
     tt.add_entry(pos.get_zobrist_key(), alpha, best_move, depth, node_type);
     return best_score;
 }
 
-int Search::iterative_deepening(const Position& pos, Timer& timer, Transposition_Table& tt) {
+/**
+ * @brief Calls search algorithm and iterates its depth until time is up
+ * 
+ * @param pos root position
+ * @param timer used to keep track of turn allowance
+ * @param tt used to store previous positions
+ * @return int score of best move or 0
+ */
+int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, Game_History& gh) {
     Move last_best_move;
     int last_best_score = -INT_MAX;
     int depth = 1;
     while(true) {
-        // Negamax //
-        //int score = -negamax(depth, 0, pos, timer);
-        //         //
-
-        // Alpha Beta //
-        int score = -alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt);
-        //            //
+        int score = -alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, gh);
+        // if(forced_flag != Forced_Flag::NO_FORCED) { // if there is a forced position, stop searching further
+        //     last_best_move = root_best_move;
+        //     last_best_score = root_best_score;
+        //     std::cout << "info score cp " << score << " depth " << depth << std::endl;
+        //     return score;
+        // }
 
         if(timer.is_out_of_time()) {
             root_best_move = last_best_move;
@@ -183,33 +133,31 @@ int Search::iterative_deepening(const Position& pos, Timer& timer, Transposition
  * @return true if 50 move or repetition rule has occured
  * @return false if 50 move or repetition rule has not occured
  */
-bool Search::is_draw(const int& ply, const Position& pos) {
-    // 50 move rule:
-    if(pos.get_half_move_clock() == 100) {
-        std::cout << "\n\nHello\n\n";
-        return true;
+bool Search::is_draw(Position& pos, Game_History& gh, int ply) {
+    // Check for insufficient mating material
+    // Inspired by: https://github.com/zzzzz151/Starzix/blob/main/src/board.hpp
+    u64 board = pos.get_board();
+    // King vs King
+    if (Utils::count_number_of_1bs(board) == 2) { return true; }
+    // King and Bishop vs King or King and Knight vs King
+    if (Utils::count_number_of_1bs(board) == 3) {
+        if(pos.get_knights() > 0 || pos.get_bishops() > 0) {
+            return true;
+        }
     }
-    // Repetition:
-    bool has_repeated = false;
-    bool repetition = false;
-    const int head = static_cast<int>(zobrist_key_stack.size()) - 1;
-    const int max_dist = std::min(static_cast<int>(pos.get_half_move_clock()), head);
 
-// starting from 4 because you cannot have the same position from ply 2 as you cannot loop back in 1 move
-    for(int ply_from_current_pos = 4; ply_from_current_pos <= max_dist; ply_from_current_pos += 2) {
-        // std::cout << pos.get_zobrist_key() << std::endl;
-        // std::cout << zobrist_key_stack[head - ply_from_current_pos] << std::endl;
-        if(pos.get_zobrist_key() == zobrist_key_stack[head - ply_from_current_pos]) {
-        //             std::cout << pos.get_zobrist_key() << std::endl;
-        // std::cout << zobrist_key_stack[head - ply_from_current_pos] << std::endl;
-            if(ply >= ply_from_current_pos) { // if there is a repetition within our search tree, we return true instantly as you only want to check for 2 fold in the search tree
-                return true;
-            }
-            if(has_repeated) { // if has repetition in game history for a second time, return true
-                return true;
-            }
-            has_repeated = true;
-            ply_from_current_pos += 2; // same logic as starting from 4, we add an extra two as n - 2 cannot be a repeat
+    // 50 move rule:
+    if(pos.get_half_move_clock() == 100) { return true; }
+
+    // Repetition: (Checks for 2 fold repetition)
+    if(pos.get_half_move_clock() < 4) { return false; } // no repetition could have occured
+    int stack_top_index = gh.get_index();
+    if(stack_top_index < 4) { return false; } // no repetition could have occured
+    bool repetition_has_occured = false;
+    for(int i  = 1; i <= stack_top_index; i++) {
+        if(pos.get_zobrist_key() == gh.get_element(stack_top_index - i)) {
+            if(repetition_has_occured) { return true; } // if repetition has already occured, return true
+            repetition_has_occured = true;
         }
     }
     return false;

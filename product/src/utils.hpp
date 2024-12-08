@@ -2,14 +2,11 @@
 #define UTILS_HPP
 
 #include "Types.hpp"
-#include "Position.hpp"
 
 #include <cstdint>
 #include <array>
 #include <string>
 #include <iostream>
-
-class Position; // Forward declaration to avoid circular dependencies.
 
 namespace Utils {
     u64 shift_up(u64 board); // replace bit with 0, replace bit shifted 8 left with 1
@@ -23,7 +20,6 @@ namespace Utils {
     u64 clear_bit(u64 board, int index);
     Move encode_move(Piece type, u8 src_square, u8 dest_square, u8 en_passant_target);
     std::string move_to_board_notation(Move move);
-    Move board_notation_to_move(std::string board_notation, Position& pos);
     std::string square_to_board_notation(u8 square);
 
 

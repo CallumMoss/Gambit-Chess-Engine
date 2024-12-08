@@ -38,7 +38,7 @@ std::vector<std::string> UCI::split_args(std::string input)
     */
 
 // Inspired by https://github.com/AndyGrant/Ethereal/blob/master/src/uci.c#L133
-u64 UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, std::vector<u64> game_history_stack, Transposition_Table& tt) {
+void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transposition_Table& tt, Game_History& gh) {
     // Give default values which are updated later
     // Usually these values for wtime and btime should always be updated, so value here is technically irrelevant
     u64 wtime = 60'000; // white has x msec left on the clock
@@ -70,21 +70,17 @@ u64 UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, std::ve
 
     timer.start_timer();
 
-    Search search = Search(game_history_stack);
+    Search search = Search();
 
-    //** Negamax Iterative Deepening (With Timer) **//
-    int score = search.iterative_deepening(pos, timer, tt);
+    int score = search.iterative_deepening(pos, timer, tt, gh);
     Move best_move = search.get_root_best_move();
     std::string best_move_str = Utils::move_to_board_notation(best_move);
     std::cout << "bestmove " << best_move_str << std::endl;
-    //** ---------------------------------------- **//
-    
-    // Apply best move to pos so we can get its zobrist for game history
     pos.make_move(best_move);
-    return pos.get_zobrist_key();
+
 }
 
-void UCI::position(std::vector<std::string>& args, Position& pos) {
+void UCI::position(std::vector<std::string>& args, Position& pos, Game_History& gh) {
     if(args[1] == "fen") {
         std::string constructed_fen{""};
 
@@ -114,8 +110,10 @@ void UCI::position(std::vector<std::string>& args, Position& pos) {
     }
     if(index != -1) { // if there is a moves argument
         for(index++; index < static_cast<int>(args.size()); index++) {
-            Move move = Utils::board_notation_to_move(args[index], pos);
+            Move move = pos.board_notation_to_move(args[index]);
             pos.make_move(move);
+            // add game history
+            //gh.add(pos.get_zobrist_key());
         }
     }
     else {
