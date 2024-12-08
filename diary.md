@@ -1,5 +1,5 @@
 07/12/2024 - 08/12/2024:
-Working on repetition checks.
+Working on repetition checks. Added forced flag checks.
 
 06/12/2024:
 Meeting with Eduard to discuss report and presentation.

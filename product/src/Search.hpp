@@ -8,11 +8,11 @@
 #include "Transposition_Table.hpp"
 #include "Game_History.hpp"
 
-// enum Forced_Flag {
-//     NO_FORCED,
-//     STALEMATE,
-//     CHECKMATE
-// };
+enum Forced_Flag {
+    NO_FORCED,
+    STALEMATE,
+    CHECKMATE
+};
 
 class Search {
     public:
@@ -39,7 +39,7 @@ class Search {
         Move root_best_move;
         int root_best_score = -INT_MAX;
         bool has_found_a_legal_move = false;
-        //Forced_Flag forced_flag = Forced_Flag::NO_FORCED;
+        Forced_Flag forced_flag = Forced_Flag::NO_FORCED;
 };
 
 #endif // #ifndef SEARCH_HPP

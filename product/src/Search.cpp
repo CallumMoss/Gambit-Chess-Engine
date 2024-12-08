@@ -78,12 +78,12 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
     if(!has_found_a_legal_move) { // if there are no legal moves at a depth past 1, then 
         if(pos.in_check()) {
             best_score = Utils::MATE_SCORE + ply;
-            //forced_flag = Forced_Flag::CHECKMATE;
+            forced_flag = Forced_Flag::CHECKMATE;
         }
 
         else {
             best_score = Utils::DRAW_SCORE;
-            //forced_flag = Forced_Flag::STALEMATE;
+            forced_flag = Forced_Flag::STALEMATE;
         }
     }
     // unsure:
@@ -105,12 +105,12 @@ int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table
     int depth = 1;
     while(true) {
         int score = -alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, gh);
-        // if(forced_flag != Forced_Flag::NO_FORCED) { // if there is a forced position, stop searching further
-        //     last_best_move = root_best_move;
-        //     last_best_score = root_best_score;
-        //     std::cout << "info score cp " << score << " depth " << depth << std::endl;
-        //     return score;
-        // }
+        if(forced_flag != Forced_Flag::NO_FORCED) { // if there is a forced position, stop searching further
+            last_best_move = root_best_move;
+            last_best_score = root_best_score;
+            std::cout << "info score cp " << score << " depth " << depth << std::endl;
+            return score;
+        }
 
         if(timer.is_out_of_time()) {
             root_best_move = last_best_move;
