@@ -26,7 +26,8 @@ namespace Utils {
     static constexpr u8 NULL_EN_PASSANT = 64;
     static Move NULL_MOVE = Move(64, 64, Move_Flag::NULL_FLAG);
     static constexpr int MATE_SCORE = -INT_MAX + 1;
-    static constexpr int DRAW_SCORE = 0; // can change this to vary level of contempt, however wont work if is an int and try to use decimals.
+    static constexpr int DRAW_SCORE = 0; // can change this to vary level of contempt
+    static constexpr int MAX_PLY = 255;
 
     constexpr u64 WHITE_PAWN_ATTACKS[64] {
         0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, // although a white pawn from here could move, there should never be one here

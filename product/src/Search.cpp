@@ -10,17 +10,17 @@ Search::Search():
     has_found_a_legal_move(false) {}
 
 // Inspired by: https://www.chessprogramming.org/Alpha-Beta#Negamax_Framework
-int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, Game_History& gh) {
-    // // if resulting position after a move is a draw, return draw score instantly
-    // if(ply != 0) {
-    //     if(is_draw(pos, gh, ply)) { return Utils::DRAW_SCORE; }
-    // }
+int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps) {
+    // if resulting position after a move is a draw, return draw score instantly
+    if(ply > 0) {
+        if(is_draw(pos, ps, ply)) { return Utils::DRAW_SCORE; }
+    }
 
     if(depth == 0) { return Evaluation::evaluate(pos); }
 
     Node_Type node_type = Node_Type::UPPER;
     Move zobrist_move = Utils::NULL_MOVE;
-    if(ply != 0) {
+    if(ply > 0) {
         // Checking if position is in transposition table
         // Inspired by https://github.com/TiltedDFA/TDFA/blob/main/src/Search.cpp
         if(tt.entry_is_in_tt(pos.get_zobrist_key())) {
@@ -37,7 +37,7 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
     int score = -INT_MAX;
     std::vector<Move> moves = pos.generate_all_moves();
     moves = sort_by_mvv_lva(moves, pos);
-    Move best_move = moves[0];
+     Move best_move = moves[0];
     if(!zobrist_move.equals(Utils::NULL_MOVE)) {
         moves.insert(moves.begin(), zobrist_move); // look at zobrist best move first
     }
@@ -52,9 +52,9 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
 
         if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
 
-        //gh.add(new_position.get_zobrist_key());
-        score = -alpha_beta(depth - 1, ply + 1, new_position, timer, -beta, -alpha, tt, gh);
-        //gh.pop();
+        ps.push_back(pos.get_zobrist_key()); // adds original position, which in the next call is the next position and checks for draw first
+        score = -alpha_beta(depth - 1, ply + 1, new_position, timer, -beta, -alpha, tt, ps);
+        ps.pop_back();
 
         if(score > best_score) {
             best_score = score;
@@ -99,12 +99,12 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
  * @param tt used to store previous positions
  * @return int score of best move or 0
  */
-int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, Game_History& gh) {
+int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps) {
     Move last_best_move;
     int last_best_score = -INT_MAX;
     int depth = 1;
-    while(true) {
-        int score = -alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, gh);
+    while(depth <= 255) {
+        int score = -alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps);
         if(forced_flag != Forced_Flag::NO_FORCED) { // if there is a forced position, stop searching further
             last_best_move = root_best_move;
             last_best_score = root_best_score;
@@ -126,14 +126,14 @@ int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table
 }
 
 /**
- * @brief Checks for 50 move rule, then repetition
+ * @brief Checks for insufficient mating material, 50 move rule, then repetition
  * 
  * @param ply number of half moves from current search tree depth to root
  * @param pos current position after make move
  * @return true if 50 move or repetition rule has occured
  * @return false if 50 move or repetition rule has not occured
  */
-bool Search::is_draw(Position& pos, Game_History& gh, int ply) {
+bool Search::is_draw(Position& pos, PositionStack& ps, int ply) {
     // Check for insufficient mating material
     // Inspired by: https://github.com/zzzzz151/Starzix/blob/main/src/board.hpp
     u64 board = pos.get_board();
@@ -150,14 +150,16 @@ bool Search::is_draw(Position& pos, Game_History& gh, int ply) {
     if(pos.get_half_move_clock() == 100) { return true; }
 
     // Repetition: (Checks for 2 fold repetition)
-    if(pos.get_half_move_clock() < 4) { return false; } // no repetition could have occured
-    int stack_top_index = gh.get_index();
-    if(stack_top_index < 4) { return false; } // no repetition could have occured
+    int stack_top_index = ps.size() - 1;
     bool repetition_has_occured = false;
-    for(int i  = 1; i <= stack_top_index; i++) {
-        if(pos.get_zobrist_key() == gh.get_element(stack_top_index - i)) {
-            if(repetition_has_occured) { return true; } // if repetition has already occured, return true
-            repetition_has_occured = true;
+    int search_cap = stack_top_index;
+    //int search_cap = std::min(stack_top_index, static_cast<int>(pos.get_half_move_clock()));
+    for(int i = 3; i <= search_cap; i++) {
+        if(pos.get_zobrist_key() == ps[stack_top_index - i]) {
+            return true;
+            // if(repetition_has_occured) { return true; } // if repetition has already occured, return true
+            // repetition_has_occured = true;
+            //pos.print_position();
         }
     }
     return false;
@@ -166,7 +168,8 @@ bool Search::is_draw(Position& pos, Game_History& gh, int ply) {
 // Most Valuable Victim - Least Valuable Aggressor
 // Simple heuristic to help sort captures in a way where it is more likely to benefit from the exchange
 // Ranges from [4, 49], where the lower the number the higher the priority
-int Search::find_mvv_lva(Piece victim_type, Piece attacker_type) { // we give weight towards the victim to ensure it gets sorted first
+int Search::find_mvv_lva(Piece victim_type, Piece attacker_type)
+{ // we give weight towards the victim to ensure it gets sorted first
     return ((value_of_piece_from_type_and_capture_role(victim_type, true) * 10) - value_of_piece_from_type_and_capture_role(attacker_type, false));
 }
 
@@ -226,29 +229,6 @@ std::vector<Move> Search::sort_by_mvv_lva(const std::vector<Move>& moves, const 
     }
     
     return sorted_moves;
-}
-
-/**
- * @brief Determines whether a 3 fold repetition has occured based on the past 6 half moves
- * 
- * @return true if a repetition has occured
- * @return false if a repetition has not occured
- */
-bool Search::three_fold_repetition_has_occured(Move last_6_half_moves[6]) {
-    Move null_move;
-    for(int i = 0; i < 6; i++) { // checking if not equal to the inital null array
-        if(last_6_half_moves[i].equals(null_move)) { return false; }    
-    }
-    if(last_6_half_moves[0].equals(last_6_half_moves[2])) {
-        if(last_6_half_moves[2].equals(last_6_half_moves[4])) {
-            if(last_6_half_moves[1].equals(last_6_half_moves[3])) {
-                if(last_6_half_moves[3].equals(last_6_half_moves[5])) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
 }
 
 // int Search::quintescence_search(std::vector<Move>& moves, u64 board) {

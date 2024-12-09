@@ -1285,9 +1285,10 @@
 //   // Expect to see "Repetition detected" in the terminal
 // }
 
+// Inspired by: https://github.com/toanth/motors/blob/main/motors/src/search/chess.rs
 TEST(MOVE_REPETITION, testing_2_fold) {
-  Position pos = Position("4Q3/6pk/8/8/8/2q5/3r4/7K w - - 0 1");
-  //r1rrrrk1/8/8/8/5q2/4q3/4qq2/1Q5K w - - 0 1
+  // position fen 8/3Q4/2K5/k7/6P1/8/8/8 w - - 0 1 moves d7d4 a5a6 d4d6 a6a5 d6d4 a5a6 d4d7 a6a5
+  // Move outputted should not be Qd4
 }
 
 // TEST(EVAL, eval) {

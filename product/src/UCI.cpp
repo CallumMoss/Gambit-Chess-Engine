@@ -38,7 +38,7 @@ std::vector<std::string> UCI::split_args(std::string input)
     */
 
 // Inspired by https://github.com/AndyGrant/Ethereal/blob/master/src/uci.c#L133
-void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transposition_Table& tt, Game_History& gh) {
+void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transposition_Table& tt, PositionStack& ps) {
     // Give default values which are updated later
     // Usually these values for wtime and btime should always be updated, so value here is technically irrelevant
     u64 wtime = 60'000; // white has x msec left on the clock
@@ -72,15 +72,14 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transp
 
     Search search = Search();
 
-    int score = search.iterative_deepening(pos, timer, tt, gh);
+    int score = search.iterative_deepening(pos, timer, tt, ps);
     Move best_move = search.get_root_best_move();
     std::string best_move_str = Utils::move_to_board_notation(best_move);
     std::cout << "bestmove " << best_move_str << std::endl;
     pos.make_move(best_move);
-
 }
 
-void UCI::position(std::vector<std::string>& args, Position& pos, Game_History& gh) {
+void UCI::position(std::vector<std::string>& args, Position& pos, PositionStack& ps) {
     if(args[1] == "fen") {
         std::string constructed_fen{""};
 
@@ -113,12 +112,10 @@ void UCI::position(std::vector<std::string>& args, Position& pos, Game_History& 
             Move move = pos.board_notation_to_move(args[index]);
             pos.make_move(move);
             // add game history
-            //gh.add(pos.get_zobrist_key());
+            ps.push_back(pos.get_zobrist_key());
         }
     }
-    else {
-        return;
-    }
+    else { return; }
 }
 
 int UCI::options(std::vector<std::string>& args) {

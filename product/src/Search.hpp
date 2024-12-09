@@ -20,12 +20,11 @@ class Search {
         //Search(std::vector<u64>& game_history_stack, int tt_size_in_mb);
 
         // Search algorithms
-        int iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, Game_History& gh);
-        int alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, Game_History& gh);
+        int iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps);
+        int alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps);
 
         // Utils
-        bool is_draw(Position& pos, Game_History& gh, int ply);
-        bool three_fold_repetition_has_occured(Move last_6_half_moves[6]);
+        bool is_draw(Position& pos, PositionStack& ps, int ply);
         int find_mvv_lva(Piece victim_type, Piece attacker_type);
         int value_of_piece_from_type_and_capture_role(Piece type, bool is_victim);
         std::vector<Move> sort_by_mvv_lva(const std::vector<Move>& moves, const Position& pos);

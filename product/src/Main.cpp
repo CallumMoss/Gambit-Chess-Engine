@@ -10,7 +10,7 @@
 #include <iostream>
 
 int main() {
-    std::string version = "v1.9.0";
+    std::string version = "v1.11.0";
 
     Magics::init();
     Zobrist zobrist;
@@ -21,7 +21,8 @@ int main() {
     Timer timer;
     Move null_move;
     Position pos = Position();
-    Game_History gh; // object that stores previously played moves and is updated and reverted during search to check for repetitions
+    PositionStack ps; // vector that stores occured positions and searched positions
+    ps.reserve(255);
 
     // Inspired by https://github.com/TiltedDFA/TDFA/blob/c26a01e29ba87c41af50700c2c8321e3e2667c8f/src/Uci.cpp
     while(std::getline(std::cin, input)) { // whilst isnt empty
@@ -40,17 +41,17 @@ int main() {
         else if(command == "ucinewgame") {
             pos = Position();
             tt.clear_table();
-            gh.clear();
+            ps.clear();
         }
         else if (command == "setoption") {
             tt.resize(UCI::options(args));
         }
         else if(command == "position") {
-            gh.clear();
-            UCI::position(args, pos, gh);
+            ps.clear();
+            UCI::position(args, pos, ps);
         }
         else if (command == "go") {
-            UCI::go(args, timer, pos, tt, gh);
+            UCI::go(args, timer, pos, tt, ps);
         }
         else if(command == "quit") {
             break;

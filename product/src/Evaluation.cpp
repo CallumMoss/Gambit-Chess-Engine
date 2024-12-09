@@ -80,10 +80,12 @@ int Evaluation::calculate_piece_square_advantage(const Position& pos, Turn colou
                 else { piece_square_advantage += Evaluation::BLACK_PAWN_SQUARE_TABLE[square]; }
                 break;
             case(Piece::KNIGHT):
-                piece_square_advantage += Evaluation::KNIGHT_SQUARE_TABLE[square];
+                if(colour == Turn::WHITE) { piece_square_advantage += Evaluation::WHITE_KNIGHT_SQUARE_TABLE[square]; }
+                else { piece_square_advantage += Evaluation::BLACK_KNIGHT_SQUARE_TABLE[square]; }
                 break;
             case(Piece::BISHOP):
-                piece_square_advantage += Evaluation::BISHOP_SQUARE_TABLE[square];
+                if(colour == Turn::WHITE) { piece_square_advantage += Evaluation::WHITE_BISHOP_SQUARE_TABLE[square]; }
+                else { piece_square_advantage += Evaluation::BLACK_BISHOP_SQUARE_TABLE[square]; }
                 break;
             case(Piece::ROOK):
                 if(colour == Turn::WHITE) { piece_square_advantage += Evaluation::WHITE_ROOK_SQUARE_TABLE[square]; }

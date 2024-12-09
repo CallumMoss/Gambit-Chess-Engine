@@ -1,3 +1,6 @@
+09/12/2024:
+Passed some repetition tests, still high draw rate.
+
 07/12/2024 - 08/12/2024:
 Working on repetition checks. Added forced flag checks.
 
