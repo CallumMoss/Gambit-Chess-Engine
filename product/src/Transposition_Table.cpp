@@ -27,7 +27,7 @@ void Transposition_Table::resize(int tt_size_in_mb) {
 
 // Inspired by: https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
 /**
- * @brief finds the index in the transposition table of a position based off its zobrist key
+ * @brief GCC specific function that finds the index in the transposition table of a position based off its zobrist key.
  * 
  * @param zobrist_key 
  * @return u64 

@@ -5,7 +5,6 @@
 #include "Timer.hpp"
 #include "Zobrist.hpp"
 #include "Transposition_Table.hpp"
-#include "Game_History.hpp"
 
 #include <iostream>
 
@@ -25,14 +24,14 @@ int main() {
     ps.reserve(255);
 
     // Inspired by https://github.com/TiltedDFA/TDFA/blob/c26a01e29ba87c41af50700c2c8321e3e2667c8f/src/Uci.cpp
-    while(std::getline(std::cin, input)) { // whilst isnt empty
+    while(std::getline(std::cin, input))
+    {
         std::vector<std::string> args = UCI::split_args(input);
         std::string command = args[0];
         // parameters = rest of args
         if(command == "uci") {
             std::cout << "id name Gambit " << version << std::endl; // insert version here
             std::cout << "id author Callum Moss" << std::endl;
-            // can print option commands
             std::cout << "uciok" << std::endl; // engine has set all parameters and is ready
         }
         else if(command == "isready") {
@@ -58,6 +57,5 @@ int main() {
         }
         output = "";
     }
-
     return 0;
 }

@@ -5,7 +5,6 @@
 #include "Search.hpp"
 #include "Position.hpp"
 #include "Timer.hpp"
-#include "Game_History.hpp"
 
 #include <chrono>
 

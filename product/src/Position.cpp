@@ -130,7 +130,6 @@ void Position::compute_zobrist_key() {
     // If turn is white, then zobrist key will not be XORd.
     // This state represents white.
     u64 temp_board = get_board();
-    int square;
     for(u8 sq = Utils::find_piece_index(temp_board); temp_board; temp_board = Utils::clear_bit(temp_board, sq), sq = Utils::find_piece_index(temp_board))
     {
         zobrist_key ^= (Zobrist::get_piece(get_piece_type_from_square(sq) + (6 * get_colour_value_from_square(sq)), sq));
@@ -450,7 +449,7 @@ std::vector<Move> Position::bb_to_move_list(Piece type, u8 src_square, u64 attac
     for(u64 attack : bb_list) {
         dest_square = Utils::find_piece_index(attack);
         if(type == Piece::PAWN) {
-            if((dest_square >=56 && dest_square < 64) || (dest_square >= 0 && dest_square < 8)) { // promotion has occured
+            if((dest_square >= 56 && dest_square < 64) || (dest_square < 8)) { // promotion has occured
             // We dont care about colour as pawns cant get to their own end rank
                 // if promotion, add promotion moves and continue as to not add a pawn move
                 move_list.push_back(Move(src_square, dest_square, Move_Flag::KNIGHT_PROMOTION_FLAG));
@@ -467,15 +466,12 @@ std::vector<Move> Position::bb_to_move_list(Piece type, u8 src_square, u64 attac
 
 bool Position::in_check() const { // used to detect stalemate. Finds if we are currently in check after make move has been applied
     u64 king_square_u64;
-    u64 our_pieces;
     u64 opponent_pieces;
     if(turn == Turn::BLACK) { // is flipped because we flip turn after make move, so we check if we are in check
-        our_pieces = get_white_pieces();
         opponent_pieces = get_black_pieces();
         king_square_u64 = get_white_king();
     }
     else {
-        our_pieces = get_black_pieces();
         opponent_pieces = get_white_pieces();
         king_square_u64 = get_black_king();
     }
@@ -517,15 +513,12 @@ bool Position::is_legal(Move& move) const
 {
     // Finding King Square and opponents pieces:
     u64 king_square_u64;
-    u64 our_pieces;
     u64 opponent_pieces;
     if(turn == Turn::BLACK) { // is flipped because we flip turn after make move
-        our_pieces = get_white_pieces();
         opponent_pieces = get_black_pieces();
         king_square_u64 = get_white_king();
     }
     else {
-        our_pieces = get_black_pieces();
         opponent_pieces = get_white_pieces();
         king_square_u64 = get_black_king();
     }
@@ -568,7 +561,6 @@ bool Position::is_legal(Move& move) const
         // Now need to check whether the squares the king traverses are in check, or whether the king was in check
         u8 relevant_square_1;
         u8 relevant_square_2;
-        u64 relevant_squares = 0ULL;
         if(move.get_dest_square() == 2) {
             relevant_square_1 = 2;
             relevant_square_2 = 3;
@@ -725,7 +717,6 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
     u8 dest_square = move.get_dest_square();
     Piece moved_piece_type = get_piece_type_from_square(src_square);
     Piece captured_piece_type = get_piece_type_from_square(dest_square);
-    Piece promoted_piece_type = Piece::INVALID;
     half_move_clock++;
     full_move_counter = half_move_clock / 2; // ints floor divide in C++
 
@@ -1047,7 +1038,6 @@ void Position::remove_blcr() { castling_rights = castling_rights & ~(1 << Castli
 
 // Returns 0 for white and 1 for black
 int Position::get_colour_value_from_square(u8 square) { return (get_black_pieces() & (1ULL << square)) ? 1 : 0; }
-
 
 void Position::set_turn(Turn turn) {this->turn = turn;}
 

@@ -31,7 +31,7 @@ class Zobrist
             #ifdef ZOBRIST_DBG
                 call_order.push_back(std::format("ZOBRIST_CALL:\tpiece sq:{}, \ttype:{} \treturned:{}", square, type, instance->pieces[square][type]));
             #endif
-            if(square >= instance->pieces.size() || type >= instance->pieces[0].size()) {
+            if(square >= static_cast<int>(instance->pieces.size()) || type >= static_cast<int>(instance->pieces[0].size())) {
                 std::cerr << "Error: attempted to access an index of pieces outside of the array." << std::endl;
                 std::cerr << "Square:" << static_cast<int>(square) << std::endl;
                 std::cerr << "Type:" << static_cast<int>(type) << std::endl;

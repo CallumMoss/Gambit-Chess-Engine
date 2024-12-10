@@ -1291,12 +1291,19 @@ TEST(MOVE_REPETITION, testing_2_fold) {
   // Move outputted should not be Qd4
 }
 
+TEST(STALEMATE, test1) {
+  // position fen 5q1k/8/5K2/2BB4/8/3Q4/8/8 w - - 0 1
+  // Should not capture the queen
+}
+
 // TEST(EVAL, eval) {
 //   Position pos;
 //   std::cout << Evaluation::evaluate(pos) << std::endl;
 //   Position pos2 = Position("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
 //   std::cout << Evaluation::evaluate(pos2) << std::endl;
 // }
+
+// mate in one: position fen 4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/4R1P1/B1Q2RK1 b - - 4 32
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

@@ -6,7 +6,6 @@
 #include "Position.hpp"
 #include "Evaluation.hpp"
 #include "Transposition_Table.hpp"
-#include "Game_History.hpp"
 
 enum Forced_Flag {
     NO_FORCED,
@@ -32,7 +31,6 @@ class Search {
 
         // Getters and Setters
         Move get_root_best_move() { return root_best_move; }
-        bool get_has_found_a_legal_move() { return has_found_a_legal_move; }
 
     private:
         Move root_best_move;
