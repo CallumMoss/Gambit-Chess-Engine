@@ -6,14 +6,13 @@
 #include <iostream>
 #include <chrono>
 
-#include "../Types.hpp"
-#include "../Position.hpp"
+#include "Perft.hpp"
 
 
 // Perft suite used: http://www.rocechess.ch/perft.html
 
 // Used AI assistance for this function as the problem seemed relatively trivial
-static std::vector<std::string> Split(const std::string& str, const std::string& delimiter) {
+static std::vector<std::string> Perft::Split(const std::string& str, const std::string& delimiter) {
     std::vector<std::string> tokens;
     size_t start = 0;
     size_t end = str.find(delimiter);
@@ -29,7 +28,7 @@ static std::vector<std::string> Split(const std::string& str, const std::string&
 }
 
 // Heavily inspired by the following implementation, but adapted for my own project: https://github.com/TiltedDFA/TDFA/tree/c26a01e29ba87c41af50700c2c8321e3e2667c8f
-static u64 test_perft(u8 depth, u64 expected_nodes, uint16_t test_number, const std::string& fen, const bool& output_perft) {
+static u64 Perft::test_perft(u8 depth, u64 expected_nodes, uint16_t test_number, const std::string& fen, const bool& output_perft) {
     Position pos(fen);
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -53,7 +52,7 @@ static u64 test_perft(u8 depth, u64 expected_nodes, uint16_t test_number, const 
     return nps;
 }
 
-static bool run_perft_suite(const bool& output_perft) {
+static bool Perft::run_perft_suite(const bool& output_perft) {
     std::fstream perft_file("../product/src/tests/perftsuite.epd", std::ios::in);
 
     if(!perft_file.is_open()){
@@ -89,4 +88,55 @@ static bool run_perft_suite(const bool& output_perft) {
     perft_file.close();
 
     return true;
+}
+
+u64 Perft::split_perft(int current_depth, const int& desired_depth, const bool& output_split, Move& last_move, Position pos) // desired depth being the initial depth input
+{
+    Move null_move = Move(0, 0, NULL_FLAG);
+    if(!last_move.equals(null_move)) {
+        Position current_pos = pos;
+        current_pos.recompute_zobrist_key(); // reset zobrist key then recalculate to see if the key has been updated properly based on the position
+        u64 carried = pos.get_zobrist_key();
+        u64 actual = current_pos.get_zobrist_key();
+        if(actual != carried) {
+            // std::cerr << equals_with_debugging(current_pos);
+            // std::cerr << zobrist_equals_with_debugging(actual) << std::endl;
+            std::cerr << "Last move applied: " << Utils::move_to_board_notation(last_move) << "\tMove Flag: " << static_cast<int>(last_move.get_flag()) << std::endl;
+            std::cerr << "Board: " << std::endl;
+            Utils::print_bb(pos.get_board());
+            pos.print_position();
+            std::cout << "Piece Type: " << pos.get_piece_type_from_square(last_move.get_dest_square()) << std::endl;
+            std::cout << "Zobrist call log:" << std::endl;
+            Zobrist::print_log();
+            std::exit(-1);
+        }
+    }
+    Zobrist::clear_log();
+
+    if (current_depth == 0) {
+        return 1ULL;
+    }
+    
+    u64 sum = 0;
+    u64 nodes = 0;
+    std::vector<Move> moves = pos.generate_all_moves();
+    for(Move& move : moves) {
+        // Reset position
+        // Create a copy of the current starting position at each depth
+        Position new_position = pos;
+        new_position.make_move(move); // apply move to current pos
+
+        if(!new_position.is_legal(move)) { // if move isnt legal, don't count
+            continue;
+        }
+        nodes = split_perft(current_depth - 1, desired_depth, output_split, move, new_position);
+        sum += nodes;
+
+        if(output_split) {
+            if(current_depth == desired_depth) { // if finished recursion
+                std::cout << Utils::move_to_board_notation(move) << ": " << nodes << std::endl;
+            }
+        }
+    }
+    return sum;
 }

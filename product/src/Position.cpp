@@ -685,7 +685,7 @@ void Position::handle_en_passant(const u8& src_square, const u8& dest_square)
 }
 
 /**
- * @brief Updated internal board state of pieces and colours for castling
+ * @brief Updates internal board state of pieces and colours for castling
  * 
  * @param src_square 
  * @param dest_square 
@@ -833,57 +833,6 @@ void Position::make_move(Move& move) // simpler than make and unmake but slightl
     // Flip the turn
     turn = !turn;
     zobrist_key ^= Zobrist::get_side_to_move();
-}
-
-u64 Position::split_perft(int current_depth, const int& desired_depth, const bool& output_split, Move& last_move) // desired depth being the initial depth input
-{
-    Move null_move = Move(0, 0, NULL_FLAG);
-    if(!last_move.equals(null_move)) {
-        Position current_pos = *this;
-        current_pos.recompute_zobrist_key(); // reset zobrist key then recalculate to see if the key has been updated properly based on the position
-        u64 carried = this->get_zobrist_key();
-        u64 actual = current_pos.get_zobrist_key();
-        if(actual != carried) {
-            // std::cerr << equals_with_debugging(current_pos);
-            // std::cerr << zobrist_equals_with_debugging(actual) << std::endl;
-            std::cerr << "Last move applied: " << Utils::move_to_board_notation(last_move) << "\tMove Flag: " << static_cast<int>(last_move.get_flag()) << std::endl;
-            std::cerr << "Board: " << std::endl;
-            Utils::print_bb(get_board());
-            print_position();
-            std::cout << "Piece Type: " << get_piece_type_from_square(last_move.get_dest_square()) << std::endl;
-            std::cout << "Zobrist call log:" << std::endl;
-            Zobrist::print_log();
-            std::exit(-1);
-        }
-    }
-    Zobrist::clear_log();
-
-    if (current_depth == 0) {
-        return 1ULL;
-    }
-    
-    u64 sum = 0;
-    u64 nodes = 0;
-    std::vector<Move> moves = generate_all_moves();
-    for(Move& move : moves) {
-        // Reset position
-        // Create a copy of the current starting position at each depth
-        Position new_position = *this;
-        new_position.make_move(move); // apply move to current pos
-
-        if(!new_position.is_legal(move)) { // if move isnt legal, don't count
-            continue;
-        }
-        nodes = new_position.split_perft(current_depth - 1, desired_depth, output_split, move);
-        sum += nodes;
-
-        if(output_split) {
-            if(current_depth == desired_depth) { // if finished recursion
-                std::cout << Utils::move_to_board_notation(move) << ": " << nodes << std::endl;
-            }
-        }
-    }
-    return sum;
 }
 
 bool Position::equals(const Position& posb) const {

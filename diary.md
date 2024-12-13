@@ -1,6 +1,15 @@
+12/12/2024
+Further refactoring.
+
+11/12/2024:
+Interim presentation.
+
+10/12/2024:
+Refactoring.
+
 09/12/2024:
 Passed some repetition tests, still high draw rate.
-Issues with MVV-LVA and has_found_a_legal_move or forced flag is believed to cause stalemates
+Issues with MVV-LVA and has_found_a_legal_move or forced flag is believed to cause stalemates.
 
 07/12/2024 - 08/12/2024:
 Working on repetition checks. Added forced flag checks.
