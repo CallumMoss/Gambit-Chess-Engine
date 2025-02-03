@@ -38,7 +38,7 @@ std::vector<std::string> UCI::split_args(std::string input)
     */
 
 // Inspired by https://github.com/AndyGrant/Ethereal/blob/master/src/uci.c#L133
-void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transposition_Table& tt, PositionStack& ps) {
+void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transposition_Table& tt, PositionStack& ps, bool is_gambit, Opponent& opp) {
     // Give default values which are updated later
     // Usually these values for wtime and btime should always be updated, so value here is technically irrelevant
     u64 wtime = 60'000; // white has x msec left on the clock
@@ -70,13 +70,11 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transp
 
     timer.start_timer();
 
-    Search search = Search();
-
-    search.iterative_deepening(pos, timer, tt, ps);
+    Search search = Search(is_gambit);
+    search.search(pos, timer, tt, ps, opp);
     Move best_move = search.get_root_best_move();
     std::string best_move_str = Utils::move_to_board_notation(best_move);
     std::cout << "bestmove " << best_move_str << std::endl;
-    pos.make_move(best_move);
 }
 
 void UCI::position(std::vector<std::string>& args, Position& pos, PositionStack& ps) {

@@ -6,6 +6,7 @@
 #include "Position.hpp"
 #include "Evaluation.hpp"
 #include "Transposition_Table.hpp"
+#include "Opponent.hpp"
 
 enum Forced_Flag {
     NO_FORCED,
@@ -15,10 +16,21 @@ enum Forced_Flag {
 
 class Search {
     public:
-        Search();
+        Search(bool is_gambit = false);
         //Search(std::vector<u64>& game_history_stack, int tt_size_in_mb);
 
         // Search algorithms
+        /**
+         * @brief Main search function which calls other search functions
+         * 
+         * @param pos 
+         * @param timer 
+         * @param tt 
+         * @param ps 
+         * @return int 
+         */
+        int search(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, Opponent& opp);
+
         int iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps);
         int alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps);
 
@@ -32,11 +44,19 @@ class Search {
         // Getters and Setters
         Move get_root_best_move() { return root_best_move; }
 
+        // Gambit Features:
+        void approach0_initial_call(Position& pos);
+        int approach0(int depth, int ply, Position& pos, std::vector<std::vector<EvaluatedMove>>& evaluated_moves);
+        int quiescence_search(Position& pos, int alpha, int beta);
+        int gambit_search(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, Opponent& opp);
+        int alpha_beta_prediction(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps, Opponent& opp);
+
     private:
         Move root_best_move;
         int root_best_score = -INT_MAX;
         bool has_found_a_legal_move = false;
         Forced_Flag forced_flag = Forced_Flag::NO_FORCED;
+        bool is_gambit = false;
 };
 
 #endif // #ifndef SEARCH_HPP

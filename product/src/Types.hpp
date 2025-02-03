@@ -189,6 +189,42 @@ struct Move {
         return true;
     }
 
+    bool is_promotion() {
+        // Could check if within range of values as flags are sequential
+        // But if I change the flags around, this function may break
+        Move_Flag flag = get_flag();
+        return flag == KNIGHT_PROMOTION_FLAG || 
+               flag == BISHOP_PROMOTION_FLAG || 
+               flag == ROOK_PROMOTION_FLAG || 
+               flag == QUEEN_PROMOTION_FLAG;
+    }
+
+    bool is_capture(u64 board) {
+        // && is logically wrong, that would check if both are non zero rather than performing bit operations
+        // wont generate a self capture so this is valid
+        return board & (1ULL << get_dest_square());
+    }
+
+    /**
+     * @brief Determines whether a move is a capture or promotion
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool is_noisy(u64 board) {
+        return is_promotion() || is_capture(board);
+    }
+
+
+};
+
+struct EvaluatedMove {
+    Move move;
+    int eval;
+    EvaluatedMove(Move move, int eval) {
+        this->move = move;
+        this->eval = eval;
+    }
 };
 
 enum Node_Type

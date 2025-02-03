@@ -34,7 +34,7 @@ static u64 Perft::test_perft(u8 depth, u64 expected_nodes, uint16_t test_number,
     auto start = std::chrono::high_resolution_clock::now();
 
     Move null_move = Move(0, 0, Move_Flag::NULL_FLAG);
-    u64 total_nodes = pos.split_perft(depth, depth, output_perft, null_move);
+    u64 total_nodes = split_perft(depth, depth, output_perft, null_move, pos);
 
     auto end = std::chrono::high_resolution_clock::now();
 

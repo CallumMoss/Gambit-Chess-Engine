@@ -23,6 +23,9 @@ int main() {
     PositionStack ps; // vector that stores occured positions and searched positions
     ps.reserve(255);
 
+    bool is_gambit = false;
+    Opponent opp = Opponent();
+
     // Inspired by https://github.com/TiltedDFA/TDFA/blob/c26a01e29ba87c41af50700c2c8321e3e2667c8f/src/Uci.cpp
     while(std::getline(std::cin, input))
     {
@@ -43,14 +46,24 @@ int main() {
             ps.clear();
         }
         else if (command == "setoption") {
-            tt.resize(UCI::options(args));
+            if(args[1] == "Search") { // setoption Search default || setoption Search Default || setoption Search Gambit || setoption Search gambit
+                if(args[2] == "gambit" || args[2] == "Gambit") {
+                    is_gambit = true;
+                }
+                else if(!(args[2] == "default" || args[2] == "Default")) {
+                    std::cerr << "Invalid search option" << std::endl;
+                }
+            }
+            else if(args[1] == "Hash") {
+                tt.resize(UCI::options(args));
+            }
         }
         else if(command == "position") {
             ps.clear();
             UCI::position(args, pos, ps);
         }
         else if (command == "go") {
-            UCI::go(args, timer, pos, tt, ps);
+            UCI::go(args, timer, pos, tt, ps, is_gambit, opp);
         }
         else if(command == "quit") {
             break;

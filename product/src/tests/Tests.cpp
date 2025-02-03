@@ -816,7 +816,44 @@ TEST(EVAL, eval) {
   std::cout << Evaluation::evaluate(pos2) << std::endl;
 }
 
-// mate in one: position fen 4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/4R1P1/B1Q2RK1 b - - 4 32
+// // mate in one: position fen 4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/4R1P1/B1Q2RK1 b - - 4 32
+
+
+
+TEST(GAMBIT_FEATURES, approach0) {
+  // Create a position where there is a move that is better than the AB move, probably to do with a queen blunder.
+  // Is true when eval is better than AB in some world (but not every world).
+  // Promoting pawn is better in a world that black doesnt capture back with a rook.
+  // However AB move is taking bishop
+    std::cout << "\n\n I AM HERE \n\n";
+  Position pos = Position("4nr2/5k1P/8/8/8/8/1K6/1R1b4 w - - 0 1");
+      std::cout << "\n\n I AM HERE 2 \n\n";
+  Search search = Search();
+  Timer timer;
+  PositionStack ps;
+  Transposition_Table tt;
+  u64 wtime = 60'000; // white has x msec left on the clock
+  u64 btime = 60'000; // black has x msec left on the clock
+  u64 winc = 0; // white increment per move in mseconds if x > 0
+  u64 binc = 0; // black increment per move in mseconds if x > 0
+  if(pos.get_turn() == Turn::WHITE) {
+      timer.set_fields(wtime, winc);
+  }
+  else {
+      timer.set_fields(btime, binc);
+  }
+  timer.start_timer();
+  search.iterative_deepening(pos, timer, tt, ps);
+  Move best_move = search.get_root_best_move();
+  std::string best_move_str = Utils::move_to_board_notation(best_move);
+  std::cout << "bestmove ID: " << best_move_str << std::endl;
+
+  // search.approach1_initial_call(pos);
+  // best_move = search.get_root_best_move();
+  // best_move_str = Utils::move_to_board_notation(best_move);
+  // std::cout << "bestmove approach1: " << best_move_str << std::endl;
+}
+
 
 // TEST(PERFT, perft_suite) {
 //   run_perft_suite(false);

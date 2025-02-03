@@ -10,7 +10,7 @@
 
 namespace UCI {
     std::vector<std::string> split_args(std::string input);
-    void go(std::vector<std::string>& args, Timer& timer, Position& pos, Transposition_Table& tt, PositionStack& ps);
+    void go(std::vector<std::string>& args, Timer& timer, Position& pos, Transposition_Table& tt, PositionStack& ps, bool is_gambit, Opponent& opp);
     void position(std::vector<std::string>& args, Position& pos, PositionStack& ps);
     int options(std::vector<std::string>& args);
 }
