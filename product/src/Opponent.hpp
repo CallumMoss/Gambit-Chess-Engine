@@ -1,20 +1,21 @@
 #ifndef OPPONENT_HPP
 #define OPPONENT_HPP
 
+#include "Types.hpp"
+#include "utils.hpp"
+#include "Position.hpp"
+
 // Could be represented in a bitstring, but too complex to detect many tactics at once
-// enum Tactic {
-//     how do engines percieve tactics? once this is the case,
-//     I can get more complex stuff going.
-//     Perhaps neural net is the only way to go though
-//     Maybe check if patricia for example was trained to go for short games
-//     fork,
-//     pin,
-//     battery,
-//     check,
-//     sacrafice,
-//     en_passant,
-//     discovered_attack
-// };
+enum Tactic {
+    fork,
+    pin,
+    battery,
+    check,
+    sacrafice,
+    en_passant,
+    discovered_attack,
+    zugzwang // if all moves.eval makes eval worse
+};
 
 // Used to form an opponent model
 // This is used to determine whether a move is likely to be found
@@ -48,14 +49,30 @@ class Opponent {
          * 
          * @return int between 0 and 100 using a normalizer function
          */
-        int calculate_likelihood(Position& pos, Move& move) {
-            return 50;
+        int calculate_likelihood(Position& pos, Move& move, int score) {
+            /*
+                Heuristics:
+                Less likely: involves complex tactic
+            */
+
+            // the difference between best score and this score will impact decision.
+
+
+            if(move.get_flag() == Move_Flag::KNIGHT_FLAG)
+            { // minus reinforces these moves for some reason
+                return -10000;
+            }
+            else { return 1; }
         }
 
         // Tactic get_tactic(Move& move) {
         //     // Moves already have various move types like promotions, castling etc
         //     // Detecting noisy moves would be good for Q search
         // }
+
+        float use_maia() {
+            return 0;
+        }
 
         /**
          * @brief If a line likelihood is above NSL, store in a list and pick the highest SLE:Sucess

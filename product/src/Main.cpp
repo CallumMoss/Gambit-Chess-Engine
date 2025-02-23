@@ -46,9 +46,10 @@ int main() {
             ps.clear();
         }
         else if (command == "setoption") {
-            if(args[1] == "Search") { // setoption Search default || setoption Search Default || setoption Search Gambit || setoption Search gambit
+            if(args[1] == "Search" || args[1] == "search") { // setoption Search default || setoption Search Default || setoption Search Gambit || setoption Search gambit
                 if(args[2] == "gambit" || args[2] == "Gambit") {
                     is_gambit = true;
+                    std::cout << "Gambit Search = True" << std::endl;
                 }
                 else if(!(args[2] == "default" || args[2] == "Default")) {
                     std::cerr << "Invalid search option" << std::endl;

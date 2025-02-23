@@ -1,3 +1,15 @@
+23/02/2025
+Pushed early attempts at promise scores
+
+18/02/2025
+Made a concrete plan for what to do and when
+
+05/02/2025 - 17/02/2025
+Working on assignments and looking for jobs
+
+04/02/2025 - 05/02/2025
+Began researching Maia chess and neural networks for move prediction.
+
 03/02/2025
 Implemented UCI option for using default or gambit search.
 Begun development on searched based on (for now a fixed) probability.

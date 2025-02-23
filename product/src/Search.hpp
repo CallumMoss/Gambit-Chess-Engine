@@ -35,7 +35,7 @@ class Search {
         int alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps);
 
         // Utils
-        bool is_draw(Position& pos, PositionStack& ps, int ply);
+        bool is_draw(Position& pos, PositionStack& ps);
         int find_mvv_lva(Piece victim_type, Piece attacker_type);
         int value_of_piece_from_type_and_capture_role(Piece type, bool is_victim);
         std::vector<Move> sort_by_mvv_lva(const std::vector<Move>& moves, const Position& pos);
@@ -45,11 +45,11 @@ class Search {
         Move get_root_best_move() { return root_best_move; }
 
         // Gambit Features:
-        void approach0_initial_call(Position& pos);
-        int approach0(int depth, int ply, Position& pos, std::vector<std::vector<EvaluatedMove>>& evaluated_moves);
         int quiescence_search(Position& pos, int alpha, int beta);
         int gambit_search(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, Opponent& opp);
         int alpha_beta_prediction(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps, Opponent& opp);
+        int promise_score_initial(Position& pos, Timer& timer);
+        void promise_score_search(int depth, int ply, Position& pos, Timer& timer, int& promise_score, int& num_of_moves);
 
     private:
         Move root_best_move;
