@@ -27,7 +27,7 @@ int Utils::count_number_of_1bs(u64 board) {
 
 // Finds the square index of the ls1b
 // Credit to https://www.chessprogramming.org/BitScan#DeBruijnMultiplation and Reference: Hacker's Delight by Henry S. Warren, Jr. and ChatGPT
-u8 Utils::find_piece_index(u64 bitboard) {
+u8 Utils::find_ls1b_index(u64 bitboard) {
     if(bitboard == 0ULL) {
         return 64; // Not applicable
     }

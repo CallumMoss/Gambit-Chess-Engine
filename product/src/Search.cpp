@@ -14,11 +14,39 @@ Search::Search(bool gambit_flag):
 int Search::search(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, Opponent& opp) {
     if(is_gambit) {
         //return gambit_search(pos, timer, tt, ps, opp);
-        return promise_score_initial(pos, timer);
+        return promise_score_iterative_deepening(pos, timer, tt, ps);
     }
     else {
         return iterative_deepening(pos, timer, tt, ps);
     }
+}
+
+
+/**
+ * @brief Calls search algorithm and iterates its depth until time is up
+ * 
+ * @param pos root position
+ * @param timer used to keep track of turn allowance
+ * @param tt used to store previous positions
+ * @return int score of best move or 0
+ */
+int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps) {
+    Move last_best_move;
+    int last_best_score = -INT_MAX;
+    int depth = 1;
+    while(depth <= 255) {
+        int score = -alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps);
+        if(timer.is_out_of_time()) {
+            root_best_move = last_best_move;
+            return last_best_score;
+        }
+        last_best_move = root_best_move;
+        last_best_score = root_best_score;
+        has_found_a_legal_move = false;
+        std::cout << "info score cp " << score << " depth " << depth << std::endl;
+        depth++;
+    }
+    return 0; // shouldnt need to return anything as this shouldnt be reached
 }
 
 // Inspired by: https://www.chessprogramming.org/Alpha-Beta#Negamax_Framework
@@ -122,35 +150,6 @@ int Search::quiescence_search(Position& pos, int alpha, int beta) {
         }
     }
     return best_score;
-}
-
-
-
-/**
- * @brief Calls search algorithm and iterates its depth until time is up
- * 
- * @param pos root position
- * @param timer used to keep track of turn allowance
- * @param tt used to store previous positions
- * @return int score of best move or 0
- */
-int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps) {
-    Move last_best_move;
-    int last_best_score = -INT_MAX;
-    int depth = 1;
-    while(depth <= 255) {
-        int score = -alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps);
-        if(timer.is_out_of_time()) {
-            root_best_move = last_best_move;
-            return last_best_score;
-        }
-        last_best_move = root_best_move;
-        last_best_score = root_best_score;
-        has_found_a_legal_move = false;
-        std::cout << "info score cp " << score << " depth " << depth << std::endl;
-        depth++;
-    }
-    return 0; // shouldnt need to return anything as this shouldnt be reached
 }
 
 /**
@@ -371,87 +370,96 @@ bool compare_by_eval(EvaluatedMove move1, EvaluatedMove move2)
 
 //stores for the initial pos hence 20 evaluated moves.
 
+
 /**
- * @brief Initial call for iterative deepening with promise scores and soft minimax
+ * @brief Applies soft minimax to get promise scores for eval.
  * 
- * @return int move evaluation
+ * @param pos 
+ * @param timer 
+ * @param tt 
+ * @param ps 
+ * @param previous_promise_score 
+ * @return int 
  */
-int Search::promise_score_initial(Position& pos, Timer& timer)
+int Search::promise_score_iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps)
 {
-    int depth = 1;
+    // Using a vector of promise scores for now to get an idea of how the eval is for each line
     std::vector<Move> moves = pos.generate_all_moves();
     std::vector<EvaluatedMove> evaluated_moves;
-    evaluated_moves.reserve(218); // Maximum number of moves in a chess position
+    evaluated_moves.reserve(moves.size()); // for example, 20 moves at the start pos
+    Move last_best_move;
+    int last_best_score = -INT_MAX;
 
-    while (depth <= 255)
+    u64 nodes_evaluated = 0;
+    long long promise_score = 0; // can be negative
+
+    for(int depth = 1; depth < 255; depth++)
     {
-        int total_promise_score = 0;
-        int total_num_of_moves = 0;
-        has_found_a_legal_move = false; // Reset for each depth
-
-        for (Move move : moves)
+        for(int i = 0; i < moves.size(); ++i)
         {
-            int promise_score = 0;
-            int num_of_moves = 0;
+            // for each move, we need to count EVERY evaluation performed.
+            // pretty sure this would just be during Evaluation::evaluate(), not in retrieval of score.
+            // at like depth 4, it would be looking at 20 moves roughly 20 times per depth remaining
+            // sp depth 4 could easily see 20^5 steps.
+            // do i need a double?
 
-            promise_score_search(depth, 0, pos, timer, promise_score, num_of_moves);
+            // will store illegal moves but they should be at the bottom. Perhaps can sort this out with an if somewhere.
+            // sorta like generating pseudo legal, then checking later
+            // lower level of complexity this way
+            promise_score_search(depth, 1, pos, timer, tt, ps, promise_score, nodes_evaluated);
+            evaluated_moves[i] = EvaluatedMove(moves[i], promise_score / (long)(long)nodes_evaluated);
 
-            if (num_of_moves > 0) {
-                //promise_score /= -num_of_moves; // Average the evaluations
+            // Let search finish then grab last depths best move.
+            // Soft timeout
+            if(timer.is_out_of_time())
+            {
+                root_best_move = last_best_move; // disregard an incomplete search
+                return last_best_score;
             }
-            EvaluatedMove eval_move = EvaluatedMove(move, promise_score);
-            evaluated_moves.emplace_back(eval_move); // more efficient than push_back
 
-            total_promise_score += promise_score;
-            total_num_of_moves += num_of_moves;
-
-            if (timer.is_out_of_time()) {
-                std::sort(evaluated_moves.begin(), evaluated_moves.end(), compare_by_eval);
-                root_best_move = evaluated_moves[0].move;
-                return evaluated_moves[0].eval;
-            }
         }
-
         std::sort(evaluated_moves.begin(), evaluated_moves.end(), compare_by_eval);
-        std::cout << "info score cp " << evaluated_moves[0].eval << " depth " << depth << std::endl;
-        std::cout << "Evaluated moves count: " << evaluated_moves.size() << std::endl;
+        // always trust higher depths, so take most recent best move as the best, regardless of the eval of the last best.
+        last_best_move = evaluated_moves[0].move;
+        last_best_score = evaluated_moves[0].eval;
+        std::cout << "info score cp " << last_best_score << " depth " << depth << std::endl;
+        // Reset
+        has_found_a_legal_move = false;
+        promise_score = 0;
+        nodes_evaluated = 0;
+        evaluated_moves.clear(); // maintains reserved memory
 
-        evaluated_moves.clear();
-        depth++;
+
+        // at some point i need to average the eval for each move at each depth
     }
-
-    return 0; // Shouldn't be reached
+    return 0; // should never be reached
 }
 
-// No alpha-beta, TT, or PS
-void Search::promise_score_search(int depth, int ply, Position& pos, Timer& timer, int& promise_score, int& num_of_moves)
+void Search::promise_score_search(int depth, int ply, Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, long long& promise_score, u64& nodes_evaluated)
 {
-    if (depth == 0)
+    // draw
+    if(depth == 0)
     {
+        // promise score is incremented here, therefore we should also incrememnt num of evals for our average
+        nodes_evaluated++;
         promise_score += Evaluation::evaluate(pos);
-        num_of_moves++;
         return;
     }
-
+    
+    int score = -INT_MAX;
+    int num_of_moves = 0;
     std::vector<Move> moves = pos.generate_all_moves();
-    bool found_legal_move = false;
-
-    for (Move move : moves)
+    for(Move move : moves)
     {
-        if (timer.is_out_of_time()) return;
+        if(timer.is_out_of_time()) return; 
 
-        Position new_position = pos;
-        new_position.make_move(move);
-        if (!new_position.is_legal(move)) continue;
-
-        found_legal_move = true;
-
-        promise_score_search(depth - 1, ply + 1, new_position, timer, promise_score, num_of_moves);
+        Position new_pos = pos;
+        new_pos.make_move(move);
+        if(!new_pos.is_legal(move))
+        {
+            continue;
+        }
+        promise_score_search(depth - 1, ply + 1, new_pos, timer, tt, ps, promise_score, nodes_evaluated);
     }
 
-    if (!found_legal_move)
-    {
-        int score = pos.in_check() ? (Utils::MATE_SCORE + ply) : Utils::DRAW_SCORE;
-        promise_score += score;
-    }
 }

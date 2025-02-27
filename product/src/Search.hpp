@@ -48,8 +48,8 @@ class Search {
         int quiescence_search(Position& pos, int alpha, int beta);
         int gambit_search(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, Opponent& opp);
         int alpha_beta_prediction(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps, Opponent& opp);
-        int promise_score_initial(Position& pos, Timer& timer);
-        void promise_score_search(int depth, int ply, Position& pos, Timer& timer, int& promise_score, int& num_of_moves);
+        int promise_score_iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps);
+        void promise_score_search(int depth, int ply, Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, long long& promise_score, u64& nodes_evaluated);
 
     private:
         Move root_best_move;

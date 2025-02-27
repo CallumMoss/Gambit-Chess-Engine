@@ -1,6 +1,6 @@
 #include "Evaluation.hpp"
 
-int Evaluation::evaluate(const Position& pos) {
+int Evaluation::evaluate(const Position& pos) { 
     int white_material = count_material(pos, Turn::WHITE);
     int black_material = count_material(pos, Turn::BLACK);
     bool is_endgame = false;
@@ -10,7 +10,7 @@ int Evaluation::evaluate(const Position& pos) {
     int eval = white_material - black_material;
     eval += calculate_piece_square_advantage(pos, Turn::WHITE, is_endgame); // check values from piece square tables
     eval -= calculate_piece_square_advantage(pos, Turn::BLACK, is_endgame);
-    if(pos.get_turn() == Turn::WHITE) { return eval; }
+    if(pos.get_turn() == Turn::WHITE) { return eval; } // turn is flipped after make move
     else { return -eval; } 
 }
 
@@ -26,8 +26,7 @@ int Evaluation::count_material(const Position& pos, Turn colour) {
     Piece piece;
     int square = 0;
     while(true) {
-        // find ls1b square
-        square = Utils::find_piece_index(board);
+        square = Utils::find_ls1b_index(board);
         if(square == 64) { // no more pieces
             break;
         }
@@ -69,7 +68,7 @@ int Evaluation::calculate_piece_square_advantage(const Position& pos, Turn colou
     int square = 0;
     while(true) {
         // find ls1b square
-        square = Utils::find_piece_index(board);
+        square = Utils::find_ls1b_index(board);
         if(square == 64) { // no more pieces
             break;
         }

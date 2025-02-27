@@ -9,17 +9,106 @@
 #include <iostream>
 
 namespace Utils {
-    u64 shift_up(u64 board); // replace bit with 0, replace bit shifted 8 left with 1
+    /**
+     * @brief Shifts all bits up from the LERFT POV
+     * 
+     * @param board board to shift
+     * @return u64 new board
+     */
+    u64 shift_up(u64 board); // replace bit with 0, replace bit shifted 8 left with 
+    
+    /**
+     * @brief  Shifts all bits down from the LERFT POV
+     * 
+     * @param board board to shift
+     * @return u64 new board
+     */
     u64 shift_down(u64 board);
+
+    /**
+     *  Shifts all bits to the left from the LERFT POV
+     * 
+     * @param board board to shift
+     * @return u64 new board
+     */
     u64 shift_left(u64 board);
+
+    /**
+     * @brief Shifts all bits to the right from the LERFT POV
+     * 
+     * @param board board to shift
+     * @return u64 new board
+     */
     u64 shift_right(u64 board);
+
+    /**
+     * @brief Checks whether a bit at a given index is 1.
+     * 
+     * @param board bitboard to check
+     * @param square square to check
+     * @return true if there is a piece at the square
+     * @return false if there is not a piece at the square
+     */
     bool piece_is_at_square(uint64_t board, int square);
+
+    /**
+     * @brief Prints bitboard in a user friendly format.
+     * 
+     * @param board board to print
+     * @param board_center places an x at this index to symbolise movement of pieces
+     */
     void print_bb(u64 board, int board_center = 64); // defaults to 64 if no argument provided (no center)
+
+    /**
+     * @brief Counts the number of pieces on a bitboard.
+     * 
+     * @param board bitboard to be iterated through
+     * @return int number of 1bs, where each 1b is a piece
+     */
     int count_number_of_1bs(u64 board);
-    u8 find_piece_index(u64 bitboard);
+
+    /**
+     * @brief Returns the index of the least significant 1 bit.
+     * 
+     * @param bitboard bitboard to be iterated through
+     * @return u8 index of the least significant 1 bit
+     */
+    u8 find_ls1b_index(u64 bitboard);
+
+    /**
+     * @brief Returns the parameter bitboard with a bit turned from 1 to 0.
+     * 
+     * @param board bitboard to be altered
+     * @param index index of the bit to turn to 0
+     * @return u64 altered bitboard
+     */
     u64 clear_bit(u64 board, int index);
+
+    /**
+     * @brief Creates a move object from various parameters.
+     * 
+     * @param type piece type moving
+     * @param src_square square origin
+     * @param dest_square square destination
+     * @param en_passant_target destination square for a pawn performing en passant
+     * @return Move encoded move object
+     */
     Move encode_move(Piece type, u8 src_square, u8 dest_square, u8 en_passant_target);
+
+    /**
+     * @brief Determines the algebriac notation for a move
+     * 
+     * @param move to be played
+     * @return std::string algebraic notation for the move
+     */
     std::string move_to_board_notation(Move move);
+
+    /**
+     * @brief Converts square index to algebraic notation
+     * 
+     * @param square index on bitboard
+     * @return std::string algebraic notation for the square
+     */
     std::string square_to_board_notation(u8 square);
 
 

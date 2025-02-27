@@ -130,7 +130,7 @@ void Position::compute_zobrist_key() {
     // If turn is white, then zobrist key will not be XORd.
     // This state represents white.
     u64 temp_board = get_board();
-    for(u8 sq = Utils::find_piece_index(temp_board); temp_board; temp_board = Utils::clear_bit(temp_board, sq), sq = Utils::find_piece_index(temp_board))
+    for(u8 sq = Utils::find_ls1b_index(temp_board); temp_board; temp_board = Utils::clear_bit(temp_board, sq), sq = Utils::find_ls1b_index(temp_board))
     {
         zobrist_key ^= (Zobrist::get_piece(get_piece_type_from_square(sq) + (6 * get_colour_value_from_square(sq)), sq));
     }
@@ -447,7 +447,7 @@ std::vector<Move> Position::bb_to_move_list(Piece type, u8 src_square, u64 attac
     u8 dest_square;
     std::vector<u64> bb_list = extract_piece_moves(attacks);
     for(u64 attack : bb_list) {
-        dest_square = Utils::find_piece_index(attack);
+        dest_square = Utils::find_ls1b_index(attack);
         if(type == Piece::PAWN) {
             if((dest_square >= 56 && dest_square < 64) || (dest_square < 8)) { // promotion has occured
             // We dont care about colour as pawns cant get to their own end rank
@@ -479,7 +479,7 @@ bool Position::in_check() const { // used to detect stalemate. Finds if we are c
         return false;
     }
 
-    u8 king_square_index = Utils::find_piece_index(king_square_u64);
+    u8 king_square_index = Utils::find_ls1b_index(king_square_u64);
 
     // Finding if king is in check
     // Finding squares where if a piece is on, would see the king.
@@ -498,7 +498,7 @@ bool Position::in_check() const { // used to detect stalemate. Finds if we are c
     u64 attacks;
     Piece type;
     while(opponent_relevant_pieces) {
-        index = Utils::find_piece_index(opponent_relevant_pieces);
+        index = Utils::find_ls1b_index(opponent_relevant_pieces);
         type = get_piece_type_from_square(index);
         attacks = generate_piece_attacks(type, index);
         if(attacks & king_square_u64) { // if there is a piece hitting the king
@@ -527,7 +527,7 @@ bool Position::is_legal(Move& move) const
         return false;
     }
 
-    u8 king_square_index = Utils::find_piece_index(king_square_u64);
+    u8 king_square_index = Utils::find_ls1b_index(king_square_u64);
 
     // Finding if king is in check
     // Finding squares where if a piece is on, would see the king.
@@ -546,7 +546,7 @@ bool Position::is_legal(Move& move) const
     u64 attacks;
     Piece type;
     while(opponent_relevant_pieces) {
-        index = Utils::find_piece_index(opponent_relevant_pieces);
+        index = Utils::find_ls1b_index(opponent_relevant_pieces);
         type = get_piece_type_from_square(index);
         attacks = generate_piece_attacks(type, index);
         if(attacks & king_square_u64) { // if there is a piece hitting the king
@@ -592,7 +592,7 @@ bool Position::is_legal(Move& move) const
         opponent_relevant_pieces = target_mask & opponent_pieces; // squares with an opponents piece on
 
         while(opponent_relevant_pieces) {
-            index = Utils::find_piece_index(opponent_relevant_pieces);
+            index = Utils::find_ls1b_index(opponent_relevant_pieces);
             type = get_piece_type_from_square(index);
             attacks = generate_piece_attacks(type, index);
             if(type == Piece::PAWN) {
