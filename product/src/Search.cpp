@@ -258,118 +258,115 @@ std::vector<Move> Search::sort_by_mvv_lva(const std::vector<Move>& moves, const 
     return sorted_moves;
 }
 
-/**
- * @brief Acts as iterative deepening with modified behaviours
- * 
- * @return int 
- */
-int Search::gambit_search(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, Opponent& opp) {
-    Move last_best_move;
-    int last_best_score = -INT_MAX;
-    int depth = 1;
-    while(depth <= 255) {
-        int score = -alpha_beta_prediction(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps, opp);
-        if(timer.is_out_of_time()) {
-            root_best_move = last_best_move;
-            return last_best_score;
-        }
-        last_best_move = root_best_move;
-        last_best_score = root_best_score;
-        has_found_a_legal_move = false;
-        std::cout << "info score cp " << score << " depth " << depth << std::endl;
-        depth++;
-    }
-    return 0; // shouldnt need to return anything as this shouldnt be reached
-}
+// /**
+//  * @brief Acts as iterative deepening with modified behaviours
+//  * 
+//  * @return int 
+//  */
+// int Search::gambit_search(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, Opponent& opp) {
+//     Move last_best_move;
+//     int last_best_score = -INT_MAX;
+//     int depth = 1;
+//     while(depth <= 255) {
+//         int score = -alpha_beta_prediction(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps, opp);
+//         if(timer.is_out_of_time()) {
+//             root_best_move = last_best_move;
+//             return last_best_score;
+//         }
+//         last_best_move = root_best_move;
+//         last_best_score = root_best_score;
+//         has_found_a_legal_move = false;
+//         std::cout << "info score cp " << score << " depth " << depth << std::endl;
+//         depth++;
+//     }
+//     return 0; // shouldnt need to return anything as this shouldnt be reached
+// }
 
 
-/**
- * @brief Same as alpha beta but evaluates with probability too
- * 
- * @return int 
- */
-int Search::alpha_beta_prediction(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps, Opponent& opp) {
-    // if resulting position after a move is a draw, return draw score instantly
-    if(ply > 0) {
-        if(is_draw(pos, ps)) { return Utils::DRAW_SCORE; }
-    }
+// /**
+//  * @brief Same as alpha beta but evaluates with probability too
+//  * 
+//  * @return int 
+//  */
+// int Search::alpha_beta_prediction(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps, Opponent& opp) {
+//     // if resulting position after a move is a draw, return draw score instantly
+//     if(ply > 0) {
+//         if(is_draw(pos, ps)) { return Utils::DRAW_SCORE; }
+//     }
 
-    if(depth == 0) { return Evaluation::evaluate(pos); }
+//     if(depth == 0) { return Evaluation::evaluate(pos); }
 
-    Node_Type node_type = Node_Type::UPPER;
-    Move zobrist_move = Utils::NULL_MOVE;
-    if(ply > 0) {
-        // Checking if position is in transposition table
-        // Inspired by https://github.com/TiltedDFA/TDFA/blob/main/src/Search.cpp
-        if(tt.entry_is_in_tt(pos.get_zobrist_key())) {
-            TT_Entry entry = tt.get_entry(pos.get_zobrist_key());
-            zobrist_move = entry.best_move;
-            if(entry.depth >= depth) { // if entry has been evaluated at the current desired depth, then we can just return, otherwise we should continue search
-                if((entry.node_type == Node_Type::EXACT) || (entry.node_type == Node_Type::UPPER && entry.score <= alpha) || (entry.node_type == Node_Type::LOWER && entry.score >= beta)) {
-                    return entry.score; // uses fail soft by returning the score regardless of which condition is true
-                }
-            }
-        }
-    }
-    int best_score = -INT_MAX;
-    int score = -INT_MAX;
-    std::vector<Move> moves = pos.generate_all_moves();
-    //moves = sort_by_mvv_lva(moves, pos);
-    Move best_move = moves[0];
-    if(!zobrist_move.equals(Utils::NULL_MOVE)) {
-        moves.insert(moves.begin(), zobrist_move); // look at zobrist best move first
-    }
-    for(Move move : moves) {
-        if(timer.is_out_of_time()) {
-            return best_score; // could return anything as this score wont be used
-        }
-        // reset position
-        Position new_position = pos;
-        new_position.make_move(move);
-        if(!new_position.is_legal(move)) { continue; }
+//     Node_Type node_type = Node_Type::UPPER;
+//     Move zobrist_move = Utils::NULL_MOVE;
+//     if(ply > 0) {
+//         // Checking if position is in transposition table
+//         // Inspired by https://github.com/TiltedDFA/TDFA/blob/main/src/Search.cpp
+//         if(tt.entry_is_in_tt(pos.get_zobrist_key())) {
+//             TT_Entry entry = tt.get_entry(pos.get_zobrist_key());
+//             zobrist_move = entry.best_move;
+//             if(entry.depth >= depth) { // if entry has been evaluated at the current desired depth, then we can just return, otherwise we should continue search
+//                 if((entry.node_type == Node_Type::EXACT) || (entry.node_type == Node_Type::UPPER && entry.score <= alpha) || (entry.node_type == Node_Type::LOWER && entry.score >= beta)) {
+//                     return entry.score; // uses fail soft by returning the score regardless of which condition is true
+//                 }
+//             }
+//         }
+//     }
+//     int best_score = -INT_MAX;
+//     int score = -INT_MAX;
+//     std::vector<Move> moves = pos.generate_all_moves();
+//     //moves = sort_by_mvv_lva(moves, pos);
+//     Move best_move = moves[0];
+//     if(!zobrist_move.equals(Utils::NULL_MOVE)) {
+//         moves.insert(moves.begin(), zobrist_move); // look at zobrist best move first
+//     }
+//     for(Move move : moves) {
+//         if(timer.is_out_of_time()) {
+//             return best_score; // could return anything as this score wont be used
+//         }
+//         // reset position
+//         Position new_position = pos;
+//         new_position.make_move(move);
+//         if(!new_position.is_legal(move)) { continue; }
 
-        if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
+//         if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
 
-        ps.push_back(pos.get_zobrist_key()); // adds original position, which in the next call is the next position and checks for draw first
-        score = -alpha_beta(depth - 1, ply + 1, new_position, timer, -beta, -alpha, tt, ps);
-        score = score * opp.calculate_likelihood(pos, move, score); // calculating weighted score
-        ps.pop_back();
+//         ps.push_back(pos.get_zobrist_key()); // adds original position, which in the next call is the next position and checks for draw first
+//         score = -alpha_beta(depth - 1, ply + 1, new_position, timer, -beta, -alpha, tt, ps);
+//         score = score * opp.calculate_likelihood(pos, move, score); // calculating weighted score
+//         ps.pop_back();
 
-        if(score > best_score) {
-            best_score = score;
-            best_move = move;
-            if(score > alpha) {
-                node_type = Node_Type::EXACT;
-                alpha = score;
-            }
-            if(ply == 0) { // if we have got the score for the best move at root (the one we will give to UCI to play)
-                root_best_move = move;
-                root_best_score = score;
-            }
-        }
-        if(score >= beta) {
-            node_type = Node_Type::LOWER;
-            tt.add_entry(pos.get_zobrist_key(), score, move, depth, node_type);
-            break; // fail soft, we exit here to return the correct score based on whether there is a mate or stalemate
-        }
-    }
+//         if(score > best_score) {
+//             best_score = score;
+//             best_move = move;
+//             if(score > alpha) {
+//                 node_type = Node_Type::EXACT;
+//                 alpha = score;
+//             }
+//             if(ply == 0) { // if we have got the score for the best move at root (the one we will give to UCI to play)
+//                 root_best_move = move;
+//                 root_best_score = score;
+//             }
+//         }
+//         if(score >= beta) {
+//             node_type = Node_Type::LOWER;
+//             tt.add_entry(pos.get_zobrist_key(), score, move, depth, node_type);
+//             break; // fail soft, we exit here to return the correct score based on whether there is a mate or stalemate
+//         }
+//     }
 
-    if(!has_found_a_legal_move) { // if there are no legal moves at a depth past 1, then 
-        if(pos.in_check()) { best_score = Utils::MATE_SCORE + ply; }
-        else { best_score = Utils::DRAW_SCORE; }
-        return best_score;
-    }
-    tt.add_entry(pos.get_zobrist_key(), alpha, best_move, depth, node_type);
-    return best_score;
-}
+//     if(!has_found_a_legal_move) { // if there are no legal moves at a depth past 1, then 
+//         if(pos.in_check()) { best_score = Utils::MATE_SCORE + ply; }
+//         else { best_score = Utils::DRAW_SCORE; }
+//         return best_score;
+//     }
+//     tt.add_entry(pos.get_zobrist_key(), alpha, best_move, depth, node_type);
+//     return best_score;
+// }
 
 bool compare_by_eval(EvaluatedMove move1, EvaluatedMove move2)
 {
     return move1.eval > move2.eval;
 }
-
-//stores for the initial pos hence 20 evaluated moves.
-
 
 /**
  * @brief Applies soft minimax to get promise scores for eval.
@@ -385,17 +382,17 @@ int Search::promise_score_iterative_deepening(Position& pos, Timer& timer, Trans
 {
     // Using a vector of promise scores for now to get an idea of how the eval is for each line
     std::vector<Move> moves = pos.generate_all_moves();
-    std::vector<EvaluatedMove> evaluated_moves;
-    evaluated_moves.reserve(moves.size()); // for example, 20 moves at the start pos
     Move last_best_move;
+    Move depth_best_move;
     int last_best_score = -INT_MAX;
+    int depth_best_score = -INT_MAX;
 
     u64 nodes_evaluated = 0;
     long long promise_score = 0; // can be negative
 
     for(int depth = 1; depth < 255; depth++)
     {
-        for(int i = 0; i < moves.size(); ++i)
+        for(int i = 0; i < moves.size(); i++)
         {
             // for each move, we need to count EVERY evaluation performed.
             // pretty sure this would just be during Evaluation::evaluate(), not in retrieval of score.
@@ -408,30 +405,28 @@ int Search::promise_score_iterative_deepening(Position& pos, Timer& timer, Trans
             // lower level of complexity this way
             // we also flip one last time
             promise_score_search(depth, 1, pos, timer, tt, ps, promise_score, nodes_evaluated);
-            evaluated_moves[i] = EvaluatedMove(moves[i], (-promise_score * (int)moves.size()) / (long)(long)nodes_evaluated);
-
             // Let search finish then grab last depths best move.
             // Soft timeout
             if(timer.is_out_of_time())
             {
-                root_best_move = last_best_move; // disregard an incomplete search
+                root_best_move = last_best_move; // take last complete search
                 return last_best_score;
             }
-
+            int score = static_cast<int>(-promise_score / static_cast<long long>(nodes_evaluated));
+            if(score > depth_best_score)
+            {
+                depth_best_move = moves[i]; // updates the current best move found at this depth
+                depth_best_score = score;
+            }
         }
-        std::sort(evaluated_moves.begin(), evaluated_moves.end(), compare_by_eval);
         // always trust higher depths, so take most recent best move as the best, regardless of the eval of the last best.
-        last_best_move = evaluated_moves[0].move;
-        last_best_score = evaluated_moves[0].eval;
+        last_best_move = depth_best_move; // once searched all moves at a given depth, update the best found move
+        last_best_score = depth_best_score;
         std::cout << "info score cp " << last_best_score << " depth " << depth << std::endl;
         // Reset
         has_found_a_legal_move = false;
         promise_score = 0;
         nodes_evaluated = 0;
-        evaluated_moves.clear(); // maintains reserved memory
-
-
-        // at some point i need to average the eval for each move at each depth
     }
     return 0; // should never be reached
 }
@@ -441,15 +436,15 @@ void Search::promise_score_search(int depth, int ply, Position& pos, Timer& time
     // draw
     if(depth == 0)
     {
-        // promise score is incremented here, therefore we should also incrememnt num of evals for our average
+        // promise score is incremented here, therefore we should also increment num of evals for our average
         nodes_evaluated++;
         promise_score += Evaluation::evaluate(pos);
         return;
     }
     
     int score = -INT_MAX;
-    int num_of_moves = 0;
     std::vector<Move> moves = pos.generate_all_moves();
+    //moves = sort_by_mvv_lva(moves, pos); // use MVV_LVA to explore most promising moves first. Useless for gambit search?
     for(Move move : moves)
     {
         if(timer.is_out_of_time()) return; 

@@ -1,5 +1,7 @@
 11/03/2025
-
+Made Gambit the default search and updated the centipawn output.
+Seems like current implementation of promise score is ineffective as simply too slow.
+Going to move onto opponent modelling instead.
 
 27/02/2025
 Figuring out how to compare both search algorithms
