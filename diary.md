@@ -1,3 +1,9 @@
+11/03/2025
+
+
+27/02/2025
+Figuring out how to compare both search algorithms
+
 23/02/2025
 Pushed early attempts at promise scores
 

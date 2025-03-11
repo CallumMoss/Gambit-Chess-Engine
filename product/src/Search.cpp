@@ -406,8 +406,9 @@ int Search::promise_score_iterative_deepening(Position& pos, Timer& timer, Trans
             // will store illegal moves but they should be at the bottom. Perhaps can sort this out with an if somewhere.
             // sorta like generating pseudo legal, then checking later
             // lower level of complexity this way
+            // we also flip one last time
             promise_score_search(depth, 1, pos, timer, tt, ps, promise_score, nodes_evaluated);
-            evaluated_moves[i] = EvaluatedMove(moves[i], promise_score / (long)(long)nodes_evaluated);
+            evaluated_moves[i] = EvaluatedMove(moves[i], (-promise_score * (int)moves.size()) / (long)(long)nodes_evaluated);
 
             // Let search finish then grab last depths best move.
             // Soft timeout

@@ -23,7 +23,7 @@ int main() {
     PositionStack ps; // vector that stores occured positions and searched positions
     ps.reserve(255);
 
-    bool is_gambit = false;
+    bool is_gambit = true; // default gambit search to true
     Opponent opp = Opponent();
 
     // Inspired by https://github.com/TiltedDFA/TDFA/blob/c26a01e29ba87c41af50700c2c8321e3e2667c8f/src/Uci.cpp

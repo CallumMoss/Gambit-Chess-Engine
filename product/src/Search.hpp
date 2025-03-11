@@ -16,7 +16,7 @@ enum Forced_Flag {
 
 class Search {
     public:
-        Search(bool is_gambit = false);
+        Search(bool is_gambit = true); // defaults to using gambit search
         //Search(std::vector<u64>& game_history_stack, int tt_size_in_mb);
 
         // Search algorithms
