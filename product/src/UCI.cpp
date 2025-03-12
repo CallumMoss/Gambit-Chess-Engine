@@ -70,8 +70,8 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transp
 
     timer.start_timer();
 
-    Search search = Search(is_gambit);
-    search.search(pos, timer, tt, ps, opp);
+    Search search = Search(is_gambit, opp);
+    search.iterative_deepening(pos, timer, tt, ps);
     Move best_move = search.get_root_best_move();
     std::string best_move_str = Utils::move_to_board_notation(best_move);
     std::cout << "bestmove " << best_move_str << std::endl;

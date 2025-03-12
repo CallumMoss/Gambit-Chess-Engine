@@ -51,7 +51,13 @@ int main() {
                     is_gambit = true;
                     std::cout << "Gambit Search = True" << std::endl;
                 }
-                else if(!(args[2] == "default" || args[2] == "Default")) {
+                else if(args[2] == "default" || args[2] == "Default")
+                {
+                    is_gambit = false;
+                    std::cout << "Gambit Search = False" << std::endl;
+                }
+                else
+                {
                     std::cerr << "Invalid search option" << std::endl;
                 }
             }

@@ -16,21 +16,11 @@ enum Forced_Flag {
 
 class Search {
     public:
-        Search(bool is_gambit = true); // defaults to using gambit search
+        Search(bool is_gambit, Opponent& opp);
+
         //Search(std::vector<u64>& game_history_stack, int tt_size_in_mb);
 
         // Search algorithms
-        /**
-         * @brief Main search function which calls other search functions
-         * 
-         * @param pos 
-         * @param timer 
-         * @param tt 
-         * @param ps 
-         * @return int 
-         */
-        int search(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, Opponent& opp);
-
         int iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps);
         int alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps);
 
@@ -46,10 +36,6 @@ class Search {
 
         // Gambit Features:
         int quiescence_search(Position& pos, int alpha, int beta);
-        int gambit_search(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, Opponent& opp);
-        int alpha_beta_prediction(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps, Opponent& opp);
-        int promise_score_iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps);
-        void promise_score_search(int depth, int ply, Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, long long& promise_score, u64& nodes_evaluated);
 
     private:
         Move root_best_move;
@@ -57,6 +43,7 @@ class Search {
         bool has_found_a_legal_move = false;
         Forced_Flag forced_flag = Forced_Flag::NO_FORCED;
         bool is_gambit = false;
+        Opponent& opponent;
 };
 
 #endif // #ifndef SEARCH_HPP
