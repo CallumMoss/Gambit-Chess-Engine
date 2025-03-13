@@ -23,6 +23,7 @@ class Search {
         // Search algorithms
         int iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps);
         int alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps);
+        int quiescence_search(Position& pos, int alpha, int beta, Timer& timer);
 
         // Utils
         bool is_draw(Position& pos, PositionStack& ps);
@@ -34,8 +35,6 @@ class Search {
         // Getters and Setters
         Move get_root_best_move() { return root_best_move; }
 
-        // Gambit Features:
-        int quiescence_search(Position& pos, int alpha, int beta);
 
     private:
         Move root_best_move;

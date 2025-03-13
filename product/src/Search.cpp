@@ -22,11 +22,13 @@ Search::Search(bool gambit_flag, Opponent& opp):
 int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps) {
     Move last_best_move;
     int last_best_score = -INT_MAX;
-    int depth = 1;
-    while(depth <= 255) {
+
+    for(int depth = 1; depth < 256; depth++)
+    {
         int score = -alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps);
         // if score - pos full move or half move number is less than a certain score, should stop search.
-        if(timer.is_out_of_time()) {
+        if(timer.is_out_of_time())
+        {
             root_best_move = last_best_move;
             return last_best_score;
         }
@@ -34,27 +36,30 @@ int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table
         last_best_score = root_best_score;
         has_found_a_legal_move = false;
         std::cout << "info score cp " << score << " depth " << depth << std::endl;
-        depth++;
     }
     return 0; // shouldnt need to return anything as this shouldnt be reached
 }
 
 // Inspired by: https://www.chessprogramming.org/Alpha-Beta#Negamax_Framework
-int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps) {
+int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps)
+{
     // if resulting position after a move is a draw, return draw score instantly
     if(ply > 0)
     {
         if(is_draw(pos, ps)) { return Utils::DRAW_SCORE; }
     }
 
-    if(depth == 0) { return Evaluation::evaluate(pos); }
+    // if(depth == 0) { return Evaluation::evaluate(pos); }
+    if(depth == 0) { return quiescence_search(pos, -INT_MAX, INT_MAX, timer); }
 
     Node_Type node_type = Node_Type::UPPER;
     Move zobrist_move = Utils::NULL_MOVE;
-    if(ply > 0) {
+    if(ply > 0)
+    {
         // Checking if position is in transposition table
         // Inspired by https://github.com/TiltedDFA/TDFA/blob/main/src/Search.cpp
-        if(tt.entry_is_in_tt(pos.get_zobrist_key())) {
+        if(tt.entry_is_in_tt(pos.get_zobrist_key()))
+        {
             TT_Entry entry = tt.get_entry(pos.get_zobrist_key());
             zobrist_move = entry.best_move;
             if(entry.depth >= depth) { // if entry has been evaluated at the current desired depth, then we can just return, otherwise we should continue search
@@ -66,14 +71,17 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
     }
     int best_score = -INT_MAX;
     int score = -INT_MAX;
-    std::vector<Move> moves = pos.generate_all_moves();
-    //moves = sort_by_mvv_lva(moves, pos);
+    std::vector<Move> moves = pos.generate_all_moves(false);
+    moves = sort_by_mvv_lva(moves, pos);
     Move best_move = moves[0];
-    if(!zobrist_move.equals(Utils::NULL_MOVE)) {
+    if(!zobrist_move.equals(Utils::NULL_MOVE))
+    {
         moves.insert(moves.begin(), zobrist_move); // look at zobrist best move first
     }
-    for(Move move : moves) {
-        if(timer.is_out_of_time()) {
+    for(Move move : moves)
+    {
+        if(timer.is_out_of_time())
+        {
             return best_score; // could return anything as this score wont be used
         }
         // reset position
@@ -88,26 +96,31 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
         //if(is_gambit) score *= opponent.calculate_likelihood(pos, move, score); // calculating weighted score
         ps.pop_back();
 
-        if(score > best_score) {
+        if(score > best_score)
+        {
             best_score = score;
             best_move = move;
-            if(score > alpha) {
+            if(score > alpha)
+            {
                 node_type = Node_Type::EXACT;
                 alpha = score;
             }
-            if(ply == 0) { // if we have got the score for the best move at root (the one we will give to UCI to play)
+            if(ply == 0)
+            { // if we have got the score for the best move at root (the one we will give to UCI to play)
                 root_best_move = move;
                 root_best_score = score;
             }
         }
-        if(score >= beta) {
+        if(score >= beta)
+        {
             node_type = Node_Type::LOWER;
             tt.add_entry(pos.get_zobrist_key(), score, move, depth, node_type);
             break; // fail soft, we exit here to return the correct score based on whether there is a mate or stalemate
         }
     }
 
-    if(!has_found_a_legal_move) { // if there are no legal moves at a depth past 1, then 
+    if(!has_found_a_legal_move)
+    { // if there are no legal moves at a depth past 1, then 
         if(pos.in_check()) { best_score = Utils::MATE_SCORE + ply; }
         else { best_score = Utils::DRAW_SCORE; }
         return best_score;
@@ -116,30 +129,43 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
     return best_score;
 }
 
-int Search::quiescence_search(Position& pos, int alpha, int beta) {
+int Search::quiescence_search(Position& pos, int alpha, int beta, Timer& timer)
+{
     int stand_pat = Evaluation::evaluate(pos);
     int best_score = stand_pat;
     int score = -INT_MAX;
+
+    // int stand_pat = Evaluate();
+    // int best_value = stand_pat;
+    // if( stand_pat >= beta )
+    //     return stand_pat;
+    // if( alpha < stand_pat )
+    //     alpha = stand_pat;
+
     if(stand_pat >= beta) { return stand_pat; }
     if (alpha < stand_pat) { alpha = stand_pat; }
 
-    std::vector<Move> moves = pos.generate_all_moves();
-    for(Move& move : moves) {
+    std::vector<Move> noisy_moves = pos.generate_all_moves(true); // moves involving captures
+    // mvv lva just makes pruning more frequent, therefore search speeds up.
+    noisy_moves = sort_by_mvv_lva(noisy_moves, pos);
+
+    for(Move& move : noisy_moves)
+    {
+        // if(timer.is_out_of_time())
+        // {
+        //     return best_score; // could return anything as this score wont be used
+        // }
         Position new_position = pos;
         new_position.make_move(move);
         if(!new_position.is_legal(move)) { continue; }
 
         //if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
 
-        //ps.push_back(pos.get_zobrist_key()); // adds original position, which in the next call is the next position and checks for draw first
-        score = -quiescence_search(pos, -beta, -alpha);
-        //ps.pop_back();
+        score = -quiescence_search(pos, -beta, -alpha, timer);
 
-        if(move.is_noisy(pos.get_board())) {
-            if(score >= beta) { return score; }
-            if(score > best_score) { best_score = score; }
-            if(score > alpha) { alpha = score; }   
-        }
+        if(score >= beta) { return score; }
+        if(score > best_score) { best_score = score; }
+        if(score > alpha) { alpha = score; }   
     }
     return best_score;
 }
@@ -152,15 +178,18 @@ int Search::quiescence_search(Position& pos, int alpha, int beta) {
  * @return true if 50 move or repetition rule has occured
  * @return false if 50 move or repetition rule has not occured
  */
-bool Search::is_draw(Position& pos, PositionStack& ps) {
+bool Search::is_draw(Position& pos, PositionStack& ps)
+{
     // Check for insufficient mating material
     // Inspired by: https://github.com/zzzzz151/Starzix/blob/main/src/board.hpp
     u64 board = pos.get_board();
     // King vs King
     if (Utils::count_number_of_1bs(board) == 2) { return true; }
     // King and Bishop vs King or King and Knight vs King
-    if (Utils::count_number_of_1bs(board) == 3) {
-        if(pos.get_knights() > 0 || pos.get_bishops() > 0) {
+    if (Utils::count_number_of_1bs(board) == 3)
+    {
+        if(pos.get_knights() > 0 || pos.get_bishops() > 0)
+        {
             return true;
         }
     }
@@ -173,8 +202,10 @@ bool Search::is_draw(Position& pos, PositionStack& ps) {
     //bool repetition_has_occured = false;
     int search_cap = stack_top_index;
     //int search_cap = std::min(stack_top_index, static_cast<int>(pos.get_half_move_clock()));
-    for(int i = 3; i <= search_cap; i++) {
-        if(pos.get_zobrist_key() == ps[stack_top_index - i]) {
+    for(int i = 3; i <= search_cap; i++)
+    {
+        if(pos.get_zobrist_key() == ps[stack_top_index - i])
+        {
             return true;
             // if(repetition_has_occured) { return true; } // if repetition has already occured, return true
             // repetition_has_occured = true;
@@ -192,9 +223,12 @@ int Search::find_mvv_lva(Piece victim_type, Piece attacker_type)
     return ((value_of_piece_from_type_and_capture_role(victim_type, true) * 10) - value_of_piece_from_type_and_capture_role(attacker_type, false));
 }
 
-int Search::value_of_piece_from_type_and_capture_role(Piece type, bool is_victim) {
-    if(is_victim) {
-        switch(type) {
+int Search::value_of_piece_from_type_and_capture_role(Piece type, bool is_victim)
+{
+    if(is_victim)
+    {
+        switch(type)
+        {
             case Piece::PAWN:
                 return 5;
             case Piece::KNIGHT:
@@ -218,14 +252,17 @@ std::vector<Move> Search::sort_by_mvv_lva(const std::vector<Move>& moves, const 
 {
     std::vector<MVV_LVA_Log> move_logs;
     // Iterate through each move
-    for(Move move : moves) {
+    for(Move move : moves)
+    {
         // Check if it's a capture (if the destination has a piece)
-        if(!Utils::piece_is_at_square(pos.get_board(), static_cast<int>(move.get_dest_square()))) {
+        if(!Utils::piece_is_at_square(pos.get_board(), static_cast<int>(move.get_dest_square())))
+        {
             // Not a capture, assign lowest priority (50)
             MVV_LVA_Log move_log = {move, 50};
             move_logs.push_back(move_log);
         }
-        else {
+        else
+        {
             // It's a capture, calculate MVV-LVA score
             Piece victim = pos.get_piece_type_from_square(move.get_dest_square());
             Piece attacker = pos.get_piece_type_from_square(move.get_src_square());
@@ -238,13 +275,15 @@ std::vector<Move> Search::sort_by_mvv_lva(const std::vector<Move>& moves, const 
     }
 
     // Sort the moves based on MVV-LVA score, higher priority first
-    std::stable_sort(move_logs.begin(), move_logs.end(), [](const MVV_LVA_Log& a, const MVV_LVA_Log& b) {
+    std::stable_sort(move_logs.begin(), move_logs.end(), [](const MVV_LVA_Log& a, const MVV_LVA_Log& b)
+    {
         return a.mvv_lva_score < b.mvv_lva_score; // lower scores at the front
     });
 
     // Extract sorted moves from the logs
     std::vector<Move> sorted_moves;
-    for(MVV_LVA_Log& log : move_logs) {
+    for(MVV_LVA_Log& log : move_logs)
+    {
         sorted_moves.push_back(log.move);
     }
     

@@ -330,7 +330,7 @@ Piece Position::get_piece_type_from_square(u8 square) const {
     return attacks_vector;
 }
 
-std::vector<Move> Position::generate_all_moves() const // uses the board state to generate all moves for a given colour 
+std::vector<Move> Position::generate_all_moves(bool is_qsearch) const // uses the board state to generate all moves for a given colour 
 {
     std::vector<Move> moves;
     u64 pieces = get_pieces_from_current_turn();
@@ -339,7 +339,7 @@ std::vector<Move> Position::generate_all_moves() const // uses the board state t
     for(u8 square = 0; square < 64; square++) { // can change this so it only iterates through pieces mask but can do some other time
         if((1ULL << square) & pieces) { // if the person whos turn it is has a piece on this square, gen its moves
             Piece piece_type = get_piece_type_from_square(square);
-            square_moves = generate_piece_moves(piece_type, square);
+            square_moves = generate_piece_moves(piece_type, square, is_qsearch);
             for(Move move : square_moves) {
                 moves.push_back(move);
                 // if pawn destination square is unoccupied, en passant flag
@@ -410,12 +410,12 @@ u64 Position::generate_piece_attacks(Piece type, u8 square) const { // returns u
     return attacks & ~get_pieces_from_current_turn();
 }
 
-std::vector<Move> Position::generate_piece_moves(Piece type, u8 square) const { // will be used when searching for both sides, so will use Turn.
+std::vector<Move> Position::generate_piece_moves(Piece type, u8 square, bool is_qsearch) const { // will be used when searching for both sides, so will use Turn.
     u64 attacks = 0ULL;
     switch(type) {
         case Piece::PAWN:
             attacks = get_pawn_attacks(square);
-            return bb_to_move_list(type, square, attacks); // skip check for piece colours as already handled.
+            break;
         case Piece::KNIGHT:
             attacks = Utils::KNIGHT_ATTACKS[square];
             break;
@@ -436,8 +436,23 @@ std::vector<Move> Position::generate_piece_moves(Piece type, u8 square) const { 
             break;
     }
     // Ensuring it isnt attacking its own piece
-
     attacks &= ~get_pieces_from_current_turn();
+
+    //if(qsearch) {attacks &= get_opponent_pieces()}
+    if(is_qsearch)
+    {
+        // pos.get_opponent_pieces() // where gets the pieces of the opposite turn
+        // // think about ways of indexing rather than using if ... else ...
+
+        if(turn == Turn::WHITE)
+        {
+            attacks &= get_black_pieces(); // ensure only captures considered
+        }
+        else
+        {
+            attacks &= get_white_pieces();
+        }
+    }
 
     return bb_to_move_list(type, square, attacks);
 }

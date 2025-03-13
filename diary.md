@@ -1,7 +1,11 @@
+13/03/2025
+Created a perftsuite for qsearch. Perft result captures - en passant moves because extra complications for very little elo gain.
+
+12/03/2025
+Can generate noisy moves used for qsearch. Adjustments made to allow for qsearch at the end of search. More testing needed to work for main search.
+
 11/03/2025
-Made Gambit the default search and updated the centipawn output.
-Seems like current implementation of promise score is ineffective as simply too slow.
-Going to move onto opponent modelling instead.
+Average is too slow so switched to default search of alpha beta with opponent modelling.
 
 27/02/2025
 Figuring out how to compare both search algorithms

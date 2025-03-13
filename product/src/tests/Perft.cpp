@@ -28,13 +28,13 @@ static std::vector<std::string> Perft::Split(const std::string& str, const std::
 }
 
 // Heavily inspired by the following implementation, but adapted for my own project: https://github.com/TiltedDFA/TDFA/tree/c26a01e29ba87c41af50700c2c8321e3e2667c8f
-static u64 Perft::test_perft(u8 depth, u64 expected_nodes, uint16_t test_number, const std::string& fen, const bool& output_perft) {
+static u64 Perft::test_perft(u8 depth, u64 expected_nodes, uint16_t test_number, const std::string& fen, const bool& output_perft, bool using_noisy) {
     Position pos(fen);
 
     auto start = std::chrono::high_resolution_clock::now();
 
     Move null_move = Move(0, 0, Move_Flag::NULL_FLAG);
-    u64 total_nodes = split_perft(depth, depth, output_perft, null_move, pos);
+    u64 total_nodes = split_perft(depth, depth, output_perft, null_move, pos, using_noisy);
 
     auto end = std::chrono::high_resolution_clock::now();
 
@@ -43,7 +43,7 @@ static u64 Perft::test_perft(u8 depth, u64 expected_nodes, uint16_t test_number,
     const uint64_t nps = static_cast<uint64_t>(total_nodes) * 1'000'000 / duration;
 
     if(expected_nodes == total_nodes) {
-        std::cout << "Test " << test_number << " passed at depth " << static_cast<int>(depth) << " with " << nps << " nps" << std::endl;
+        std::cout << "Test " << test_number << " passed at depth " << static_cast<int>(depth) << " with " << nps << " nps " << "and " << total_nodes << " nodes" << std::endl;
     }
     else {
         std::cout << "Test " << test_number << " *FAILED*. Exp " << expected_nodes << ", was " << static_cast<int>(total_nodes) << std::endl;
@@ -52,11 +52,23 @@ static u64 Perft::test_perft(u8 depth, u64 expected_nodes, uint16_t test_number,
     return nps;
 }
 
-static bool Perft::run_perft_suite(const bool& output_perft) {
-    std::fstream perft_file("../product/src/tests/perftsuite.epd", std::ios::in);
+bool Perft::run_perft_suite(bool output_perft, bool using_noisy)
+{
+    std::string file_path;
+    if(using_noisy)
+    {
+        file_path = "../product/src/tests/noisy_perftsuite.epd";
+    }
+    else
+    {
+        file_path = "../product/src/tests/perftsuite.epd";
+    }
+    
+    std::fstream perft_file(file_path, std::ios::in);
 
-    if(!perft_file.is_open()){
-        std::cerr << "Perft file could not open\n";
+    if(!perft_file.is_open())
+    {
+        std::cerr << "Perft file: " << file_path << "could not open\n";
         return false;
     }
 
@@ -81,7 +93,7 @@ static bool Perft::run_perft_suite(const bool& output_perft) {
             break;
         }
         assert(depth < 7);
-        test_perft(depth, expected_nodes, current_perft, fen, output_perft);
+        test_perft(depth, expected_nodes, current_perft, fen, output_perft, using_noisy);
         current_perft++;
     }
 
@@ -90,7 +102,7 @@ static bool Perft::run_perft_suite(const bool& output_perft) {
     return true;
 }
 
-u64 Perft::split_perft(int current_depth, const int& desired_depth, const bool& output_split, Move& last_move, Position pos) // desired depth being the initial depth input
+u64 Perft::split_perft(int current_depth, const int& desired_depth, const bool& output_split, Move& last_move, Position pos, bool using_noisy) // desired depth being the initial depth input
 {
     Move null_move = Move(0, 0, NULL_FLAG);
     if(!last_move.equals(null_move)) {
@@ -119,7 +131,20 @@ u64 Perft::split_perft(int current_depth, const int& desired_depth, const bool& 
     
     u64 sum = 0;
     u64 nodes = 0;
-    std::vector<Move> moves = pos.generate_all_moves();
+
+    std::vector<Move> moves;
+    if(using_noisy && (current_depth == 1)) // only perform qsearch at end of search depth.
+    {
+        // Does not look for en passant which is technically a capture and therefore noisy
+        // However the difference in elo is very very small.
+        // Therefore, noisy_perftsuite DISCLUDES en passant
+        moves = pos.generate_all_moves(true);
+    }
+    else
+    {
+        moves = pos.generate_all_moves(false);
+    }
+
     for(Move& move : moves) {
         // Reset position
         // Create a copy of the current starting position at each depth
@@ -129,7 +154,7 @@ u64 Perft::split_perft(int current_depth, const int& desired_depth, const bool& 
         if(!new_position.is_legal(move)) { // if move isnt legal, don't count
             continue;
         }
-        nodes = split_perft(current_depth - 1, desired_depth, output_split, move, new_position);
+        nodes = split_perft(current_depth - 1, desired_depth, output_split, move, new_position, using_noisy);
         sum += nodes;
 
         if(output_split) {

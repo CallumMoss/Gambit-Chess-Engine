@@ -27,9 +27,9 @@ class Position
         u64 get_bishop_moves(u8 square) const;
         u64 get_rook_moves(u8 square) const;
         u64 get_queen_moves(u8 square) const;
-        std::vector<Move> generate_all_moves() const;
+        std::vector<Move> generate_all_moves(bool is_qsearch) const;
         u64 generate_piece_attacks(Piece type, u8 square) const;
-        std::vector<Move> generate_piece_moves(Piece type, u8 square) const;
+        std::vector<Move> generate_piece_moves(Piece type, u8 square, bool is_qsearch) const;
         std::vector<u64> extract_piece_moves(u64 attacks) const;
         std::vector<Move> bb_to_move_list(Piece type, u8 square, u64 attacks) const;
 
