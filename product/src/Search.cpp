@@ -50,7 +50,7 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
     }
 
     // if(depth == 0) { return Evaluation::evaluate(pos); }
-    if(depth == 0) { return quiescence_search(pos, -INT_MAX, INT_MAX, timer); }
+    if(depth == 0) { return quiescence_search(pos, alpha, beta, timer); }
 
     Node_Type node_type = Node_Type::UPPER;
     Move zobrist_move = Utils::NULL_MOVE;
@@ -140,7 +140,9 @@ int Search::quiescence_search(Position& pos, int alpha, int beta, Timer& timer)
 
     std::vector<Move> noisy_moves = pos.generate_all_moves(true); // moves involving captures
     // mvv lva just makes pruning more frequent, therefore search speeds up.
-    //noisy_moves = sort_by_mvv_lva(noisy_moves, pos);
+    // mvv_lva here is necessary as there is no cap to depth like in negamax
+    // it will search to crazy depths on bad sequences.
+    noisy_moves = sort_by_mvv_lva(noisy_moves, pos);
 
     for(Move& move : noisy_moves)
     {

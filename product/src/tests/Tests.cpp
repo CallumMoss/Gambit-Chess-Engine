@@ -939,6 +939,22 @@
 //   Perft::run_perft_suite(false, true);
 // }
 
+TEST(SEARCH, mvv_lva5) {
+  Piece victim = Piece::QUEEN;
+  Piece attacker = Piece::PAWN;
+  Opponent opp;
+  Search s = Search(false, opp);
+	std::cout << s.find_mvv_lva(victim, attacker) << std::endl;
+}
+
+TEST(SEARCH, mvv_lva6) {
+  Piece victim = Piece::QUEEN;
+  Piece attacker = Piece::ROOK;
+  Opponent opp;
+  Search s = Search(false, opp);
+	std::cout << s.find_mvv_lva(victim, attacker) << std::endl;
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   Zobrist z;
