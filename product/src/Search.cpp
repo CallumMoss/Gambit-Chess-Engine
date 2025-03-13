@@ -135,19 +135,12 @@ int Search::quiescence_search(Position& pos, int alpha, int beta, Timer& timer)
     int best_score = stand_pat;
     int score = -INT_MAX;
 
-    // int stand_pat = Evaluate();
-    // int best_value = stand_pat;
-    // if( stand_pat >= beta )
-    //     return stand_pat;
-    // if( alpha < stand_pat )
-    //     alpha = stand_pat;
-
     if(stand_pat >= beta) { return stand_pat; }
     if (alpha < stand_pat) { alpha = stand_pat; }
 
     std::vector<Move> noisy_moves = pos.generate_all_moves(true); // moves involving captures
     // mvv lva just makes pruning more frequent, therefore search speeds up.
-    noisy_moves = sort_by_mvv_lva(noisy_moves, pos);
+    //noisy_moves = sort_by_mvv_lva(noisy_moves, pos);
 
     for(Move& move : noisy_moves)
     {
@@ -161,7 +154,7 @@ int Search::quiescence_search(Position& pos, int alpha, int beta, Timer& timer)
 
         //if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
 
-        score = -quiescence_search(pos, -beta, -alpha, timer);
+        score = -quiescence_search(new_position, -beta, -alpha, timer);
 
         if(score >= beta) { return score; }
         if(score > best_score) { best_score = score; }

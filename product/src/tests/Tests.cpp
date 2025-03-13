@@ -902,23 +902,42 @@
 //   std::cout << "bestmove: " << best_move_str << std::endl;
 // }
 
-// TEST(QSEARCH, noisy_move_gen)
+// TEST(QSEARCH, q1)
+// {
+//   Magics::init();
+//   Position pos;
+//   Opponent opp;
+//   Search search = Search(false, opp);
+//   Timer timer;
+//   PositionStack ps;
+//   Transposition_Table tt;
+//   tt.resize(16);
+//   u64 wtime = 60'000; // white has x msec left on the clock
+//   u64 btime = 60'000; // black has x msec left on the clock
+//   u64 winc = 0; // white increment per move in mseconds if x > 0
+//   u64 binc = 0; // black increment per move in mseconds if x > 0
+//   if(pos.get_turn() == Turn::WHITE) {
+//       timer.set_fields(wtime, winc);
+//   }
+//   else {
+//       timer.set_fields(btime, binc);
+//   }
+//   timer.start_timer();
+//   search.quiescence_search(pos, timer, tt, ps);
+//   Move expected_move = Move(31, 22, Move_Flag::QUEEN_FLAG);
+//   assert(search.get_root_best_move().equals(expected_move));
+//   std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_2: Test 1 passed\n";
+
+// }
+
+
+// TEST(PERFT, perft_suite)
 // {
 //   // Gotten from https://www.chessprogramming.org/Perft_Results
 //   // Where expected noisy size is number of captures minus number of en passant moves
 //   // Used for qsearch perft
-//   Position pos;
-//   std::vector<Move> moves = pos.generate_all_moves(false);
-//   std::vector<Move> noisy_moves = pos.generate_all_moves(true);
-//   std::cout << "Moves size: " << moves.size() << std::endl;
-//   std::cout << "Noisy moves size: " << noisy_moves.size() << std::endl;
+//   Perft::run_perft_suite(false, true);
 // }
-
-
-TEST(PERFT, perft_suite)
-{
-  Perft::run_perft_suite(false, true);
-}
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
