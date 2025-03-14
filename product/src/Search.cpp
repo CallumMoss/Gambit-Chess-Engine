@@ -4,6 +4,8 @@
 #include <cmath>
 #include <algorithm>
 
+void order_moves(std::vector<Move>& moves, Move tt_move, Position& pos); // forward declaring (as to make this local to Search.cpp)
+
 Search::Search(bool gambit_flag, Opponent& opp):
     root_best_move(),
     root_best_score(-INT_MAX),
@@ -49,11 +51,13 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
         if(is_draw(pos, ps)) { return Utils::DRAW_SCORE; }
     }
 
-    // if(depth == 0) { return Evaluation::evaluate(pos); }
-    if(depth == 0) { return quiescence_search(pos, alpha, beta, timer); }
+    //if(depth == 0) { return Evaluation::evaluate(pos); }
 
     Node_Type node_type = Node_Type::UPPER;
     Move zobrist_move = Utils::NULL_MOVE;
+
+    if(depth == 0) { return quiescence_search(pos, alpha, beta, timer, zobrist_move); }
+
     if(ply > 0)
     {
         // Checking if position is in transposition table
@@ -69,15 +73,19 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
             }
         }
     }
+
+    // if(depth == 0) { return quiescence_search(pos, alpha, beta, timer, zobrist_move); }
+
     int best_score = -INT_MAX;
     int score = -INT_MAX;
     std::vector<Move> moves = pos.generate_all_moves(false);
-    moves = sort_by_mvv_lva(moves, pos);
+    order_moves(moves, zobrist_move, pos);
+    // moves = sort_by_mvv_lva(moves, pos);
     Move best_move = moves[0];
-    if(!zobrist_move.equals(Utils::NULL_MOVE))
-    {
-        moves.insert(moves.begin(), zobrist_move); // look at zobrist best move first
-    }
+    // if(!zobrist_move.equals(Utils::NULL_MOVE))
+    // {
+    //     moves.insert(moves.begin(), zobrist_move); // look at zobrist best move first
+    // }
     for(Move move : moves)
     {
         if(timer.is_out_of_time())
@@ -129,7 +137,7 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
     return best_score;
 }
 
-int Search::quiescence_search(Position& pos, int alpha, int beta, Timer& timer)
+int Search::quiescence_search(Position& pos, int alpha, int beta, Timer& timer, Move tt_move)
 {
     int stand_pat = Evaluation::evaluate(pos);
     int best_score = stand_pat;
@@ -142,7 +150,7 @@ int Search::quiescence_search(Position& pos, int alpha, int beta, Timer& timer)
     // mvv lva just makes pruning more frequent, therefore search speeds up.
     // mvv_lva here is necessary as there is no cap to depth like in negamax
     // it will search to crazy depths on bad sequences.
-    noisy_moves = sort_by_mvv_lva(noisy_moves, pos);
+    order_moves(noisy_moves, tt_move, pos);
 
     for(Move& move : noisy_moves)
     {
@@ -156,7 +164,7 @@ int Search::quiescence_search(Position& pos, int alpha, int beta, Timer& timer)
 
         //if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
 
-        score = -quiescence_search(new_position, -beta, -alpha, timer);
+        score = -quiescence_search(new_position, -beta, -alpha, timer, tt_move);
 
         if(score >= beta) { return score; }
         if(score > best_score) { best_score = score; }
@@ -210,77 +218,153 @@ bool Search::is_draw(Position& pos, PositionStack& ps)
     return false;
 }
 
-// Most Valuable Victim - Least Valuable Aggressor
-// Simple heuristic to help sort captures in a way where it is more likely to benefit from the exchange
-// Ranges from [4, 49], where the lower the number the higher the priority
-int Search::find_mvv_lva(Piece victim_type, Piece attacker_type)
-{ // we give weight towards the victim to ensure it gets sorted first
-    return ((value_of_piece_from_type_and_capture_role(victim_type, true) * 10) - value_of_piece_from_type_and_capture_role(attacker_type, false));
+int calc_mvv_lva(Piece victim_type, Piece attacker_type)
+{
+    if(victim_type == Piece::INVALID || attacker_type == Piece::INVALID)
+    {
+        return 4; // lowest score
+    }
+    return ((victim_type + 1) * 10) - attacker_type;
 }
 
-int Search::value_of_piece_from_type_and_capture_role(Piece type, bool is_victim)
+// void order_moves(std::vector<Move>& moves, Move tt_move, Position& pos)
+// {
+//     std::vector<u8> mvv_lva_scores(moves.size()); // reserve space to avoid resizing
+
+//     for(int i = 0; i < moves.size(); i++)
+//     {
+//         Move move = moves[i];
+//         if(tt_move.equals(move))
+//         {
+//             mvv_lva_scores[i] = 51; // highest score
+//         }
+//         else
+//         {
+//             mvv_lva_scores[i] = calc_mvv_lva(
+//                 pos.get_piece_type_from_square(move.get_dest_square()),
+//                 pos.get_piece_type_from_square(move.get_src_square())
+//             );
+//         }
+//     }
+
+//     // Sort moves directly using the scores as keys
+//     std::sort(moves.begin(), moves.end(), [&](const Move& a, const Move& b) {
+//         size_t index_a = &a - &moves[0]; // Compute index of a
+//         size_t index_b = &b - &moves[0]; // Compute index of b
+//         return mvv_lva_scores[index_a] > mvv_lva_scores[index_b]; // Higher scores first
+//     });
+//     std::cout << "I made it!\n";
+// }
+
+void order_moves(std::vector<Move>& moves, Move tt_move, Position& pos)
 {
-    if(is_victim)
-    {
-        switch(type)
-        {
-            case Piece::PAWN:
-                return 5;
-            case Piece::KNIGHT:
-                return 4;
-            case Piece::BISHOP:
-                return 3;
-            case Piece::ROOK:
-                return 2;
-            case Piece::QUEEN:
-                return 1;
-            default: // king cannot be taken
-                std::cerr << "Unexpected piece type of victim: " << type;
-                std::exit(-1);
-        }
-    }
-    //else if attacker
-    return type + 1; // king is most valuable attacker as it implies that it is free, as he cannot walk into check
-}
-
-std::vector<Move> Search::sort_by_mvv_lva(const std::vector<Move>& moves, const Position& pos)
-{
-    std::vector<MVV_LVA_Log> move_logs;
-    // Iterate through each move
-    for(Move move : moves)
-    {
-        // Check if it's a capture (if the destination has a piece)
-        if(!Utils::piece_is_at_square(pos.get_board(), static_cast<int>(move.get_dest_square())))
-        {
-            // Not a capture, assign lowest priority (50)
-            MVV_LVA_Log move_log = {move, 50};
-            move_logs.push_back(move_log);
-        }
-        else
-        {
-            // It's a capture, calculate MVV-LVA score
-            Piece victim = pos.get_piece_type_from_square(move.get_dest_square());
-            Piece attacker = pos.get_piece_type_from_square(move.get_src_square());
-            int mvv_lva_score = find_mvv_lva(victim, attacker); // This should give a score prioritizing valuable captures
-
-            // Log the move and its score
-            MVV_LVA_Log move_log = {move, mvv_lva_score};
-            move_logs.push_back(move_log);
-        }
-    }
-
-    // Sort the moves based on MVV-LVA score, higher priority first
-    std::stable_sort(move_logs.begin(), move_logs.end(), [](const MVV_LVA_Log& a, const MVV_LVA_Log& b)
-    {
-        return a.mvv_lva_score < b.mvv_lva_score; // lower scores at the front
+    std::sort(moves.begin(), moves.end(), [&](Move &a, Move &b) {
+        u8 score_a = a.equals(tt_move)
+            ? 51
+            : calc_mvv_lva(
+                  pos.get_piece_type_from_square(a.get_dest_square()),
+                  pos.get_piece_type_from_square(a.get_src_square())
+              );
+        u8 score_b = b.equals(tt_move)
+            ? 51
+            : calc_mvv_lva(
+                  pos.get_piece_type_from_square(b.get_dest_square()),
+                  pos.get_piece_type_from_square(b.get_src_square())
+              );
+        return score_a > score_b;
     });
-
-    // Extract sorted moves from the logs
-    std::vector<Move> sorted_moves;
-    for(MVV_LVA_Log& log : move_logs)
-    {
-        sorted_moves.push_back(log.move);
-    }
-    
-    return sorted_moves;
 }
+
+
+// // Most Valuable Victim - Least Valuable Aggressor
+// // Simple heuristic to help sort captures in a way where it is more likely to benefit from the exchange
+// // Ranges from [4, 49], where the lower the number the higher the priority
+// int Search::find_mvv_lva(Piece victim_type, Piece attacker_type)
+// { // we give weight towards the victim to ensure it gets sorted first
+//     return ((value_of_piece_from_type_and_capture_role(victim_type, true) * 10) - value_of_piece_from_type_and_capture_role(attacker_type, false));
+// }
+
+// int Search::value_of_piece_from_type_and_capture_role(Piece type, bool is_victim)
+// {
+//     if(is_victim)
+//     {
+//         switch(type)
+//         {
+//             case Piece::PAWN:
+//                 return 5;
+//             case Piece::KNIGHT:
+//                 return 4;
+//             case Piece::BISHOP:
+//                 return 3;
+//             case Piece::ROOK:
+//                 return 2;
+//             case Piece::QUEEN:
+//                 return 1;
+//             default: // king cannot be taken
+//                 std::cerr << "Unexpected piece type of victim: " << type;
+//                 std::exit(-1);
+//         }
+//     }
+//     //else if attacker
+//     return type + 1; // king is most valuable attacker as it implies that it is free, as he cannot walk into check
+// }
+
+// std::vector<Move> Search::sort_by_mvv_lva(const std::vector<Move>& moves, const Position& pos)
+// {
+//     std::vector<MVV_LVA_Log> move_logs;
+//     // Iterate through each move
+//     for(Move move : moves)
+//     {
+//         // Check if it's a capture (if the destination has a piece)
+//         if(!Utils::piece_is_at_square(pos.get_board(), static_cast<int>(move.get_dest_square())))
+//         {
+//             // Not a capture, assign lowest priority (50)
+//             MVV_LVA_Log move_log = {move, 50};
+//             move_logs.push_back(move_log);
+//         }
+//         else
+//         {
+//             // It's a capture, calculate MVV-LVA score
+//             Piece victim = pos.get_piece_type_from_square(move.get_dest_square());
+//             Piece attacker = pos.get_piece_type_from_square(move.get_src_square());
+//             int mvv_lva_score = find_mvv_lva(victim, attacker); // This should give a score prioritizing valuable captures
+
+//             // Log the move and its score
+//             MVV_LVA_Log move_log = {move, mvv_lva_score};
+//             move_logs.push_back(move_log);
+//         }
+//     }
+
+//     // Sort the moves based on MVV-LVA score, higher priority first
+//     std::stable_sort(move_logs.begin(), move_logs.end(), [](const MVV_LVA_Log& a, const MVV_LVA_Log& b)
+//     {
+//         return a.mvv_lva_score < b.mvv_lva_score; // lower scores at the front
+//     });
+
+//     // Extract sorted moves from the logs
+//     std::vector<Move> sorted_moves;
+//     for(MVV_LVA_Log& log : move_logs)
+//     {
+//         sorted_moves.push_back(log.move);
+//     }
+    
+//     return sorted_moves;
+// }
+// /*
+//     Attackers (in order of most to least valuable):
+//         King, Queen, Rook, Bishop, Knight, Pawn
+//     Victims (most to least valuable):
+//         King (shouldn't occur), Queen, Rook, Bishop, Knight, Pawn
+//     Access: MVV_LVA_TABLE[attacker_type][victim_type]
+// */
+// // Best: pawn taking queen (as pawn taking king cant occur)
+//  constexpr std::array<std::array<,>, > MVV_LVA_TABLE = 
+// {
+//     {}
+// };
+
+// Search::order_moves()
+// {
+//     do mvv lva, but have the TT move be a score such that its sent to the front
+//     because currently i am inserting the tt move into the move list but it already exists somewhere in there
+// }

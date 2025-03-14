@@ -939,21 +939,35 @@
 //   Perft::run_perft_suite(false, true);
 // }
 
-TEST(SEARCH, mvv_lva5) {
-  Piece victim = Piece::QUEEN;
-  Piece attacker = Piece::PAWN;
-  Opponent opp;
-  Search s = Search(false, opp);
-	std::cout << s.find_mvv_lva(victim, attacker) << std::endl;
+TEST(SEARCH, mvv_lva6) {
+  // Technically the king is LVA because a king
+  // wont have play a move if it can be recaptured
+  // but for simplicity and because tests have shown
+  // its pretty minor, I have not considered this case
+
+
+  // Piece victim = Piece::QUEEN;
+  // Piece attacker = Piece::PAWN;
+  // Opponent opp;
+  // Search s = Search(false, opp);
+	// std::cout << s.find_mvv_lva(victim, attacker) << std::endl;
+
+  // MVV: Queen 4
+  // LVA: Pawn 0
+  // Calc: ((4 + 1) * 10) - 0 = 50
+
+  // LVV: Pawn 0
+  // MVA: King 5
+  // Calc: ((0 + 1) * 10) - 5 = 5
 }
 
-TEST(SEARCH, mvv_lva6) {
-  Piece victim = Piece::QUEEN;
-  Piece attacker = Piece::ROOK;
-  Opponent opp;
-  Search s = Search(false, opp);
-	std::cout << s.find_mvv_lva(victim, attacker) << std::endl;
-}
+// TEST(SEARCH, mvv_lva7) {
+//   Piece victim = Piece::QUEEN;
+//   Piece attacker = Piece::ROOK;
+//   Opponent opp;
+//   Search s = Search(false, opp);
+// 	std::cout << s.find_mvv_lva(victim, attacker) << std::endl;
+// }
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

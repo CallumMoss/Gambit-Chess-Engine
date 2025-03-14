@@ -23,14 +23,13 @@ class Search {
         // Search algorithms
         int iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps);
         int alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps);
-        int quiescence_search(Position& pos, int alpha, int beta, Timer& timer);
+        int quiescence_search(Position& pos, int alpha, int beta, Timer& timer, Move tt_move);
 
         // Utils
         bool is_draw(Position& pos, PositionStack& ps);
         int find_mvv_lva(Piece victim_type, Piece attacker_type);
         int value_of_piece_from_type_and_capture_role(Piece type, bool is_victim);
-        std::vector<Move> sort_by_mvv_lva(const std::vector<Move>& moves, const Position& pos);
-
+        //std::vector<Move> sort_by_mvv_lva(const std::vector<Move>& moves, const Position& pos);
 
         // Getters and Setters
         Move get_root_best_move() { return root_best_move; }
