@@ -38,7 +38,6 @@ class Search {
     private:
         Move root_best_move;
         int root_best_score = -INT_MAX;
-        bool has_found_a_legal_move = false;
         Forced_Flag forced_flag = Forced_Flag::NO_FORCED;
         bool is_gambit = false;
         Opponent& opponent;

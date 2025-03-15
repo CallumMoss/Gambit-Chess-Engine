@@ -10,7 +10,6 @@ void order_moves_qsearch(std::vector<Move>& moves, Position& pos);
 Search::Search(bool gambit_flag, Opponent& opp):
     root_best_move(),
     root_best_score(-INT_MAX),
-    has_found_a_legal_move(false), 
     is_gambit(gambit_flag),
     opponent(opp){}
 
@@ -37,7 +36,6 @@ int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table
         }
         last_best_move = root_best_move;
         last_best_score = root_best_score;
-        has_found_a_legal_move = false;
         std::cout << "info score cp " << score << " depth " << depth << std::endl;
     }
     return 0; // shouldnt need to return anything as this shouldnt be reached
@@ -75,6 +73,7 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
 
     int best_score = -INT_MAX;
     int score = -INT_MAX;
+    bool has_found_a_legal_move = false;
     std::vector<Move> moves = pos.generate_all_moves(false);
     order_moves(moves, zobrist_move, pos);
 
