@@ -5,6 +5,7 @@
 #include <algorithm>
 
 void order_moves(std::vector<Move>& moves, Move tt_move, Position& pos); // forward declaring (as to make this local to Search.cpp)
+void order_moves_qsearch(std::vector<Move>& moves, Position& pos);
 
 Search::Search(bool gambit_flag, Opponent& opp):
     root_best_move(),
@@ -27,7 +28,7 @@ int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table
 
     for(int depth = 1; depth < 256; depth++)
     {
-        int score = -alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps);
+        int score = alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps);
         // if score - pos full move or half move number is less than a certain score, should stop search.
         if(timer.is_out_of_time())
         {
@@ -51,12 +52,10 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
         if(is_draw(pos, ps)) { return Utils::DRAW_SCORE; }
     }
 
-    //if(depth == 0) { return Evaluation::evaluate(pos); }
+    if(depth <= 0) { return quiescence_search(pos, 0, alpha, beta, timer, tt); }
 
     Node_Type node_type = Node_Type::UPPER;
     Move zobrist_move = Utils::NULL_MOVE;
-
-    if(depth == 0) { return quiescence_search(pos, alpha, beta, timer, zobrist_move); }
 
     if(ply > 0)
     {
@@ -74,18 +73,13 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
         }
     }
 
-    // if(depth == 0) { return quiescence_search(pos, alpha, beta, timer, zobrist_move); }
-
     int best_score = -INT_MAX;
     int score = -INT_MAX;
     std::vector<Move> moves = pos.generate_all_moves(false);
     order_moves(moves, zobrist_move, pos);
-    // moves = sort_by_mvv_lva(moves, pos);
+
     Move best_move = moves[0];
-    // if(!zobrist_move.equals(Utils::NULL_MOVE))
-    // {
-    //     moves.insert(moves.begin(), zobrist_move); // look at zobrist best move first
-    // }
+
     for(Move move : moves)
     {
         if(timer.is_out_of_time())
@@ -133,12 +127,26 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
         else { best_score = Utils::DRAW_SCORE; }
         return best_score;
     }
-    tt.add_entry(pos.get_zobrist_key(), alpha, best_move, depth, node_type);
+    tt.add_entry(pos.get_zobrist_key(), best_score, best_move, depth, node_type);
     return best_score;
 }
 
-int Search::quiescence_search(Position& pos, int alpha, int beta, Timer& timer, Move tt_move)
+int Search::quiescence_search(Position& pos, int ply, int alpha, int beta, Timer& timer, Transposition_Table& tt)
 {
+
+    // this looks however many moves ahead,
+    // so returns mate score at depth 1 in ID.
+    // just because it returns mate score, doesnt mean that it shouldnt output the only legal move.
+
+    if(tt.entry_is_in_tt(pos.get_zobrist_key()))
+        {
+        TT_Entry entry = tt.get_entry(pos.get_zobrist_key());
+        // no depth check needed
+        if((entry.node_type == Node_Type::EXACT) || (entry.node_type == Node_Type::UPPER && entry.score <= alpha) || (entry.node_type == Node_Type::LOWER && entry.score >= beta)) {
+            return entry.score; // uses fail soft by returning the score regardless of which condition is true
+        }
+    }
+
     int stand_pat = Evaluation::evaluate(pos);
     int best_score = stand_pat;
     int score = -INT_MAX;
@@ -150,7 +158,7 @@ int Search::quiescence_search(Position& pos, int alpha, int beta, Timer& timer, 
     // mvv lva just makes pruning more frequent, therefore search speeds up.
     // mvv_lva here is necessary as there is no cap to depth like in negamax
     // it will search to crazy depths on bad sequences.
-    order_moves(noisy_moves, tt_move, pos);
+    order_moves_qsearch(noisy_moves, pos);
 
     for(Move& move : noisy_moves)
     {
@@ -162,9 +170,7 @@ int Search::quiescence_search(Position& pos, int alpha, int beta, Timer& timer, 
         new_position.make_move(move);
         if(!new_position.is_legal(move)) { continue; }
 
-        //if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
-
-        score = -quiescence_search(new_position, -beta, -alpha, timer, tt_move);
+        score = -quiescence_search(new_position, ply + 1, -beta, -alpha, timer, tt);
 
         if(score >= beta) { return score; }
         if(score > best_score) { best_score = score; }
@@ -268,6 +274,21 @@ void order_moves(std::vector<Move>& moves, Move tt_move, Position& pos)
         u8 score_b = b.equals(tt_move)
             ? 51
             : calc_mvv_lva(
+                  pos.get_piece_type_from_square(b.get_dest_square()),
+                  pos.get_piece_type_from_square(b.get_src_square())
+              );
+        return score_a > score_b;
+    });
+}
+
+void order_moves_qsearch(std::vector<Move>& moves, Position& pos)
+{
+    std::sort(moves.begin(), moves.end(), [&](Move &a, Move &b) {
+        u8 score_a = calc_mvv_lva(
+                  pos.get_piece_type_from_square(a.get_dest_square()),
+                  pos.get_piece_type_from_square(a.get_src_square())
+              );
+        u8 score_b = calc_mvv_lva(
                   pos.get_piece_type_from_square(b.get_dest_square()),
                   pos.get_piece_type_from_square(b.get_src_square())
               );

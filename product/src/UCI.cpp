@@ -73,6 +73,7 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transp
     Search search = Search(is_gambit, opp);
     search.iterative_deepening(pos, timer, tt, ps);
     Move best_move = search.get_root_best_move();
+    assert((!best_move.equals(Utils::NULL_MOVE))  && "Null move attempted to be played.");
     std::string best_move_str = Utils::move_to_board_notation(best_move);
     std::cout << "bestmove " << best_move_str << std::endl;
 }

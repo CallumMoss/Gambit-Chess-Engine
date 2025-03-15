@@ -969,6 +969,30 @@ TEST(SEARCH, mvv_lva6) {
 // 	std::cout << s.find_mvv_lva(victim, attacker) << std::endl;
 // }
 
+TEST(T, t)
+{
+  Position pos = Position("r1b1n1k1/pp3Qpr/2p4p/3pN3/8/8/P4PPP/6K1 b q - 0 1");
+  std::vector<Move> moves = pos.generate_all_moves(false);
+  for(Move m : moves)
+  {
+    Position new_pos = pos;
+    new_pos.make_move(m);
+    if(new_pos.is_legal(m)){
+    std::cout << Utils::move_to_board_notation(m);
+    std::cout << Evaluation::evaluate(new_pos) << std::endl;
+      std::vector<Move> new_moves = new_pos.generate_all_moves(false);
+      for(Move move : new_moves)
+      {
+        Position new_newpos = new_pos;
+        new_newpos.make_move(move);
+        if(new_newpos.is_legal(m)){
+          std::cout << Utils::move_to_board_notation(move);
+        }
+      }
+    }
+  }
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   Zobrist z;

@@ -1,3 +1,6 @@
+14/03/2025
+Refactored move ordering to put TT move at the start but not duplicate it and made MVV-LVA more efficient.
+
 13/03/2025
 Created a perftsuite for qsearch. Perft result captures - en passant moves because extra complications for very little elo gain.
 

@@ -23,7 +23,7 @@ class Search {
         // Search algorithms
         int iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps);
         int alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps);
-        int quiescence_search(Position& pos, int alpha, int beta, Timer& timer, Move tt_move);
+        int quiescence_search(Position& pos, int ply, int alpha, int beta, Timer& timer, Transposition_Table& tt);
 
         // Utils
         bool is_draw(Position& pos, PositionStack& ps);
