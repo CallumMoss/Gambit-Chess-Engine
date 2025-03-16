@@ -39,7 +39,7 @@ class Position
         void handle_en_passant(const u8& src_square, const u8& dest_square);
         void handle_castling(const u8& src_square, const u8& dest_square);
         bool is_legal(Move& move) const;
-        bool in_check() const;
+        bool in_check();
 
         // Getters and Setters:
         Piece get_piece_type_from_square(u8 square) const;

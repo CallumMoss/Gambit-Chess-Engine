@@ -114,7 +114,7 @@ namespace Utils {
 
     static constexpr u8 NULL_EN_PASSANT = 64;
     static Move NULL_MOVE = Move(64, 64, Move_Flag::NULL_FLAG);
-    static constexpr int MATE_SCORE = -INT_MAX + 1;
+    static constexpr int MATE_SCORE = -32000; // is flipped when returned
     static constexpr int DRAW_SCORE = 0; // can change this to vary level of contempt
     static constexpr int MAX_PLY = 255;
 
