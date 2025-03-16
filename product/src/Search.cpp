@@ -37,7 +37,7 @@ int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table
         last_best_move = root_best_move;
         last_best_score = root_best_score;
         // has_found_a_legal_move = false;
-        std::cout << "info score cp " << root_best_score << " depth " << depth << std::endl;
+        std::cout << "depth " << depth << " info score cp " << root_best_score << std::endl;
         //std::cout << Utils::move_to_board_notation(root_best_move) << std::endl;
     }
     return 0; // shouldnt need to return anything as this shouldnt be reached
@@ -71,6 +71,15 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
                     return entry.score; // uses fail soft by returning the score regardless of which condition is true
                 }
             }
+        }
+    }
+
+    if (depth <= 6 && !pos.in_check())
+    {
+        int static_eval = Evaluation::evaluate(pos);
+        if(static_eval - 80 * depth >= beta)
+        {
+            return static_eval;
         }
     }
 
@@ -130,7 +139,7 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
             //forced_flag = Forced_Flag::CHECKMATE;
             best_score = Utils::MATE_SCORE + ply; // An earlier checkmate is better than a later one
         }
-        else { best_score = Utils::DRAW_SCORE + ply; }
+        else { best_score = Utils::DRAW_SCORE; } // All draws are the same regardless of when they are
         return best_score;
     }
     tt.add_entry(pos.get_zobrist_key(), best_score, best_move, depth, node_type);

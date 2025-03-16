@@ -34,6 +34,8 @@ int Opponent::calculate_likelihood(Position& pos, Move& move, int score) {
 
 Tactic Opponent::get_tactic(Move& move)
 {
+    // For each tactic, find if it exists?
+
     // Moves already have various move types like promotions, castling etc
     // Detecting noisy moves would be good for Q search
 }

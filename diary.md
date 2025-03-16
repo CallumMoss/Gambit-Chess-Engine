@@ -1,3 +1,9 @@
+16/03/2025
+Fixed incheck, added TT to qsearch and added RFP.
+
+15/03/2025
+Working on debugging in check.
+
 14/03/2025
 Refactored move ordering to put TT move at the start but not duplicate it and made MVV-LVA more efficient.
 

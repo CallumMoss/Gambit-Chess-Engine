@@ -7,14 +7,14 @@
 
 // Could be represented in a bitstring, but too complex to detect many tactics at once
 enum Tactic {
-    fork,
+    fork, // most common
     pin,
     battery,
     check,
-    sacrafice,
+    sacrifice,
     en_passant,
     discovered_attack,
-    zugzwang // if all moves.eval makes eval worse
+    zugzwang // if all moves.eval makes eval worse. Unlikely to be known to most players though.
 };
 
 /**
