@@ -74,13 +74,11 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
         }
     }
 
-    if (depth <= 6 && !pos.in_check())
+    // RFP
+    if (depth <= 6 && !pos.in_check() && ply > 0)
     {
         int static_eval = Evaluation::evaluate(pos);
-        if(static_eval - 80 * depth >= beta)
-        {
-            return static_eval;
-        }
+        if(static_eval - 80 * depth >= beta) return static_eval;   
     }
 
     int best_score = -INT_MAX;
