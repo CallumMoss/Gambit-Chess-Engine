@@ -24,11 +24,10 @@ enum Tactic {
 class Opponent
 {
     public:
-        Opponent();
+        Opponent(Turn colour);
+        Opponent(Turn colour, int skill);
 
-        void found_best_move();
-
-        void not_found_best_move();
+        void update_skill(bool found_best_move);
 
         int calculate_risk_to_reward(int eval);
 
@@ -55,9 +54,17 @@ class Opponent
          */
         int approach_1(int ABE, int FLE, int SLE);
 
+        Turn get_colour() { return colour; }
+
+        float get_probability_of_optimal()
+        { // Could get elo from Lichess, and use our elo as a baseline for 100%.
+            return (skill / max_skill); // max probability of 1
+        }
+
     private:
-        int skill = 1000; // defaults to 1000 and is updated throughout the game
-        Turn colour = Turn::WHITE; // colour of the opponent
+        int max_skill = 10000;
+        int skill = max_skill; // assume optimal play from the start
+        Turn colour; // colour of the opponent
 };
 
 #endif // OPPONENT_HPP

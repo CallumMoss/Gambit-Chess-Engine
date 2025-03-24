@@ -1,3 +1,7 @@
+24/03/2025
+Went through some convoluted methods for expectiminimax until realising I can simply return
+opponent calc in AB with a check for if opp turn and if gambit
+
 16/03/2025
 Fixed incheck, added TT to qsearch and added RFP.
 

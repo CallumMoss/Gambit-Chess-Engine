@@ -1,3 +1,6 @@
+#ifndef MATE_IN_X_TESTS_HPP
+#define MATE_IN_X_TESTS_HPP
+
 #include "../Types.hpp"
 #include "../Position.hpp"
 #include "../utils.hpp"
@@ -7,9 +10,9 @@
 
 void test_iterative_deepening_opponent_mate_in_1() {
     // Positions from: https://lichess.org/study/IPtfJlNl
-    Magics::init();
+    //Magics::init();
     Position pos = Position("4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/4R1P1/B1Q2RK1 b - - 4 32");
-    Opponent opp;
+    Opponent opp = Opponent(Turn::WHITE);
     Search search = Search(false, opp);
     Timer timer;
     PositionStack ps;
@@ -129,9 +132,9 @@ void test_iterative_deepening_opponent_mate_in_1() {
   }
   
   void test_iterative_deepening_opponent_mate_in_2() {
-    Magics::init();
+    //Magics::init();
     Position pos = Position("4r3/1pp2rbk/6pn/4n3/P3BN1q/1PB2bPP/8/2Q1RRK1 b - - 0 31");
-    Opponent opp;
+    Opponent opp = Opponent(Turn::WHITE);
     Search search = Search(false, opp);
     Timer timer;
     PositionStack ps;
@@ -197,3 +200,5 @@ void test_iterative_deepening_opponent_mate_in_1() {
     assert(search3.get_root_best_move().equals(expected_move));
     std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_2: Test 3 passed\n";
 }
+
+#endif // MATE_IN_X_TESTS_HPP

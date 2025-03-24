@@ -27,7 +27,8 @@ int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table
 
     for(int depth = 1; depth < 256; depth++)
     {
-        alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps);
+        if(is_gambit) expectiminimax(depth, 0, pos, timer);
+        else alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps);
         // if score - pos full move or half move number is less than a certain score, should stop search.
         if(timer.is_out_of_time())
         {
@@ -265,4 +266,57 @@ void order_moves(std::vector<Move>& moves, Move tt_move, Position& pos)
               );
         return score_a > score_b;
     });
+}
+
+// Some redundant updates of worst score but keeps things simple.
+// Plus if statements would probably be just as slow
+// Sometimes the simplest solution is the best solution
+int Search::expectiminimax(int depth, int ply, Position& pos, Timer& timer)
+{
+    if(depth <= 0) return Evaluation::evaluate(pos);
+    
+    std::vector<Move> moves = pos.generate_all_moves(false);
+    int best_score = -INT_MAX;
+    int worst_score = INT_MAX;
+    int score = -INT_MAX;
+
+    for(Move move : moves)
+    {
+        if(timer.is_out_of_time()) return -INT_MAX; // could return anything as this score wont be used to update root move?
+        
+        Position new_position = pos;
+        new_position.make_move(move);
+        if(!new_position.is_legal(move)) continue; 
+
+        //if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
+        score = -expectiminimax(depth - 1, ply + 1, new_position, timer);
+        if(score < worst_score) worst_score = score;
+        if(score > best_score)
+        {
+            best_score = score;
+            if(ply == 0) // will never reach here from opp POV (unless we implement pondering)
+            {
+                root_best_score = score;
+                root_best_move = move;
+                //if(opponent.should_play(optimal_score, worst_score)) // if we should play our move against our opponent?
+            }
+        }
+    }
+    // If its the opponents turn
+    // Best score should be the AB move
+    if(opponent.get_colour() == pos.get_turn())
+        return calc_expecti_score(best_score, worst_score);
+    return best_score;
+}
+
+int Search::calc_expecti_score(int best_score, int worst_score)
+{
+    // Returning average of the two scores:
+    // return (best_score + worst_score) / 2
+
+    // Returning weighted best score:
+    // return static_cast<int>(best_score * opponent.get_probability_of_optimal());
+
+    // Returning weighted average:
+    return static_cast<int>((best_score * opponent.get_probability_of_optimal()) + (worst_score * (1 - opponent.get_probability_of_optimal())));
 }

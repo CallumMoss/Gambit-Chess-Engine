@@ -1,3 +1,7 @@
+#ifndef ZOBRIST_TESTS_HPP
+#define ZOBRIST_TESTS_HPP
+
+
 #include "../Types.hpp"
 #include "../Position.hpp"
 #include "../utils.hpp"
@@ -5,7 +9,7 @@
 #include "../Search.hpp"
 #include "../Opponent.hpp"
 
-void test_zobrist_1()
+inline void test_zobrist_1()
 {
     Position pos = Position("k7/8/8/3p4/8/8/2n2K2/8 b - - 0 1");
     Move move1 = Move(10, 4, Move_Flag::KNIGHT_FLAG);
@@ -19,7 +23,7 @@ void test_zobrist_1()
     assert(new_pos.get_zobrist_key() == pos.get_zobrist_key());
 }
   
-void test_zobrist_2()
+inline void test_zobrist_2()
 {
     // Use cutechess and grab one of the outputs of position startpos moves ...
     // apply these moves to start pos and see if it equals the new position, using the FEN from cutechess (may need to plug into lichess to get FEN)
@@ -32,7 +36,7 @@ void test_zobrist_2()
     assert(pos.get_zobrist_key() == new_pos.get_zobrist_key());
 }
   
-void test_zobrist_3()
+inline void test_zobrist_3()
 {
     Position pos = Position();
     //Position new_position = Position("r4r2/p2q1pk1/3p2pp/2p5/4P3/5R2/PP4PP/5RK1 w - - 0 29");
@@ -50,7 +54,7 @@ void test_zobrist_3()
     assert(pos.get_zobrist_key() == new_position.get_zobrist_key());
 }
   
-void test_zobrist_4()
+inline void test_zobrist_4()
 {
     Move move1 = Move(1, 18, Move_Flag::KNIGHT_FLAG);
     Move move2 = Move(51, 43, Move_Flag::PAWN_FLAG);
@@ -99,7 +103,7 @@ void test_zobrist_4()
     assert(pos.get_zobrist_key() == posply5.get_zobrist_key());
 }
   
-void test_zobrist_recomputation_1()
+inline void test_zobrist_recomputation_1()
 {
     Move move1 = Move(1, 18, Move_Flag::KNIGHT_FLAG);
     Move move2 = Move(51, 43, Move_Flag::PAWN_FLAG);
@@ -151,7 +155,7 @@ void test_zobrist_recomputation_1()
     assert(pos.get_zobrist_key() == posply5.get_zobrist_key());
 }
   
-void test_zobrist_recomputation_2()
+inline void test_zobrist_recomputation_2()
 {
     Position pos = Position("k7/8/8/3p4/8/8/2n2K2/8 b - - 0 1");
     Move move1 = Move(10, 4, Move_Flag::KNIGHT_FLAG);
@@ -165,7 +169,7 @@ void test_zobrist_recomputation_2()
     assert(new_pos.get_zobrist_key() == pos.get_zobrist_key());
 }
   
-  void test_zobrist_recomputation_3()
+  inline void test_zobrist_recomputation_3()
   {
     Position pos = Position("k7/3p4/8/8/8/8/5K2/4n3 b - - 0 1");
     Move move1 = Move(51, 51-16, Move_Flag::PAWN_TWO_FORWARD_FLAG);
@@ -179,7 +183,7 @@ void test_zobrist_recomputation_2()
     assert(new_pos.get_zobrist_key() == pos.get_zobrist_key());
 }
   
-void test_zobrist_recomputation_4()
+inline void test_zobrist_recomputation_4()
 {
     Position pos = Position("1k6/8/8/3p4/8/8/5K2/4n3 b - - 0 1");
     Move move1 = Move(57, 56, Move_Flag::KING_FLAG);
@@ -193,7 +197,7 @@ void test_zobrist_recomputation_4()
     assert(new_pos.get_zobrist_key() == pos.get_zobrist_key());
 }
   
-void test_zobrist_recomputation_5()
+inline void test_zobrist_recomputation_5()
 {
     Position pos = Position("k7/8/8/3p4/8/8/4pK2/8 b - - 0 1");
     Move move1 = Move(12, 4, Move_Flag::QUEEN_PROMOTION_FLAG);
@@ -207,7 +211,7 @@ void test_zobrist_recomputation_5()
     assert(new_pos.get_zobrist_key() == pos.get_zobrist_key());
 }
   
-void test_zobrist_recomputation_6()
+inline void test_zobrist_recomputation_6()
 { // Piece capture
     Position pos = Position("1k6/8/8/3p4/8/8/2n2K2/4R3 b - - 0 1");
     Move move1 = Move(10, 4, Move_Flag::KNIGHT_FLAG);
@@ -221,7 +225,7 @@ void test_zobrist_recomputation_6()
     assert(new_pos.get_zobrist_key() == pos.get_zobrist_key());
 }
   
-void test_zobrist_recomputation_7()
+inline void test_zobrist_recomputation_7()
 {
     Position pos = Position("1k6/8/8/3p4/8/8/3p1K2/8 b - - 0 1");
     Move move1 = Move(11, 3, Move_Flag::KNIGHT_PROMOTION_FLAG);
@@ -239,7 +243,7 @@ void test_zobrist_recomputation_7()
     assert(new_pos.get_zobrist_key() == pos.get_zobrist_key());
 }
   
-void test_zobrist_recomputation_8()
+inline void test_zobrist_recomputation_8()
 {
     Position pos = Position("1k6/8/8/3p4/8/8/p4K2/8 b - - 0 1");
     Move move1 = Move(8, 0, Move_Flag::KNIGHT_PROMOTION_FLAG);
@@ -258,7 +262,7 @@ void test_zobrist_recomputation_8()
 }
   
   
-void test_zobrist_recomputation_9()
+inline void test_zobrist_recomputation_9()
 {
     Position pos = Position("k7/8/8/3p4/8/8/4pK2/8 b - - 0 1");
     Move move1 = Move(12, 4, Move_Flag::KNIGHT_PROMOTION_FLAG);
@@ -289,3 +293,5 @@ void test_zobrist_recomputation_9()
     std::cout << pos.zobrist_equals_with_debugging(pos_ply2.get_zobrist_key());
     assert(pos_ply2.get_zobrist_key() == pos.get_zobrist_key());
   }
+
+#endif // ZOBRIST_TESTS_HPP

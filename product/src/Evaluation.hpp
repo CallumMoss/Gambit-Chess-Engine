@@ -7,6 +7,13 @@
 
 
 namespace Evaluation {
+    /**
+     * @brief Returns the evaluation from the perspective
+     * 
+     * @param pos 
+     * @return int 
+     */
+    // This means that if you are in a worse position you will evaluate a negative number irrelevant of which colour you are
     int evaluate(const Position& pos);
     int count_material(const Position& pos, Turn colour);
     int calculate_piece_square_advantage(const Position& pos, Turn colour, bool is_endgame);

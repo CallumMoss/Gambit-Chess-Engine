@@ -1,3 +1,6 @@
+#ifndef FEN_PARSING_TESTS_HPP
+#define FEN_PARSING_TESTS_HPP
+
 #include "../Types.hpp"
 #include "../Position.hpp"
 #include "../utils.hpp"
@@ -116,3 +119,5 @@ void parse_complex_pos()
 	assert(pos.get_half_move_clock() == 0 && "Expected the half move clock to be 0, but it is not.");
 	assert(pos.get_full_move_counter() == 14 && "Expected the full move clock to be 14, but it is not.");
 }
+
+#endif // FEN_PARSING_TESTS_HPP
