@@ -29,7 +29,8 @@ void test_iterative_deepening_opponent_mate_in_1() {
         timer.set_fields(btime, binc);
     }
     timer.start_timer();
-    search.iterative_deepening(pos, timer, tt, ps);
+    std::vector<EvaluatedMove> unused;
+    search.iterative_deepening(pos, timer, tt, ps, unused);
     Move expected_move = Move(31, 15, Move_Flag::QUEEN_FLAG);
     std::cout << Utils::move_to_board_notation(search.get_root_best_move()) << std::endl;
     assert(search.get_root_best_move().equals(expected_move));
@@ -52,7 +53,7 @@ void test_iterative_deepening_opponent_mate_in_1() {
         timer.set_fields(btime, binc);
     }
     timer.start_timer();
-    search2.iterative_deepening(pos, timer, tt, ps);
+    search2.iterative_deepening(pos, timer, tt, ps, unused);
     expected_move = Move(10, 46, Move_Flag::QUEEN_FLAG);
     std::cout << Utils::move_to_board_notation(search2.get_root_best_move()) << std::endl;
     assert(search2.get_root_best_move().equals(expected_move));
@@ -75,7 +76,7 @@ void test_iterative_deepening_opponent_mate_in_1() {
         timer.set_fields(btime, binc);
     }
     timer.start_timer();
-    search3.iterative_deepening(pos, timer, tt, ps);
+    search3.iterative_deepening(pos, timer, tt, ps, unused);
     ps = PositionStack();
     tt = Transposition_Table();
     tt.resize(16);
@@ -101,7 +102,7 @@ void test_iterative_deepening_opponent_mate_in_1() {
         timer.set_fields(btime, binc);
     }
     timer.start_timer();
-    search4.iterative_deepening(pos, timer, tt, ps);
+    search4.iterative_deepening(pos, timer, tt, ps, unused);
     expected_move = Move(52, 31, Move_Flag::BISHOP_FLAG);
     std::cout << Utils::move_to_board_notation(search4.get_root_best_move()) << std::endl;
     assert(search4.get_root_best_move().equals(expected_move));
@@ -124,7 +125,7 @@ void test_iterative_deepening_opponent_mate_in_1() {
         timer.set_fields(btime, binc);
     }
     timer.start_timer();
-    search5.iterative_deepening(pos, timer, tt, ps);
+    search5.iterative_deepening(pos, timer, tt, ps, unused);
     expected_move = Move(28, 18, Move_Flag::KNIGHT_FLAG);
     std::cout << Utils::move_to_board_notation(search5.get_root_best_move()) << std::endl;
     assert(search5.get_root_best_move().equals(expected_move));
@@ -151,7 +152,8 @@ void test_iterative_deepening_opponent_mate_in_1() {
         timer.set_fields(btime, binc);
     }
     timer.start_timer();
-    search.iterative_deepening(pos, timer, tt, ps);
+    std::vector<EvaluatedMove> unused;
+    search.iterative_deepening(pos, timer, tt, ps, unused);
     Move expected_move = Move(31, 22, Move_Flag::QUEEN_FLAG);
     assert(search.get_root_best_move().equals(expected_move));
     std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_2: Test 1 passed\n";
@@ -173,7 +175,7 @@ void test_iterative_deepening_opponent_mate_in_1() {
         timer.set_fields(btime, binc);
     }
     timer.start_timer();
-    search2.iterative_deepening(pos, timer, tt, ps);
+    search2.iterative_deepening(pos, timer, tt, ps, unused);
     expected_move = Move(21, 56, Move_Flag::QUEEN_FLAG);
     assert(search2.get_root_best_move().equals(expected_move));
     std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_2: Test 2 passed\n";
@@ -195,7 +197,7 @@ void test_iterative_deepening_opponent_mate_in_1() {
         timer.set_fields(btime, binc);
     }
     timer.start_timer();
-    search3.iterative_deepening(pos, timer, tt, ps);
+    search3.iterative_deepening(pos, timer, tt, ps, unused);
     expected_move = Move(29, 47, Move_Flag::QUEEN_FLAG);
     assert(search3.get_root_best_move().equals(expected_move));
     std::cout << "Test suite: test_negamax_fixed_depth_2_opponent_mate_in_2: Test 3 passed\n";

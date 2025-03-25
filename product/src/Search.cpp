@@ -21,27 +21,56 @@ Search::Search(bool gambit_flag, Opponent& opp):
  * @param tt used to store previous positions
  * @return int score of best move or 0
  */
-int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps) {
+int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, std::vector<EvaluatedMove>& evaluated_opp_responses) {
     Move last_best_move;
     int last_best_score = -INT_MAX;
+    std::vector<EvaluatedMove> last_opp_responses;
 
     for(int depth = 1; depth < 256; depth++)
     {
         if(is_gambit) expectiminimax(depth, 0, pos, timer);
         else alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps);
         // if score - pos full move or half move number is less than a certain score, should stop search.
+
+        // if incomplete search, set the move to play the last full searched best move
         if(timer.is_out_of_time())
         {
             root_best_move = last_best_move;
+            if(is_gambit) evaluated_opp_responses = last_opp_responses;
             return last_best_score;
         }
+
+        if(is_gambit) last_opp_responses = get_evaluated_responses(pos);
         last_best_move = root_best_move;
         last_best_score = root_best_score;
-        // has_found_a_legal_move = false;
+        
         std::cout << "depth " << depth << " info score cp " << root_best_score << std::endl;
-        //std::cout << Utils::move_to_board_notation(root_best_move) << std::endl;
     }
     return 0; // shouldnt need to return anything as this shouldnt be reached
+}
+
+std::vector<EvaluatedMove> Search::get_evaluated_responses(Position& pos)
+{
+    Position new_pos = pos;
+    new_pos.make_move(root_best_move);
+    std::vector<Move> responses = new_pos.generate_all_moves(false);
+    std::vector<EvaluatedMove> evaluated_responses;
+
+    for(Move move : responses)
+    {
+        Position temp_pos = new_pos;
+        temp_pos.make_move(move);
+        if(temp_pos.is_legal(move))
+        {
+            EvaluatedMove eval_move = EvaluatedMove(move, Evaluation::evaluate(temp_pos));
+            evaluated_responses.push_back(eval_move);
+        }
+    }
+    // now sort by eval
+    std::sort(evaluated_responses.begin(), evaluated_responses.end(), [](const EvaluatedMove& a, const EvaluatedMove& b) {
+        return a.eval > b.eval; // Higher scores come first
+    });
+    return evaluated_responses;
 }
 
 // Inspired by: https://www.chessprogramming.org/Alpha-Beta#Negamax_Framework

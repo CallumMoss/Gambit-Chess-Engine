@@ -1,6 +1,9 @@
 24/03/2025
 Went through some convoluted methods for expectiminimax until realising I can simply return
-opponent calc in AB with a check for if opp turn and if gambit
+opponent calc in a copy of AB with a check for if opp turn and if gambit.
+Can now pick a move based on opponent score.
+Able to adjust opponent score during play.
+Moved main to a function to be callable from tests.exe.
 
 16/03/2025
 Fixed incheck, added TT to qsearch and added RFP.

@@ -38,7 +38,7 @@ std::vector<std::string> UCI::split_args(std::string input)
     */
 
 // Inspired by https://github.com/AndyGrant/Ethereal/blob/master/src/uci.c#L133
-void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transposition_Table& tt, PositionStack& ps, bool is_gambit, Opponent& opp) {
+void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transposition_Table& tt, PositionStack& ps, bool is_gambit, Opponent& opp, std::vector<EvaluatedMove>& evaluated_opp_responses) {
     // Give default values which are updated later
     // Usually these values for wtime and btime should always be updated, so value here is technically irrelevant
     u64 wtime = 60'000; // white has x msec left on the clock
@@ -71,14 +71,14 @@ void UCI::go(std::vector<std::string>& args, Timer& timer, Position& pos, Transp
     timer.start_timer();
 
     Search search = Search(is_gambit, opp);
-    search.iterative_deepening(pos, timer, tt, ps);
+    search.iterative_deepening(pos, timer, tt, ps, evaluated_opp_responses);
     Move best_move = search.get_root_best_move();
     assert((!best_move.equals(Utils::NULL_MOVE))  && "Null move attempted to be played.");
     std::string best_move_str = Utils::move_to_board_notation(best_move);
     std::cout << "bestmove " << best_move_str << std::endl;
 }
 
-void UCI::position(std::vector<std::string>& args, Position& pos, PositionStack& ps) {
+void UCI::position(std::vector<std::string>& args, Position& pos, PositionStack& ps, bool is_gambit, Opponent& opp, std::vector<EvaluatedMove>& evaluated_opp_responses) {
     if(args[1] == "fen") {
         std::string constructed_fen{""};
 
@@ -106,15 +106,34 @@ void UCI::position(std::vector<std::string>& args, Position& pos, PositionStack&
             break;
         }
     }
+    if(index == 0) opp.set_colour(Turn::BLACK); // if we are asked to play and no moves have been played then we are white
+    else if(index == 1) opp.set_colour(Turn::WHITE);
+
     if(index != -1) { // if there is a moves argument
         for(index++; index < static_cast<int>(args.size()); index++) {
             Move move = pos.board_notation_to_move(args[index]);
+
             pos.make_move(move);
             // add game history
             ps.push_back(pos.get_zobrist_key());
         }
+
+        if(is_gambit)
+        { // Adjust opponent skill based on their move
+            if(!evaluated_opp_responses.empty()) // for if opp plays first
+            {
+                Move move_played = pos.board_notation_to_move(args.back());
+                for(int i = 0; i < evaluated_opp_responses.size(); i++)
+                {
+                    if(move_played.equals(evaluated_opp_responses[i].move))
+                    {
+                        opp.update_skill(i, evaluated_opp_responses.size());
+                    }
+                }
+            }
+        }
     }
-    else { return; }
+    //else { return; }
 }
 
 int UCI::options(std::vector<std::string>& args) {

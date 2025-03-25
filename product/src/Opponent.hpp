@@ -24,10 +24,11 @@ enum Tactic {
 class Opponent
 {
     public:
+        Opponent();
         Opponent(Turn colour);
         Opponent(Turn colour, int skill);
 
-        void update_skill(bool found_best_move);
+        void update_skill(int move_ranking, int move_list_size);
 
         int calculate_risk_to_reward(int eval);
 
@@ -55,6 +56,8 @@ class Opponent
         int approach_1(int ABE, int FLE, int SLE);
 
         Turn get_colour() { return colour; }
+        void set_colour(Turn colour) { this->colour = colour; }
+
 
         float get_probability_of_optimal()
         { // Could get elo from Lichess, and use our elo as a baseline for 100%.

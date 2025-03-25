@@ -1,5 +1,7 @@
 #include "Opponent.hpp"
 
+Opponent::Opponent(){} // default constructor
+
 Opponent::Opponent(Turn colour)
 {
     this->colour = colour;
@@ -11,13 +13,17 @@ Opponent::Opponent(Turn colour, int skill)
     this->skill = skill;
 }
 
-void Opponent::update_skill(bool found_best_move)
+void Opponent::update_skill(int move_ranking, int move_list_size)
 {
-    // Average chess game is 40 moves.
-    // We do not want to assume a below 50% chance of finding the best move
-    // Therefore, (100 - 50) / 40 = 1.25. Dealing with floats is not ideal 
-    // So must increase magnitude by 100.
-     skill += found_best_move ? 125 : -125; // times by some weight based on difficulty of finding move
+    int skill_adjustment_weight = 100;
+    // index at move_list_size / 2 is 0. Then adjust accordingly.
+    int middle = move_list_size / 2;
+    
+    // Example: move_list_size = 40
+    // if best move, where index is 0, then skill += skill_adjustment_weight * (20 - 0), which if 100 then increased by 2000.
+    // if worst move, index is 39, then skill += skill_adjustment_weight * (20 - 39), which if 100 then decreased by 1900.
+    // if somewhere near the middle, then minor increase or decrease to score.
+    skill += skill_adjustment_weight * (middle - move_ranking);
 }
 
 int Opponent::calculate_risk_to_reward(int eval)
