@@ -109,28 +109,32 @@ void UCI::position(std::vector<std::string>& args, Position& pos, PositionStack&
     if(index == 0) opp.set_colour(Turn::BLACK); // if we are asked to play and no moves have been played then we are white
     else if(index == 1) opp.set_colour(Turn::WHITE);
 
-    if(index != -1) { // if there is a moves argument
-        for(index++; index < static_cast<int>(args.size()); index++) {
-            Move move = pos.board_notation_to_move(args[index]);
-
-            pos.make_move(move);
-            // add game history
-            ps.push_back(pos.get_zobrist_key());
-        }
-
+    if(index != -1)
+    { // if there is a moves argument
         if(is_gambit)
         { // Adjust opponent skill based on their move
+            
             if(!evaluated_opp_responses.empty()) // for if opp plays first
-            {
+            { // position startpos moves e2e4 e7e5
                 Move move_played = pos.board_notation_to_move(args.back());
                 for(int i = 0; i < evaluated_opp_responses.size(); i++)
                 {
                     if(move_played.equals(evaluated_opp_responses[i].move))
                     {
+                        std::cout << "Old skill: " << opp.get_skill() << std::endl;
                         opp.update_skill(i, evaluated_opp_responses.size());
+                        std::cout << "New skill: " << opp.get_skill() << std::endl;
                     }
                 }
             }
+        }
+        for(index++; index < static_cast<int>(args.size()); index++)
+        {
+            Move move = pos.board_notation_to_move(args[index]);
+
+            pos.make_move(move);
+            // add game history
+            ps.push_back(pos.get_zobrist_key());
         }
     }
     //else { return; }

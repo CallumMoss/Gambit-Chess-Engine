@@ -28,7 +28,7 @@ int Search::iterative_deepening(Position& pos, Timer& timer, Transposition_Table
 
     for(int depth = 1; depth < 256; depth++)
     {
-        if(is_gambit) expectiminimax(depth, 0, pos, timer);
+        if(is_gambit) expectimax(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps);
         else alpha_beta(depth, 0, pos, timer, -INT_MAX, INT_MAX, tt, ps);
         // if score - pos full move or half move number is less than a certain score, should stop search.
 
@@ -134,7 +134,6 @@ int Search::alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alph
 
         ps.push_back(pos.get_zobrist_key()); // adds original position, which in the next call is the next position and checks for draw first
         score = -alpha_beta(depth - 1, ply + 1, new_position, timer, -beta, -alpha, tt, ps);
-        //if(is_gambit) score *= opponent.calculate_likelihood(pos, move, score); // calculating weighted score
         ps.pop_back();
 
         if(score > best_score)
@@ -297,46 +296,156 @@ void order_moves(std::vector<Move>& moves, Move tt_move, Position& pos)
     });
 }
 
-// Some redundant updates of worst score but keeps things simple.
-// Plus if statements would probably be just as slow
-// Sometimes the simplest solution is the best solution
-int Search::expectiminimax(int depth, int ply, Position& pos, Timer& timer)
-{
-    if(depth <= 0) return Evaluation::evaluate(pos);
+// // Some redundant updates of worst score but keeps things simple.
+// // Plus if statements would probably be just as slow
+// // Sometimes the simplest solution is the best solution
+// int old(int depth, int ply, Position& pos, Timer& timer)
+// {
+//     if(depth <= 0) return Evaluation::evaluate(pos);
     
-    std::vector<Move> moves = pos.generate_all_moves(false);
+//     std::vector<Move> moves = pos.generate_all_moves(false);
+//     int best_score = -INT_MAX;
+//     int worst_score = INT_MAX;
+//     int score = -INT_MAX;
+
+//     for(Move move : moves)
+//     {
+//         if(timer.is_out_of_time()) return -INT_MAX; // could return anything as this score wont be used to update root move?
+        
+//         Position new_position = pos;
+//         new_position.make_move(move);
+//         if(!new_position.is_legal(move)) continue; 
+
+//         //if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
+//         score = -old(depth - 1, ply + 1, new_position, timer);
+//         if(score < worst_score) worst_score = score;
+//         if(score > best_score)
+//         {
+//             best_score = score;
+//             if(ply == 0) // will never reach here from opp POV (unless we implement pondering)
+//             {
+//                 root_best_score = score;
+//                 root_best_move = move;
+//                 //if(opponent.should_play(optimal_score, worst_score)) // if we should play our move against our opponent?
+//             }
+//         }
+//     }
+//     // If its the opponents turn
+//     // Best score should be the AB move
+//     if(opponent.get_colour() == pos.get_turn())
+//         return calc_expecti_score(best_score, worst_score);
+//     return best_score;
+// }
+
+int Search::expectimax(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps)
+{
+    // if resulting position after a move is a draw, return draw score instantly
+    if(ply > 0)
+    {
+        if(is_draw(pos, ps)) { return Utils::DRAW_SCORE; }
+    }
+
+    if(depth <= 0)
+    {
+        if(opponent.get_colour() == pos.get_turn())
+            return Evaluation::evaluate(pos);
+        else return quiescence_search(pos, 0, alpha, beta, timer, tt);
+    }
+    
+    Node_Type node_type = Node_Type::UPPER;
+    Move zobrist_move = Utils::NULL_MOVE;
+
+    if(ply > 0 && opponent.get_colour() != pos.get_turn())
+    {
+        // Checking if position is in transposition table
+        // Inspired by https://github.com/TiltedDFA/TDFA/blob/main/src/Search.cpp
+        if(tt.entry_is_in_tt(pos.get_zobrist_key()))
+        {
+            TT_Entry entry = tt.get_entry(pos.get_zobrist_key());
+            zobrist_move = entry.best_move;
+            if(entry.depth >= depth) { // if entry has been evaluated at the current desired depth, then we can just return, otherwise we should continue search
+                if((entry.node_type == Node_Type::EXACT) || (entry.node_type == Node_Type::UPPER && entry.score <= alpha) || (entry.node_type == Node_Type::LOWER && entry.score >= beta)) {
+                    return entry.score; // uses fail soft by returning the score regardless of which condition is true
+                }
+            }
+        }
+    }
+
+    // RFP
+    if (depth <= 6 && !pos.in_check() && ply > 0)
+    {
+        int static_eval = Evaluation::evaluate(pos);
+        if(static_eval - 80 * depth >= beta) return static_eval;   
+    }
+
     int best_score = -INT_MAX;
-    int worst_score = INT_MAX;
     int score = -INT_MAX;
+    int worst_score = INT_MAX;
+    bool has_found_a_legal_move = false;
+    std::vector<Move> moves = pos.generate_all_moves(false);
+    if(opponent.get_colour() != pos.get_turn())
+        order_moves(moves, zobrist_move, pos);
+
+    Move best_move = moves[0];
 
     for(Move move : moves)
     {
-        if(timer.is_out_of_time()) return -INT_MAX; // could return anything as this score wont be used to update root move?
-        
+        if(timer.is_out_of_time())
+        {
+            return best_score; // could return anything as this score wont be used
+        }
+        // reset position
         Position new_position = pos;
         new_position.make_move(move);
-        if(!new_position.is_legal(move)) continue; 
+        if(!new_position.is_legal(move)) continue;
 
-        //if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
-        score = -expectiminimax(depth - 1, ply + 1, new_position, timer);
+        if(!has_found_a_legal_move) { has_found_a_legal_move = true; }
+
+        ps.push_back(pos.get_zobrist_key()); // adds original position, which in the next call is the next position and checks for draw first
+        score = -alpha_beta(depth - 1, ply + 1, new_position, timer, -beta, -alpha, tt, ps);
+        ps.pop_back();
         if(score < worst_score) worst_score = score;
         if(score > best_score)
         {
             best_score = score;
-            if(ply == 0) // will never reach here from opp POV (unless we implement pondering)
+            best_move = move;
+            if(score > alpha && opponent.get_colour() != pos.get_turn()) // if our turn
             {
-                root_best_score = score;
+                node_type = Node_Type::EXACT;
+                alpha = score;
+            }
+            if(ply == 0)
+            { // if we have got the score for the best move at root (the one we will give to UCI to play)
                 root_best_move = move;
-                //if(opponent.should_play(optimal_score, worst_score)) // if we should play our move against our opponent?
+                root_best_score = score;
             }
         }
+        if(score >= beta && opponent.get_colour() != pos.get_turn())
+        {
+            node_type = Node_Type::LOWER;
+            tt.add_entry(pos.get_zobrist_key(), score, move, depth, node_type);
+            break; // fail soft, we exit here to return the correct score based on whether there is a mate or stalemate
+        }
     }
-    // If its the opponents turn
-    // Best score should be the AB move
+
+    if(!has_found_a_legal_move)
+    { // if there are no legal moves at a depth past 1, then 
+        if(pos.in_check())
+        {
+            //forced_flag = Forced_Flag::CHECKMATE;
+            best_score = Utils::MATE_SCORE + ply; // An earlier checkmate is better than a later one
+        }
+        else { best_score = Utils::DRAW_SCORE; } // All draws are the same regardless of when they are
+        if(opponent.get_colour() == pos.get_turn())
+            return calc_expecti_score(best_score, worst_score);
+        return best_score;
+    }
     if(opponent.get_colour() == pos.get_turn())
         return calc_expecti_score(best_score, worst_score);
+    tt.add_entry(pos.get_zobrist_key(), best_score, best_move, depth, node_type);
     return best_score;
 }
+
 
 int Search::calc_expecti_score(int best_score, int worst_score)
 {

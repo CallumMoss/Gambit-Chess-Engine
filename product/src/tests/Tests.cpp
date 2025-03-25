@@ -63,19 +63,50 @@ TEST(Zobrist_Hashing, testing_zobrist)
 
 #include "../RunGambit.hpp"
 
-TEST(Opponent_Modelling, Expectiminimax)
-{  
-  std::vector<std::string> commands =
-  {
-    "isready", "go"
-  };
-  run_gambit(commands);
-}
+// TEST(Opponent_Modelling, Expectiminimax)
+// {  
+//   // std::vector<std::string> commands =
+//   // {
+//   //   "go", "position startpos moves b1c3"
+//   // };
+//   // run_gambit(commands);
+//   Opponent opp;
+//   Position pos;
+//   Move move_played = Move(1, 18, Move_Flag::KNIGHT_FLAG);
+
+//   Position new_pos = pos;
+//   new_pos.make_move(move_played);
+//   std::vector<Move> responses = new_pos.generate_all_moves(false);
+//   std::vector<EvaluatedMove> evaluated_responses;
+//   for(Move move : responses)
+//   {
+//       Position temp_pos = new_pos;
+//       temp_pos.make_move(move);
+//       if(temp_pos.is_legal(move))
+//       {
+//           EvaluatedMove eval_move = EvaluatedMove(move, Evaluation::evaluate(temp_pos));
+//           evaluated_responses.push_back(eval_move);
+//       }
+//   }
+ 
+//   // now sort by eval
+//   std::sort(evaluated_responses.begin(), evaluated_responses.end(), [](const EvaluatedMove& a, const EvaluatedMove& b) {
+//       return a.eval > b.eval; // Higher scores come first
+//   });
+  
+//   for(EvaluatedMove em : evaluated_responses)
+//   {
+//     std::cout << Utils::move_to_board_notation(em.move) << std::endl;
+//     std::cout << em.eval << std::endl;
+//   }
+//   //Move response =  // best response
+// doesnt work because doesnt look into enough depth to get something reasonable so should run main
+// }
 
 int main(int argc, char **argv)
 {
   testing::InitGoogleTest(&argc, argv);
-  // Zobrist z;
-  // Magics::init();
+  Zobrist z;
+  Magics::init();
   return RUN_ALL_TESTS();
 }

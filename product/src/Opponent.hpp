@@ -58,10 +58,14 @@ class Opponent
         Turn get_colour() { return colour; }
         void set_colour(Turn colour) { this->colour = colour; }
 
+        int get_skill() { return skill; }
 
         float get_probability_of_optimal()
         { // Could get elo from Lichess, and use our elo as a baseline for 100%.
-            return (skill / max_skill); // max probability of 1
+            // Ensure skill used in computation is within ranges for calculation
+            int temp_skill = std::min(skill, max_skill);
+            temp_skill = std::max(temp_skill, 0);
+            return (temp_skill / max_skill); // max probability of 1
         }
 
     private:

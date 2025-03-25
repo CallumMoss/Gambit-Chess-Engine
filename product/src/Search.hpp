@@ -25,11 +25,7 @@ class Search {
         int alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps);
         int quiescence_search(Position& pos, int ply, int alpha, int beta, Timer& timer, Transposition_Table& tt);
 
-        int expectiminimax(int depth, int ply, Position& pos, Timer& timer);
-        int expectiminimax_us(int depth, int ply, Position& pos, Timer& timer);
-        int expectiminimax_opp(int depth, int ply, Position& pos, Timer& timer);
-        int expectiminimax2(int depth, int ply, Position& pos, Timer& timer);
-
+        int expectimax(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps);
         int calc_expecti_score(int best_score, int worst_score);
 
         std::vector<EvaluatedMove> get_evaluated_responses(Position& pos);
