@@ -15,6 +15,8 @@ Opponent::Opponent(Turn colour, int skill)
 
 void Opponent::update_skill(int move_ranking, int move_list_size)
 {
+    assert(move_ranking < move_list_size);
+    assert(move_ranking >= 0);
     int skill_adjustment_weight = 100;
     // index at move_list_size / 2 is 0. Then adjust accordingly.
     int middle = move_list_size / 2;

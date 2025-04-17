@@ -121,9 +121,8 @@ void UCI::position(std::vector<std::string>& args, Position& pos, PositionStack&
                 {
                     if(move_played.equals(evaluated_opp_responses[i].move))
                     {
-                        std::cout << "Old skill: " << opp.get_skill() << std::endl;
                         opp.update_skill(i, evaluated_opp_responses.size());
-                        std::cout << "New skill: " << opp.get_skill() << std::endl;
+                        std::cout << "Skill updated to: " << opp.get_skill() << " out of: " << opp.get_max_skill() << std::endl;
                     }
                 }
             }

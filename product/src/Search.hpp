@@ -39,7 +39,7 @@ class Search {
 
         // Getters and Setters
         Move get_root_best_move() { return root_best_move; }
-
+        void set_root_best_move(Move move) { root_best_move = move; }
 
     private:
         Move root_best_move;

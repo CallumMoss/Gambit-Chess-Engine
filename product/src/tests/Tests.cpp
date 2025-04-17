@@ -8,6 +8,7 @@
 #include "../Search.hpp"
 #include "../Opponent.hpp"
 #include "Perft.hpp"
+#include "../RunGambit.hpp"
 
 // Test files:
 #include "fen_parsing_tests.hpp"
@@ -61,47 +62,63 @@ TEST(Zobrist_Hashing, testing_zobrist)
 }
 */
 
-#include "../RunGambit.hpp"
+TEST(Opponent_Modelling, Skill_Updating)
+{
+  // Increase
+  Opponent opp;
+  int move_ranking = 0;
+  int move_list_size = 20;
+  opp.update_skill(move_ranking, move_list_size);
+  std::cout << opp.get_skill() << std::endl;
 
-// TEST(Opponent_Modelling, Expectiminimax)
-// {  
-//   // std::vector<std::string> commands =
-//   // {
-//   //   "go", "position startpos moves b1c3"
-//   // };
-//   // run_gambit(commands);
-//   Opponent opp;
-//   Position pos;
-//   Move move_played = Move(1, 18, Move_Flag::KNIGHT_FLAG);
+  // Decrease
+  opp = Opponent();
+  move_ranking = 19;
+  move_list_size = 20;
+  opp.update_skill(move_ranking, move_list_size);
+  std::cout << opp.get_skill() << std::endl;
+  //assert(opp.get_skill() == (opp.get_max_skill()))
+}
 
-//   Position new_pos = pos;
-//   new_pos.make_move(move_played);
-//   std::vector<Move> responses = new_pos.generate_all_moves(false);
-//   std::vector<EvaluatedMove> evaluated_responses;
-//   for(Move move : responses)
-//   {
-//       Position temp_pos = new_pos;
-//       temp_pos.make_move(move);
-//       if(temp_pos.is_legal(move))
-//       {
-//           EvaluatedMove eval_move = EvaluatedMove(move, Evaluation::evaluate(temp_pos));
-//           evaluated_responses.push_back(eval_move);
-//       }
-//   }
- 
-//   // now sort by eval
-//   std::sort(evaluated_responses.begin(), evaluated_responses.end(), [](const EvaluatedMove& a, const EvaluatedMove& b) {
-//       return a.eval > b.eval; // Higher scores come first
-//   });
+TEST(Opponent_Modelling, Move_Evaluation)
+{ // Testing in a mate in one pos
+
+  // Move that invoked this position that we played
+  Move us_move = Move(9, 0, Move_Flag::BISHOP_FLAG);
+
+  Position pos = Position("4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/1B2R1P1/2Q2RK1 w - - 4 32");
+  // when us move is applied, we reach the mate in 1 position to evaluate
+
+  Opponent opp;
+  Search s = Search(true, opp);
+  s.set_root_best_move(us_move);
+
+  std::vector<EvaluatedMove> responses = s.get_evaluated_responses(pos);
+  for(EvaluatedMove em : responses)
+  {
+    std::cout << Utils::move_to_board_notation(em.move) << " | " << em.eval << std::endl;
+  }
   
-//   for(EvaluatedMove em : evaluated_responses)
-//   {
-//     std::cout << Utils::move_to_board_notation(em.move) << std::endl;
-//     std::cout << em.eval << std::endl;
-//   }
-//   //Move response =  // best response
-// doesnt work because doesnt look into enough depth to get something reasonable so should run main
-// }
+  // // Increase
+  // int move_ranking = 0;
+  // int move_list_size = 20;
+  // opp.update_skill(move_ranking, move_list_size);
+  // std::cout << opp.get_skill() << std::endl;
+
+  // // Decrease
+  // opp = Opponent();
+  // move_ranking = 19;
+  // move_list_size = 20;
+  // opp.update_skill(move_ranking, move_list_size);
+  // std::cout << opp.get_skill() << std::endl;
+  // //assert(opp.get_skill() == (opp.get_max_skill()))
+}
+
+/*
+  instead of finding the opps ranked moves after search which would result in O(2n), where n is the complexity of search
+  we can do it in 0(kn), where k is a constant time operation to perform this extra step.
+  We rank the opponents best moves throughout the search process
+*/
 
 int main(int argc, char **argv)
 {
