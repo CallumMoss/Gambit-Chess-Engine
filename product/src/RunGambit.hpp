@@ -51,6 +51,7 @@ inline void run_gambit(std::vector<std::string> args = {})
                 pos = Position();
                 tt.clear_table();
                 ps.clear();
+                opp = Opponent();
             }
             else if (command == "setoption") {
                 if(args[1] == "Search" || args[1] == "search") { // setoption Search default || setoption Search Default || setoption Search Gambit || setoption Search gambit
