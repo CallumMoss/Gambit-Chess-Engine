@@ -24,8 +24,8 @@ class Search {
         int iterative_deepening(Position& pos, Timer& timer, Transposition_Table& tt, PositionStack& ps, std::vector<EvaluatedMove>& evaluated_opp_responses);
         int alpha_beta(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps);
         int quiescence_search(Position& pos, int ply, int alpha, int beta, Timer& timer, Transposition_Table& tt);
+        int expectimax(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps, std::vector<EvaluatedMove>& );
 
-        int expectimax(int depth, int ply, Position& pos, Timer& timer, int alpha, int beta, Transposition_Table& tt, PositionStack& ps);
         int calc_expecti_score(int best_score, int worst_score);
 
         std::vector<EvaluatedMove> get_evaluated_responses(Position& pos);
@@ -47,6 +47,7 @@ class Search {
         Forced_Flag forced_flag = Forced_Flag::NO_FORCED;
         bool is_gambit = false;
         Opponent& opponent;
+        std::vector<EvaluatedMove> root_opp_responses;
 };
 
 #endif // #ifndef SEARCH_HPP

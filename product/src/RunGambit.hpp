@@ -13,7 +13,7 @@
 
 inline void run_gambit(std::vector<std::string> args = {})
 {
-    std::string version = "v1.20.0";
+    std::string version = "v1.19.1";
 
     Magics::init();
     Zobrist zobrist;

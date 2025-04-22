@@ -1,3 +1,12 @@
+12/04/2025 - 22/04/2025
+Adjusting gambit features for search and improved opponent modelling.
+
+05/04/2025 - 12/04/2025
+Working on final report.
+
+25/03/2025 - 04/04/2025
+Working on other assignments.
+
 24/03/2025
 Went through some convoluted methods for expectiminimax until realising I can simply return
 opponent calc in a copy of AB with a check for if opp turn and if gambit.

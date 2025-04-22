@@ -113,18 +113,20 @@ void UCI::position(std::vector<std::string>& args, Position& pos, PositionStack&
     { // if there is a moves argument
         if(is_gambit)
         { // Adjust opponent skill based on their move
-            
             if(!evaluated_opp_responses.empty()) // for if opp plays first
-            { // position startpos moves e2e4 e7e5
+            {
                 Move move_played = pos.board_notation_to_move(args.back());
                 for(int i = 0; i < evaluated_opp_responses.size(); i++)
                 {
+                    //std::cout << Utils::move_to_board_notation(evaluated_opp_responses[i].move) << std::endl;
                     if(move_played.equals(evaluated_opp_responses[i].move))
                     {
                         opp.update_skill(i, evaluated_opp_responses.size());
-                        std::cout << "Skill updated to: " << opp.get_skill() << " out of: " << opp.get_max_skill() << std::endl;
+                        std::cout << "Skill updated to: " << opp.get_skill() << std::endl;
+                        break;
                     }
                 }
+                evaluated_opp_responses.clear();
             }
         }
         for(index++; index < static_cast<int>(args.size()); index++)

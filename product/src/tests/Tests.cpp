@@ -80,39 +80,39 @@ TEST(Opponent_Modelling, Skill_Updating)
   //assert(opp.get_skill() == (opp.get_max_skill()))
 }
 
-TEST(Opponent_Modelling, Move_Evaluation)
-{ // Testing in a mate in one pos
+// TEST(Opponent_Modelling, Move_Evaluation)
+// { // Testing in a mate in one pos
 
-  // Move that invoked this position that we played
-  Move us_move = Move(9, 0, Move_Flag::BISHOP_FLAG);
+//   // Move that invoked this position that we played
+//   Move us_move = Move(9, 0, Move_Flag::BISHOP_FLAG);
 
-  Position pos = Position("4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/1B2R1P1/2Q2RK1 w - - 4 32");
-  // when us move is applied, we reach the mate in 1 position to evaluate
+//   Position pos = Position("4r2k/1p3rbp/2p1N1p1/p3n3/P2NB1nq/1P6/1B2R1P1/2Q2RK1 w - - 4 32");
+//   // when us move is applied, we reach the mate in 1 position to evaluate
 
-  Opponent opp;
-  Search s = Search(true, opp);
-  s.set_root_best_move(us_move);
+//   Opponent opp;
+//   Search s = Search(true, opp);
+//   s.set_root_best_move(us_move);
 
-  std::vector<EvaluatedMove> responses = s.get_evaluated_responses(pos);
-  for(EvaluatedMove em : responses)
-  {
-    std::cout << Utils::move_to_board_notation(em.move) << " | " << em.eval << std::endl;
-  }
+//   std::vector<EvaluatedMove> responses = s.get_evaluated_responses(pos);
+//   for(EvaluatedMove em : responses)
+//   {
+//     std::cout << Utils::move_to_board_notation(em.move) << " | " << em.eval << std::endl;
+//   }
   
-  // // Increase
-  // int move_ranking = 0;
-  // int move_list_size = 20;
-  // opp.update_skill(move_ranking, move_list_size);
-  // std::cout << opp.get_skill() << std::endl;
+//   // // Increase
+//   // int move_ranking = 0;
+//   // int move_list_size = 20;
+//   // opp.update_skill(move_ranking, move_list_size);
+//   // std::cout << opp.get_skill() << std::endl;
 
-  // // Decrease
-  // opp = Opponent();
-  // move_ranking = 19;
-  // move_list_size = 20;
-  // opp.update_skill(move_ranking, move_list_size);
-  // std::cout << opp.get_skill() << std::endl;
-  // //assert(opp.get_skill() == (opp.get_max_skill()))
-}
+//   // // Decrease
+//   // opp = Opponent();
+//   // move_ranking = 19;
+//   // move_list_size = 20;
+//   // opp.update_skill(move_ranking, move_list_size);
+//   // std::cout << opp.get_skill() << std::endl;
+//   // //assert(opp.get_skill() == (opp.get_max_skill()))
+// }
 
 /*
   instead of finding the opps ranked moves after search which would result in O(2n), where n is the complexity of search
