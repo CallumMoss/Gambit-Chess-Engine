@@ -8,7 +8,7 @@ Gambit is a UCI compliant chess engine which capitalises on human fallibility th
 ## **Usage**  
 
 ### **Terminal Usage**
-Open the "PRODUCT" directory in a terminal and run the following command:
+Open the "PRODUCT/executables" directory in a terminal and run the following command:
 ```bash
 ./Gambit.exe
 ```
