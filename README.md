@@ -3,6 +3,7 @@ This is a chess engine developed as part of a final year project with Royal Holl
 
 Gambit is a UCI compliant chess engine which capitalises on human fallibility through speculative play and opponent modelling.
 
+ Awarded the "Computer Science Prize 2024-25 For Best Final Year Project" at Royal Holloway, University of London.
 ---
 
 ## **Usage**  
